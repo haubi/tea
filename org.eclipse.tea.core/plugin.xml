@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="TaskingEngine"
+         name="Eclipse Tasking Engine Advanced (TEA)"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="org.eclipse.tea.core.internal.TaskingEngineApplication">
+         </run>
+      </application>
+   </extension>
+
+</plugin>

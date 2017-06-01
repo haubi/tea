@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+   <extension
+         id="org.eclipse.tea.core.ui.fragment"
+         point="org.eclipse.e4.workbench.model">
+      <fragment
+            uri="tea.e4xmi">
+      </fragment>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.tea.core.ui.config.TaskingPreferencePage"
+            id="org.eclipse.tea.core.ui.DynamicTeaPreferences"
+            name="Tasking (TEA)">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tea.core.ui.config.TaskingPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         id="HeadlessTaskingEngine"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.tea.core.ui.TaskingEngineExtendedApplication"
+            name="Headless TaskingEngine with Workbench">
+         <property
+               name="presentationURI"
+               value="bundleclass://org.eclipse.tea.core.ui/org.eclipse.tea.core.ui.internal.headless.HeadlessContextPresentationEngine">
+         </property>
+      </product>
+   </extension>
+   <extension
+         id="TaskingEngineExtendedApplication"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            icon="resources/tea.png"
+            thread="main"
+            visible="true">
+         <run
+               class="org.eclipse.tea.core.ui.internal.TaskingEngineExtendedApplication">
+         </run>
+      </application>
+   </extension>
+
+</plugin>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ease.modules">
+      <category
+            id="org.eclipse.tea.ease.teaCategory"
+            name="TEA">
+      </category>
+      <module
+            category="org.eclipse.tea.ease.teaCategory"
+            class="org.eclipse.tea.ease.internal.TeaModule"
+            id="org.eclipse.tea.ease.teaModule"
+            name="Tasking"
+            visible="true">
+      </module>
+   </extension>
+
+</plugin>

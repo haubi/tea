@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.2.0" name="org.eclipse.tea.core.internal.context.TaskingLogLookupContextFunction">
+   <property name="service.context.key" value="org.eclipse.tea.core.services.TaskingLog"/>
+   <service>
+      <provide interface="org.eclipse.e4.core.contexts.IContextFunction"/>
+   </service>
+   <reference bind="addTaskingLog" cardinality="0..n" interface="org.eclipse.tea.core.services.TaskingLog" name="TaskingLog" policy="dynamic" policy-option="greedy" unbind="removeTaskingLog"/>
+   <implementation class="org.eclipse.tea.core.internal.context.TaskingLogLookupContextFunction"/>
+</scr:component>

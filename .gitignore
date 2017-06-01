@@ -1,0 +1,18 @@
+# generic rules only. for specific rules, put them into the plugins!
+
+*/bin/
+*.tm.epoch
+*/tm.out*
+*.xml.html
+*.xml_xmi12.xml
+*.zip_xmi12.xml
+*.xmi12.xml
+*.zip12.xml
+*.xml.zip.bak
+*.ser
+Thumbs.db
+*.swp
+*/tmp/jta.properties
+*/tmp_src/
+*/gen/tmp_src/
+*/.jatlas-settings

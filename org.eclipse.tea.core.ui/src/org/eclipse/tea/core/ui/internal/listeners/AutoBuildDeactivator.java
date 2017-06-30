@@ -127,14 +127,16 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 					ElementTree t = (ElementTree) getTree.invoke(builder);
 					getTree.setAccessible(false);
 
-					Field stampField = ElementTree.class.getDeclaredField("treeStamp");
-					stampField.setAccessible(true);
-					int stamp = (int) stampField.get(t);
-					stampField.setAccessible(false);
+					if (t != null) {
+						Field stampField = ElementTree.class.getDeclaredField("treeStamp");
+						stampField.setAccessible(true);
+						int stamp = (int) stampField.get(t);
+						stampField.setAccessible(false);
 
-					if (stamp > highestStamp) {
-						highestStamp = stamp;
-						currentTree = t;
+						if (stamp > highestStamp) {
+							highestStamp = stamp;
+							currentTree = t;
+						}
 					}
 				}
 			} catch (Exception e) {

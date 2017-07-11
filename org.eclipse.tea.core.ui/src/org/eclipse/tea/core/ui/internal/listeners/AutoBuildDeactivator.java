@@ -99,7 +99,7 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 		}
 
 		getWorkspace().getWorkManager().endUnprotected(unprotectedDepth);
-		getWorkspace().endOperation(null, false, null);
+		getWorkspace().endOperation(null, false);
 	}
 
 	/**

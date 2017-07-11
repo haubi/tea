@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.tea.core.ui.config;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,17 +20,21 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -115,12 +121,14 @@ public class TaskingPreferencePage extends FieldEditorPreferencePage implements 
 			Composite wrapper = new Composite(s, SWT.NONE);
 			GridLayoutFactory.swtDefaults().extendedMargins(15, 0, 0, 0).applyTo(wrapper);
 			s.setClient(wrapper);
+			s.setBackground(scrolled.getBackground());
 
 			Composite c = new Composite(wrapper, SWT.NONE);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(c);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(c);
 
 			allFieldEditorParents.add(c);
+			List<FieldEditor> editorsPerSection = new ArrayList<>();
 
 			for (Field f : ext.getClass().getDeclaredFields()) {
 				TaskingConfigProperty config = f.getAnnotation(TaskingConfigProperty.class);
@@ -139,20 +147,38 @@ public class TaskingPreferencePage extends FieldEditorPreferencePage implements 
 					GridData d = (GridData) t.getLayoutData();
 					d.widthHint = 30; // prevent text fields with a lot of text
 										// from exploding the layout
-					addField(editor);
+					add(editor, editorsPerSection);
 				} else if (f.getType().equals(Long.class) || f.getType().equals(long.class)) {
-					addField(new IntegerFieldEditor(propertyName, config.description(), c));
+					add(new IntegerFieldEditor(propertyName, config.description(), c), editorsPerSection);
 				} else if (f.getType().equals(Boolean.class) || f.getType().equals(boolean.class)) {
-					addField(new BooleanFieldEditor(propertyName, config.description(), c));
+					add(new BooleanFieldEditor(propertyName, config.description(), c), editorsPerSection);
 				} else if (Enum.class.isAssignableFrom(f.getType())) {
 					List<?> enumConstants = Arrays.asList(f.getType().getEnumConstants());
 					String[][] entryNamesAndValues = getEntryNamesAndValues(enumConstants);
-					addField(new ComboFieldEditor(propertyName, config.description(), entryNamesAndValues, c));
+					add(new ComboFieldEditor(propertyName, config.description(), entryNamesAndValues, c),
+							editorsPerSection);
 				}
 
 			}
+
+			Button defPerSection = new Button(wrapper, SWT.PUSH);
+			defPerSection.setText(JFaceResources.getString("defaults"));
+			Dialog.applyDialogFont(defPerSection);
+			GridDataFactory.fillDefaults().align(SWT.RIGHT, SWT.CENTER).applyTo(defPerSection);
+			defPerSection.addSelectionListener(widgetSelectedAdapter(e -> {
+				for (FieldEditor editor : editorsPerSection) {
+					editor.loadDefault();
+				}
+				checkState();
+				updateApplyButton();
+			}));
 		}
 		scrolled.setMinSize(configComp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	}
+
+	private void add(FieldEditor editor, List<FieldEditor> perSection) {
+		perSection.add(editor);
+		addField(editor);
 	}
 
 	private String[][] getEntryNamesAndValues(List<?> enumConstants) {

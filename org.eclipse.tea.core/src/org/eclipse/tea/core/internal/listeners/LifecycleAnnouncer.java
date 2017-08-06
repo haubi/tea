@@ -91,7 +91,7 @@ public class LifecycleAnnouncer implements TaskingLifeCycleListener {
 		measureMemoryUsage(log, config);
 		log.info(header(config, readableStatus(taskStatus) + " " + TaskingModel.getTaskName(task)));
 
-		if (taskStatus.getException() != null) {
+		if (taskStatus.getException() != null && taskStatus.getSeverity() != IStatus.CANCEL) {
 			log.error("Error while executing task", taskStatus.getException());
 		}
 	}

@@ -19,13 +19,14 @@ import org.eclipse.tea.core.annotations.TaskChainContextInit;
 import org.eclipse.tea.core.annotations.TaskChainMenuEntry;
 import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskChain.TaskChainId;
+import org.eclipse.tea.samples.menu.SampleMenuDecoration;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.osgi.service.component.annotations.Component;
 
-@TaskChainId(description = "Another Sample", alias = "Something", retries = 2)
-@TaskChainMenuEntry(path = "Samples")
+@TaskChainId(description = "Status Test Chain", retries = 2)
+@TaskChainMenuEntry(path = SampleMenuDecoration.SAMPLE_MENU)
 @Component
-public class AnotherSampleTaskChain implements TaskChain {
+public class SampleStatusTaskChain implements TaskChain {
 
 	@TaskChainContextInit
 	protected void init(TaskExecutionContext context, TaskingLog log) {

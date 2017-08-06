@@ -8,19 +8,18 @@
  *  Contributors:
  *      SSI Schaefer IT Solutions GmbH
  *******************************************************************************/
-package org.eclipse.tea.samples.taskchain;
+package org.eclipse.tea.samples.menu;
 
-import org.eclipse.tea.core.TaskExecutionContext;
-import org.eclipse.tea.core.annotations.TaskChainContextInit;
-import org.eclipse.tea.core.services.TaskChain;
+import org.eclipse.tea.core.services.TaskingMenuDecoration;
+import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 
-@Component
-public class SomeHiddenTaskChain implements TaskChain {
+@Component(service = TaskingMenuDecoration.class)
+public class SampleMenuDecoration implements TaskingMenuDecoration {
 
-	@TaskChainContextInit
-	public void init(TaskExecutionContext context) {
-		context.addTask(DemoTaskInheritance.class);
-	}
+	public static final String SAMPLE_MENU = "Samples";
+	
+	@TaskingMenuPathDecoration(menuPath = SAMPLE_MENU)
+	public static final String SAMPLE_ICON = "resources/sample.gif";
 
 }

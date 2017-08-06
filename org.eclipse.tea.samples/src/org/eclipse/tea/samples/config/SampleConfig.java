@@ -16,12 +16,12 @@ import org.osgi.service.component.annotations.Component;
 
 @TaskingConfig(description = "Sample Configuration")
 @Component(service = TaskingConfigurationExtension.class)
-public class SampleConfigContributor implements TaskingConfigurationExtension {
+public class SampleConfig implements TaskingConfigurationExtension {
 
-	@TaskingConfigProperty(description = "Something", headlessOnly = true)
+	@TaskingConfigProperty(description = "Sample String", headlessOnly = true)
 	public String myProperty;
 
-	@TaskingConfigProperty(description = "Something Strange")
+	@TaskingConfigProperty(description = "Sample Boolean")
 	public Boolean myBoolean = true;
 
 }

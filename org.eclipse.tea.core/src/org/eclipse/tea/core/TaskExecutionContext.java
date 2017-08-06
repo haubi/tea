@@ -23,10 +23,12 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.tea.core.annotations.TaskChainContextInit;
@@ -268,6 +270,11 @@ public class TaskExecutionContext {
 
 			// and run the task
 			ContextInjectionFactory.invoke(task, Execute.class, taskCtx);
+		} catch (InjectionException ie) {
+			if(ie.getCause() instanceof OperationCanceledException) {
+				OperationCanceledException oce = (OperationCanceledException) ie.getCause();
+				taskCtx.set(IStatus.class, new Status(IStatus.CANCEL, TaskingEngineActivator.PLUGIN_ID, "Cancelled: " + TaskingModel.getTaskName(task), oce));
+			}
 		} catch (Throwable t) {
 			taskCtx.set(IStatus.class, new Status(IStatus.ERROR, TaskingEngineActivator.PLUGIN_ID,
 					"Fatal failure while executing " + TaskingModel.getTaskName(task), t));

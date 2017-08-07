@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.tea.core.internal;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.tea.core.services.TaskProgressTracker;
 
@@ -17,17 +18,46 @@ import org.eclipse.tea.core.services.TaskProgressTracker;
  * {@link SubMonitor} based implementation of the {@link TaskProgressTracker}
  * interface.
  */
-public class TaskProgressTrackerImpl implements TaskProgressTracker {
+public class TaskProgressTrackerImpl implements TaskProgressExtendedTracker {
 
 	private final SubMonitor monitor;
+	private final ListenerList<ProgressListener> listeners = new ListenerList<>();
 
-	public TaskProgressTrackerImpl(SubMonitor monitor) {
+	private int currentValue;
+	private Object task;
+
+	public TaskProgressTrackerImpl(Object task, SubMonitor monitor) {
 		this.monitor = monitor;
+		this.task = task;
+	}
+	
+	@Override
+	public Object getTask() {
+		return task;
 	}
 
 	@Override
 	public void worked(int amount) {
+		currentValue += amount;
 		monitor.worked(amount);
+
+		notifyListeners();
+	}
+
+	@Override
+	public void addListener(ProgressListener listener) {
+		listeners.add(listener);
+	}
+
+	@Override
+	public void removeListener(ProgressListener listener) {
+		listeners.remove(listener);
+	}
+
+	private void notifyListeners() {
+		for (ProgressListener l : listeners) {
+			l.progressChanged(currentValue);
+		}
 	}
 
 	@Override
@@ -41,9 +71,9 @@ public class TaskProgressTrackerImpl implements TaskProgressTracker {
 	}
 
 	/**
-	 * Allows to make a progress tracker "restricted", which means that it is
-	 * not allowed to programmatically update the worked amount. It is allowed
-	 * to set the current task name and to check for cancellation though.
+	 * Allows to make a progress tracker "restricted", which means that it is not
+	 * allowed to programmatically update the worked amount. It is allowed to set
+	 * the current task name and to check for cancellation though.
 	 */
 	public static class RestrictedProgressTrackerImpl implements TaskProgressTracker {
 

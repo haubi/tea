@@ -41,6 +41,7 @@ import org.eclipse.tea.core.annotations.lifecycle.FinishTask;
 import org.eclipse.tea.core.annotations.lifecycle.FinishTaskChain;
 import org.eclipse.tea.core.internal.OutputRedirector;
 import org.eclipse.tea.core.internal.TaskProgressEstimationService;
+import org.eclipse.tea.core.internal.TaskProgressExtendedTracker;
 import org.eclipse.tea.core.internal.TaskProgressTrackerImpl;
 import org.eclipse.tea.core.internal.TaskingEngineActivator;
 import org.eclipse.tea.core.internal.model.TaskingModel;
@@ -56,8 +57,6 @@ import org.eclipse.tea.core.services.TaskingLog;
  * Controls the execution of a {@link TaskChain}.
  */
 public class TaskExecutionContext {
-
-	private static final String TASK_WORK_AMOUNT = "TASK_WORK_AMOUNT";
 
 	private final TaskChain chain;
 	private final IEclipseContext context;
@@ -164,10 +163,11 @@ public class TaskExecutionContext {
 		context.set(MultiStatus.class, status);
 		context.activate();
 
-		notifyAll(BeginTaskChain.class, context);
-
 		Map<Object, IEclipseContext> taskContexts = new LinkedHashMap<>();
 		int totalAmount = prepareTaskProgressTracking(log, progressService, taskContexts);
+		context.set(TaskingInjectionHelper.CTX_TASK_CONTEXTS, taskContexts);
+		
+		notifyAll(BeginTaskChain.class, context);
 
 		SubMonitor rootMonitor = SubMonitor.convert(monitor, "Executing " + TaskingModel.getTaskChainName(chain),
 				totalAmount);
@@ -178,7 +178,7 @@ public class TaskExecutionContext {
 				Object task = ctx.getKey();
 				IEclipseContext taskCtx = ctx.getValue();
 
-				Integer amount = (Integer) taskCtx.get(TASK_WORK_AMOUNT);
+				Integer amount = (Integer) taskCtx.get(TaskingInjectionHelper.CTX_TASK_WORK_AMOUNT);
 
 				// setup dedicated progress monitor, based on previous work
 				// amount calculation
@@ -186,9 +186,10 @@ public class TaskExecutionContext {
 				taskMonitor.beginTask("Execute Task", amount);
 				taskMonitor.subTask(TaskingModel.getTaskName(task));
 
+				TaskProgressTracker tracker = new TaskProgressTrackerImpl(task, taskMonitor);
+				taskCtx.set(TaskProgressExtendedTracker.class, (TaskProgressExtendedTracker)tracker);
+				
 				notifyAll(BeginTask.class, taskCtx);
-
-				TaskProgressTracker tracker = new TaskProgressTrackerImpl(taskMonitor);
 
 				// handle estimation request of tasks
 				// (TaskProgressEstimated)
@@ -340,7 +341,7 @@ public class TaskExecutionContext {
 		Integer amount = getTaskWorkAmount(log, o, progressService);
 
 		IEclipseContext taskContext = context.createChild(o.getClass().getName());
-		taskContext.set(TASK_WORK_AMOUNT, amount);
+		taskContext.set(TaskingInjectionHelper.CTX_TASK_WORK_AMOUNT, amount);
 		taskContext.set(TaskingInjectionHelper.CTX_TASK, o);
 
 		taskContexts.put(o, taskContext);

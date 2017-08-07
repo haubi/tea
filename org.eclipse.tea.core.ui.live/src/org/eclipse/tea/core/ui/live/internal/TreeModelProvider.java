@@ -1,0 +1,40 @@
+package org.eclipse.tea.core.ui.live.internal;
+
+import java.util.List;
+
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.tea.core.ui.live.internal.model.VisualizationRootNode;
+import org.eclipse.tea.core.ui.live.internal.model.VisualizationTaskNode;
+
+public class TreeModelProvider implements ITreeContentProvider {
+
+	@Override
+	public Object[] getElements(Object inputElement) {
+		if (inputElement instanceof List<?>) {
+			return ((List<?>) inputElement).toArray();
+		}
+		return null;
+	}
+
+	@Override
+	public Object[] getChildren(Object parentElement) {
+		if (parentElement instanceof VisualizationRootNode) {
+			return ((VisualizationRootNode) parentElement).getNodes().toArray();
+		} else if (parentElement instanceof VisualizationTaskNode) {
+			return ((VisualizationTaskNode) parentElement).getStatusNodes().toArray();
+		}
+		return null;
+	}
+
+	@Override
+	public Object getParent(Object element) {
+		return null;
+	}
+
+	@Override
+	public boolean hasChildren(Object element) {
+		return element instanceof VisualizationRootNode || (element instanceof VisualizationTaskNode
+				&& !((VisualizationTaskNode) element).getStatusNodes().isEmpty());
+	}
+
+}

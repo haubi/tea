@@ -47,5 +47,12 @@
          </run>
       </application>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.eclipse.tea.core.ui.TaskingCategory"
+            name="Tasking (TEA)">
+      </category>
+   </extension>
 
 </plugin>

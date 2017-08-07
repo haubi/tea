@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <e4view
+            category="org.eclipse.tea.core.ui.TaskingCategory"
+            class="org.eclipse.tea.core.ui.live.internal.TaskingLiveView"
+            icon="resources/tea.png"
+            id="org.eclipse.tea.core.ui.live.TaskingLiveView"
+            name="Tasking Live View"
+            restorable="true">
+      </e4view>
+   </extension>
+
+</plugin>

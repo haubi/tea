@@ -28,7 +28,7 @@ Export-Package: org.eclipse.tea.core.ui;
    org.eclipse.tea.core.services,
    org.eclipse.core.runtime.preferences,
    org.eclipse.tea.core.internal",
- org.eclipse.tea.core.ui.internal.listeners;x-internal:=true,
+ org.eclipse.tea.core.ui.internal.listeners;x-friends:="org.eclipse.tea.core.ui.live",
  org.eclipse.tea.core.ui.internal.menu;x-internal:=true
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tea.core,

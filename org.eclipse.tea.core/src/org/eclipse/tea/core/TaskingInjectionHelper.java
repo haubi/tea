@@ -32,6 +32,8 @@ public class TaskingInjectionHelper {
 	public static final String CTX_OUTPUT = TaskingEngineActivator.PLUGIN_ID + ".output";
 	public static final String CTX_TASK = TaskingEngineActivator.PLUGIN_ID + ".task";
 	public static final String CTX_PREPARED_TASKS = TaskingEngineActivator.PLUGIN_ID + ".prepared_tasks";
+	public static final String CTX_TASK_CONTEXTS = TaskingEngineActivator.PLUGIN_ID + ".prepared_task_contexts";
+	public static final String CTX_TASK_WORK_AMOUNT = TaskingEngineActivator.PLUGIN_ID + ".task_work";
 
 	/**
 	 * @return the root context, which is the context for the TEA core bundle

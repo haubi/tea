@@ -15,15 +15,12 @@ import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.tea.core.TaskExecutionContext;
-import org.eclipse.tea.core.TaskingInjectionHelper;
 import org.eclipse.tea.core.annotations.lifecycle.BeginTask;
 import org.eclipse.tea.core.annotations.lifecycle.BeginTaskChain;
 import org.eclipse.tea.core.annotations.lifecycle.CreateContext;
 import org.eclipse.tea.core.annotations.lifecycle.DisposeContext;
 import org.eclipse.tea.core.annotations.lifecycle.FinishTask;
 import org.eclipse.tea.core.annotations.lifecycle.FinishTaskChain;
-import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskingLifeCycleListener;
 import org.eclipse.tea.core.ui.internal.context.E4WorkbenchContextFunction;
 import org.osgi.service.component.annotations.Component;
@@ -31,49 +28,51 @@ import org.osgi.service.component.annotations.Component;
 @Component
 public class EventBrokerBridge implements TaskingLifeCycleListener {
 
-	public static final String EVENT_CTX_CREATE = "org/eclipse/tea/CreateContext";
-	public static final String EVENT_CTX_DISPOSE = "org/eclipse/tea/DisposeContext";
+	public static final String EVENT_TOPIC_BASE = "org/eclipse/tea/";
 
-	public static final String EVENT_CHAIN_BEGIN = "org/eclipse/tea/BeginTaskChain";
-	public static final String EVENT_CHAIN_FINISH = "org/eclipse/tea/FinishTaskChain";
+	public static final String EVENT_CTX_CREATE = EVENT_TOPIC_BASE + "CreateContext";
+	public static final String EVENT_CTX_DISPOSE = EVENT_TOPIC_BASE + "DisposeContext";
 
-	public static final String EVENT_TASK_BEGIN = "org/eclipse/tea/BeginTask";
-	public static final String EVENT_TASK_FINISH = "org/eclipse/tea/FinishTask";
+	public static final String EVENT_CHAIN_BEGIN = EVENT_TOPIC_BASE + "BeginTaskChain";
+	public static final String EVENT_CHAIN_FINISH = EVENT_TOPIC_BASE + "FinishTaskChain";
+
+	public static final String EVENT_TASK_BEGIN = EVENT_TOPIC_BASE + "BeginTask";
+	public static final String EVENT_TASK_FINISH = EVENT_TOPIC_BASE + "FinishTask";
 
 	@CreateContext
 	public void ctxCreate(@Optional @Named(E4WorkbenchContextFunction.E4_CONTEXT_ID) IEclipseContext ctx,
-			TaskExecutionContext created) {
-		broadcast(ctx, EVENT_CTX_CREATE, created);
+			IEclipseContext context) {
+		broadcast(ctx, EVENT_CTX_CREATE, context);
 	}
 
 	@DisposeContext
 	public void ctxDispose(@Optional @Named(E4WorkbenchContextFunction.E4_CONTEXT_ID) IEclipseContext ctx,
-			TaskExecutionContext disposed) {
-		broadcast(ctx, EVENT_CTX_DISPOSE, disposed);
+			IEclipseContext context) {
+		broadcast(ctx, EVENT_CTX_DISPOSE, context);
 	}
 
 	@BeginTaskChain
 	public void chainBegin(@Optional @Named(E4WorkbenchContextFunction.E4_CONTEXT_ID) IEclipseContext ctx,
-			TaskChain chain) {
-		broadcast(ctx, EVENT_CHAIN_BEGIN, chain);
+			IEclipseContext context) {
+		broadcast(ctx, EVENT_CHAIN_BEGIN, context);
 	}
 
 	@FinishTaskChain
 	public void chainFinish(@Optional @Named(E4WorkbenchContextFunction.E4_CONTEXT_ID) IEclipseContext ctx,
-			TaskChain chain) {
-		broadcast(ctx, EVENT_CHAIN_FINISH, chain);
+			IEclipseContext context) {
+		broadcast(ctx, EVENT_CHAIN_FINISH, context);
 	}
 
 	@BeginTask
 	public void taskBegin(@Optional @Named(E4WorkbenchContextFunction.E4_CONTEXT_ID) IEclipseContext ctx,
-			@Named(TaskingInjectionHelper.CTX_TASK) Object task) {
-		broadcast(ctx, EVENT_TASK_BEGIN, task);
+			IEclipseContext context) {
+		broadcast(ctx, EVENT_TASK_BEGIN, context);
 	}
 
 	@FinishTask
 	public void taskFinish(@Optional @Named(E4WorkbenchContextFunction.E4_CONTEXT_ID) IEclipseContext ctx,
-			@Named(TaskingInjectionHelper.CTX_TASK) Object task) {
-		broadcast(ctx, EVENT_TASK_FINISH, task);
+			IEclipseContext context) {
+		broadcast(ctx, EVENT_TASK_FINISH, context);
 	}
 
 	private void broadcast(IEclipseContext e4ctx, String event, Object data) {

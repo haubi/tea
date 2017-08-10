@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -16,6 +17,9 @@ import org.eclipse.tea.core.ui.live.internal.model.VisualizationNode;
 import org.eclipse.tea.core.ui.live.internal.model.VisualizationTaskNode;
 
 public class TreeProgressRenderer extends OwnerDrawLabelProvider {
+
+	private static final Image IMG_WAIT = Activator
+			.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "resources/waiting.png").createImage();
 
 	@Override
 	protected void measure(Event event, Object element) {
@@ -38,14 +42,28 @@ public class TreeProgressRenderer extends OwnerDrawLabelProvider {
 		Rectangle bounds = ((TreeItem) event.item).getBounds(event.index);
 
 		if (!node.isDone()) {
-			drawProgress(event, percentage, gc, bounds, 100);
-			drawPercentageText(event, percentage, gc, bounds);
+			if (node.getCurrentProgress() == 0 && !node.isActive()) {
+				drawImage(event, bounds, IMG_WAIT);
+			} else {
+				drawProgress(event, percentage, gc, bounds, 100);
+				drawPercentageText(event, percentage, gc, bounds);
+			}
 		} else if (!(node instanceof VisualizationTaskNode && ((VisualizationTaskNode) node).isSkipped())) {
 			drawProgress(event, percentage, gc, bounds, 20);
+
+			Image image = TreeLabelColumnProvider.getStatusImage(node.getStatus().getSeverity());
+			drawImage(event, bounds, image);
 		}
 
 		gc.setForeground(background);
 		gc.setBackground(foreground);
+	}
+
+	private void drawImage(Event event, Rectangle bounds, Image image) {
+		Rectangle rect2 = image.getBounds();
+		int xOff = Math.max(0, (bounds.width - rect2.width) / 2);
+		int yOff = Math.max(0, (bounds.height - rect2.height) / 2);
+		event.gc.drawImage(image, event.x + xOff, event.y + yOff);
 	}
 
 	private void drawProgress(Event event, int percentage, GC gc, Rectangle bounds, int alpha) {

@@ -59,12 +59,12 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 
 		TreeViewerColumn name = new TreeViewerColumn(tree, SWT.LEFT);
 		name.getColumn().setText("Task");
-		name.getColumn().setWidth(350);
+		name.getColumn().setWidth(300);
 		name.setLabelProvider(new TreeLabelColumnProvider());
 
 		TreeViewerColumn duration = new TreeViewerColumn(tree, SWT.LEFT);
 		duration.getColumn().setText("Duration");
-		duration.getColumn().setWidth(100);
+		duration.getColumn().setWidth(80);
 		duration.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -189,6 +189,15 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 		}
 
 		refresh();
+
+		switch (event.getTopic()) {
+		case EventBrokerBridge.EVENT_CHAIN_BEGIN:
+		case EventBrokerBridge.EVENT_CHAIN_FINISH:
+			tree.getControl().getDisplay().asyncExec(() -> {
+				tree.collapseAll();
+				tree.setExpandedElements(nodes.stream().filter(e -> e.isActive()).toArray());
+			});
+		}
 	}
 
 	@Override

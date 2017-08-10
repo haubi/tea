@@ -1,6 +1,6 @@
 package org.eclipse.tea.core.ui.live.internal;
 
-import java.util.List;
+import java.util.Deque;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.tea.core.ui.live.internal.model.VisualizationRootNode;
@@ -10,8 +10,8 @@ public class TreeModelProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getElements(Object inputElement) {
-		if (inputElement instanceof List<?>) {
-			return ((List<?>) inputElement).toArray();
+		if (inputElement instanceof Deque<?>) {
+			return ((Deque<?>) inputElement).toArray();
 		}
 		return null;
 	}

@@ -19,8 +19,8 @@ import org.eclipse.tea.core.annotations.TaskChainContextInit;
 import org.eclipse.tea.core.annotations.TaskChainMenuEntry;
 import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskChain.TaskChainId;
-import org.eclipse.tea.samples.menu.SampleMenuDecoration;
 import org.eclipse.tea.core.services.TaskingLog;
+import org.eclipse.tea.samples.menu.SampleMenuDecoration;
 import org.osgi.service.component.annotations.Component;
 
 @TaskChainId(description = "Status Test Chain", retries = 2)
@@ -33,11 +33,11 @@ public class SampleStatusTaskChain implements TaskChain {
 		log.debug("creating task chain");
 
 		context.addTask(new MyTask(Status.OK_STATUS));
-		context.addTask(new MyTask(Status.CANCEL_STATUS));
 		context.addTask(new MyTask(new Status(IStatus.WARNING, "ID", "Some warning happened!")));
 		context.addTask(new MyTask(new Status(IStatus.ERROR, "ID", "Some ERROR happened!")));
 		context.addTask(new MyTask(null));
 		context.addTask(new MyTask(new Status(IStatus.ERROR, "ID", "Some ERROR happened!")));
+		context.addTask(new MyTask(Status.CANCEL_STATUS));
 	}
 
 	public final static class MyTask {

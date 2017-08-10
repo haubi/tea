@@ -14,7 +14,15 @@ public class VisualizationStatusNode {
 	}
 
 	public String getLabel() {
-		return status.getMessage();
+		String message = status.getMessage();
+		if (status.getException() != null) {
+			return message + " (" + status.getException() + ")";
+		}
+		if (message == null || message.isEmpty()) {
+			return status.toString(); // aehm. prevent empty string (e.g.
+										// Status.CANCEL_STATUS).
+		}
+		return message;
 	}
 
 	public int getServerity() {

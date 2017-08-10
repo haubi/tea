@@ -61,12 +61,13 @@ public class VisualizationTaskNode implements VisualizationNode, ProgressListene
 			statusNodes.add(new VisualizationStatusNode(status));
 		}
 
-		this.currentProgress = 100;
+		this.currentProgress = maxProgress;
 	}
 
 	public void skip() {
 		duration = 0;
 		skipped = true;
+		status = Status.CANCEL_STATUS;
 	}
 
 	public boolean isSkipped() {
@@ -84,7 +85,7 @@ public class VisualizationTaskNode implements VisualizationNode, ProgressListene
 
 	@Override
 	public int getTotalProgress() {
-		return 100; // always map to 100% to avoid too many update events
+		return maxProgress;
 	}
 
 	@Override
@@ -94,13 +95,11 @@ public class VisualizationTaskNode implements VisualizationNode, ProgressListene
 
 	@Override
 	public void progressChanged(int currentProgress) {
-		int perc = (currentProgress * 100) / maxProgress;
-		if (this.currentProgress == perc) {
+		if (this.currentProgress == currentProgress) {
 			return; // inhibit events.
 		}
 
-		this.currentProgress = perc;
-
+		this.currentProgress = currentProgress;
 		this.refreshable.refresh();
 	}
 

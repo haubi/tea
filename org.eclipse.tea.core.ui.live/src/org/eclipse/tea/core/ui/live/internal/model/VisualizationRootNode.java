@@ -22,11 +22,11 @@ import org.eclipse.tea.core.ui.live.internal.Activator;
 
 public class VisualizationRootNode implements VisualizationNode {
 
-	private final String name;
+	private String name;
 	private final List<VisualizationTaskNode> nodes = new ArrayList<>();
 	private final TaskChain chain;
 	private boolean active = true;
-	private final TaskExecutionContext tec;
+	private TaskExecutionContext tec;
 
 	@Inject
 	public VisualizationRootNode(TaskExecutionContext tec, TaskChain chain,
@@ -111,6 +111,12 @@ public class VisualizationRootNode implements VisualizationNode {
 	@Override
 	public boolean isDone() {
 		return !active;
+	}
+
+	public void prepareRetry() {
+		tec = null; // prevent this node from being found
+		active = false; // no matter if it completed.
+		name = name + " (retrying)"; // mark for user.
 	}
 
 }

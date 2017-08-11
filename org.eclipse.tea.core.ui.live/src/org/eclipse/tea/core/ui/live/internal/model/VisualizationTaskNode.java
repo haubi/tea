@@ -58,7 +58,13 @@ public class VisualizationTaskNode implements VisualizationNode, ProgressListene
 		duration = states.getDuration(ctx, task);
 
 		if (status.getSeverity() > IStatus.OK) {
-			statusNodes.add(new VisualizationStatusNode(status));
+			if (status.isMultiStatus()) {
+				for (IStatus s : status.getChildren()) {
+					statusNodes.add(new VisualizationStatusNode(s));
+				}
+			} else {
+				statusNodes.add(new VisualizationStatusNode(status));
+			}
 		}
 
 		this.currentProgress = maxProgress;

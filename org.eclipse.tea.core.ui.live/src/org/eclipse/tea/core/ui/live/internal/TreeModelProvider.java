@@ -4,6 +4,7 @@ import java.util.Deque;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.tea.core.ui.live.internal.model.VisualizationRootNode;
+import org.eclipse.tea.core.ui.live.internal.model.VisualizationStatusNode;
 import org.eclipse.tea.core.ui.live.internal.model.VisualizationTaskNode;
 
 public class TreeModelProvider implements ITreeContentProvider {
@@ -22,6 +23,8 @@ public class TreeModelProvider implements ITreeContentProvider {
 			return ((VisualizationRootNode) parentElement).getNodes().toArray();
 		} else if (parentElement instanceof VisualizationTaskNode) {
 			return ((VisualizationTaskNode) parentElement).getStatusNodes().toArray();
+		} else if (parentElement instanceof VisualizationStatusNode) {
+			return ((VisualizationStatusNode) parentElement).getChildren().toArray();
 		}
 		return null;
 	}
@@ -33,8 +36,10 @@ public class TreeModelProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(Object element) {
-		return element instanceof VisualizationRootNode || (element instanceof VisualizationTaskNode
-				&& !((VisualizationTaskNode) element).getStatusNodes().isEmpty());
+		return element instanceof VisualizationRootNode || ((element instanceof VisualizationTaskNode
+				&& !((VisualizationTaskNode) element).getStatusNodes().isEmpty())
+				|| ((element instanceof VisualizationStatusNode)
+						&& !((VisualizationStatusNode) element).getChildren().isEmpty()));
 	}
 
 }

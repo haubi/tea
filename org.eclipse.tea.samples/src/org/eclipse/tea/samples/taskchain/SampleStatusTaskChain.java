@@ -12,7 +12,6 @@ package org.eclipse.tea.samples.taskchain;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.tea.core.TaskExecutionContext;
 import org.eclipse.tea.core.annotations.TaskChainContextInit;
@@ -49,7 +48,7 @@ public class SampleStatusTaskChain implements TaskChain {
 		}
 
 		@Execute
-		public void doIt(IEclipseContext ctx, TaskingLog log) throws Exception {
+		public IStatus doIt(TaskingLog log) throws Exception {
 			log.warn("I'm here: " + status);
 			Thread.sleep(500);
 
@@ -57,7 +56,7 @@ public class SampleStatusTaskChain implements TaskChain {
 				throw new NullPointerException("woah..");
 			}
 
-			ctx.set(IStatus.class, status);
+			return status;
 		}
 
 		@Override

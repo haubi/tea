@@ -2,9 +2,12 @@
 package org.eclipse.tea.core.ui.live.internal;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -21,10 +24,14 @@ import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.services.EMenuService;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tea.core.TaskExecutionContext;
 import org.eclipse.tea.core.TaskingEngine;
@@ -37,9 +44,12 @@ import org.eclipse.tea.core.ui.config.TaskingEclipsePreferenceStore;
 import org.eclipse.tea.core.ui.internal.listeners.EventBrokerBridge;
 import org.eclipse.tea.core.ui.live.internal.model.VisualizationNode;
 import org.eclipse.tea.core.ui.live.internal.model.VisualizationRootNode;
+import org.eclipse.tea.core.ui.live.internal.model.VisualizationStatusNode;
 import org.eclipse.tea.core.ui.live.internal.model.VisualizationTaskNode;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
+
+import com.google.common.base.Joiner;
 
 public class TaskingLiveView implements Refreshable, EventHandler {
 
@@ -48,6 +58,7 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 
 	private TreeViewer tree;
 	private final Deque<VisualizationRootNode> nodes = new ArrayDeque<>();
+	private Clipboard clipboard;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, IEventBroker broker, MPart part, EMenuService menuService) {
@@ -55,6 +66,7 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 		tree.setContentProvider(new TreeModelProvider());
 		tree.getTree().setHeaderVisible(true);
 		tree.setInput(nodes);
+		ColumnViewerToolTipSupport.enableFor(tree);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tree.getControl());
 
 		TreeViewerColumn name = new TreeViewerColumn(tree, SWT.LEFT);
@@ -84,6 +96,8 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 		progressText.getColumn().setWidth(75);
 		progressText.setLabelProvider(new TreeProgressRenderer());
 
+		clipboard = new Clipboard(tree.getControl().getDisplay());
+
 		// add toolbar entries
 		MDirectToolItem clear = MMenuFactory.INSTANCE.createDirectToolItem();
 		clear.setLabel("Clear");
@@ -94,7 +108,7 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 				refresh();
 			}
 		});
-		clear.setIconURI(getIconUri("clear.png"));
+		clear.setIconURI(getIconUri("removea_exc.png"));
 
 		part.setToolbar(MMenuFactory.INSTANCE.createToolBar());
 		part.getToolbar().getChildren().add(clear);
@@ -108,6 +122,7 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 
 		MDirectMenuItem relaunch = MMenuFactory.INSTANCE.createDirectMenuItem();
 		relaunch.setLabel("Re-Launch...");
+		relaunch.setIconURI(getIconUri("skip.png"));
 		relaunch.setObject(new Object() {
 			@CanExecute
 			public boolean can() {
@@ -127,8 +142,53 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 			}
 		});
 
-		relaunch.setIconURI(getIconUri("skip.png"));
+		MDirectMenuItem remove = MMenuFactory.INSTANCE.createDirectMenuItem();
+		remove.setLabel("Remove selected");
+		remove.setIconURI(getIconUri("clear.png"));
+		remove.setObject(new Object() {
+			@CanExecute
+			public boolean can() {
+				IStructuredSelection sel = tree.getStructuredSelection();
+				if (sel.isEmpty()) {
+					return false;
+				}
+				return sel.getFirstElement() instanceof VisualizationRootNode;
+			}
+
+			@Execute
+			public void remove() {
+				for (Object root : tree.getStructuredSelection().toList()) {
+					nodes.remove(root);
+				}
+				refresh();
+			}
+		});
+
+		MDirectMenuItem copy = MMenuFactory.INSTANCE.createDirectMenuItem();
+		copy.setLabel("Copy");
+		copy.setIconURI(getIconUri("copy_edit_co.png"));
+		copy.setObject(new Object() {
+			@Execute
+			public void copy() {
+				List<String> labels = new ArrayList<>();
+
+				// copy labels to clipboard
+				for (Object element : tree.getStructuredSelection().toList()) {
+					if (element instanceof VisualizationNode) {
+						labels.add(((VisualizationNode) element).getName());
+					} else if (element instanceof VisualizationStatusNode) {
+						labels.add(((VisualizationStatusNode) element).getLabel());
+					}
+				}
+
+				clipboard.setContents(new Object[] { Joiner.on('\n').join(labels) },
+						new Transfer[] { TextTransfer.getInstance() });
+			}
+		});
+
 		ctxMenu.getChildren().add(relaunch);
+		ctxMenu.getChildren().add(remove);
+		ctxMenu.getChildren().add(copy);
 
 		part.getMenus().add(ctxMenu);
 		menuService.registerContextMenu(tree.getControl(), CONTEXT_MENU_ID);
@@ -208,6 +268,11 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 	@Focus
 	public void onFocus() {
 		tree.getControl().setFocus();
+	}
+
+	@PreDestroy
+	public void dispose() {
+		clipboard.dispose();
 	}
 
 }

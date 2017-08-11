@@ -166,7 +166,7 @@ public class TaskExecutionContext {
 		Map<Object, IEclipseContext> taskContexts = new LinkedHashMap<>();
 		int totalAmount = prepareTaskProgressTracking(log, progressService, taskContexts);
 		context.set(TaskingInjectionHelper.CTX_TASK_CONTEXTS, taskContexts);
-		
+
 		notifyAll(BeginTaskChain.class, context);
 
 		SubMonitor rootMonitor = SubMonitor.convert(monitor, "Executing " + TaskingModel.getTaskChainName(chain),
@@ -187,8 +187,8 @@ public class TaskExecutionContext {
 				taskMonitor.subTask(TaskingModel.getTaskName(task));
 
 				TaskProgressTracker tracker = new TaskProgressTrackerImpl(task, taskMonitor);
-				taskCtx.set(TaskProgressExtendedTracker.class, (TaskProgressExtendedTracker)tracker);
-				
+				taskCtx.set(TaskProgressExtendedTracker.class, (TaskProgressExtendedTracker) tracker);
+
 				notifyAll(BeginTask.class, taskCtx);
 
 				// handle estimation request of tasks
@@ -270,15 +270,21 @@ public class TaskExecutionContext {
 			taskCtx.activate();
 
 			// and run the task
-			ContextInjectionFactory.invoke(task, Execute.class, taskCtx);
-		} catch (InjectionException ie) {
-			if(ie.getCause() instanceof OperationCanceledException) {
-				OperationCanceledException oce = (OperationCanceledException) ie.getCause();
-				taskCtx.set(IStatus.class, new Status(IStatus.CANCEL, TaskingEngineActivator.PLUGIN_ID, "Cancelled: " + TaskingModel.getTaskName(task), oce));
+			Object result = ContextInjectionFactory.invoke(task, Execute.class, taskCtx);
+
+			// check if a status was returned
+			if (result instanceof IStatus) {
+				taskCtx.set(IStatus.class, (IStatus) result);
 			}
 		} catch (Throwable t) {
-			taskCtx.set(IStatus.class, new Status(IStatus.ERROR, TaskingEngineActivator.PLUGIN_ID,
-					"Fatal failure while executing " + TaskingModel.getTaskName(task), t));
+			if (t instanceof InjectionException && t.getCause() instanceof OperationCanceledException) {
+				OperationCanceledException oce = (OperationCanceledException) t.getCause();
+				taskCtx.set(IStatus.class, new Status(IStatus.CANCEL, TaskingEngineActivator.PLUGIN_ID,
+						"Cancelled: " + TaskingModel.getTaskName(task), oce));
+			} else {
+				taskCtx.set(IStatus.class, new Status(IStatus.ERROR, TaskingEngineActivator.PLUGIN_ID,
+						"Fatal failure while executing " + TaskingModel.getTaskName(task), t));
+			}
 		} finally {
 			// reset redirection
 			redir.finish();

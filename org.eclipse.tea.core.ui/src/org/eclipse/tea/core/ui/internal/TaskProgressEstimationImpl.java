@@ -147,6 +147,7 @@ public class TaskProgressEstimationImpl implements TaskProgressEstimationService
 			}
 		}
 
+		// TODO: use task official name (replace spaces, braces, ...)
 		return task.getClass().getName().replace('$', '.');
 	}
 

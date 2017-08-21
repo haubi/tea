@@ -17,9 +17,9 @@ import javax.inject.Inject;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.tea.core.TaskingInjectionHelper;
 import org.eclipse.tea.core.internal.TaskingConfigurationStore;
-import org.eclipse.tea.core.internal.service.Service;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension.TaskingConfigProperty;
 import org.eclipse.tea.core.services.TaskingLog;

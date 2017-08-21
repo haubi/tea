@@ -13,16 +13,17 @@ package org.eclipse.tea.core.internal;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.tea.core.TaskingEngine;
 import org.eclipse.tea.core.TaskingInjectionHelper;
 import org.eclipse.tea.core.internal.config.PropertyConfigurationStore;
-import org.eclipse.tea.core.internal.service.Service;
 import org.eclipse.tea.core.services.TaskingHeadlessLifeCycle;
 import org.eclipse.tea.core.services.TaskingHeadlessLifeCycle.HeadlessShutdown;
 import org.eclipse.tea.core.services.TaskingHeadlessLifeCycle.HeadlessStartup;
@@ -131,7 +132,7 @@ public class TaskingEngineApplication implements IApplication {
 		@HeadlessStartup
 		public boolean checkStartup(TaskingLog log, IEclipseContext context,
 				@Service List<TaskingHeadlessLifeCycle> contributions) {
-			for (TaskingHeadlessLifeCycle contrib : contributions) {
+			for (TaskingHeadlessLifeCycle contrib : new TreeSet<>(contributions)) {
 				try {
 					StartupAction action = (StartupAction) ContextInjectionFactory.invoke(contrib,
 							HeadlessStartup.class, context, StartupAction.CONTINUE);
@@ -150,7 +151,7 @@ public class TaskingEngineApplication implements IApplication {
 		@HeadlessShutdown
 		public void checkShutdown(TaskingLog log, IEclipseContext context,
 				@Service List<TaskingHeadlessLifeCycle> contributions) {
-			for (TaskingHeadlessLifeCycle contrib : contributions) {
+			for (TaskingHeadlessLifeCycle contrib : new TreeSet<>(contributions)) {
 				try {
 					ContextInjectionFactory.invoke(contrib, HeadlessShutdown.class, context, null);
 				} catch (Exception e) {

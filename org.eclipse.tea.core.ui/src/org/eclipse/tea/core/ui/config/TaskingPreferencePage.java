@@ -20,6 +20,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -41,7 +42,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.tea.core.TaskingInjectionHelper;
 import org.eclipse.tea.core.internal.TaskingConfigurationStore;
 import org.eclipse.tea.core.internal.config.TaskingDevelopmentConfig;
-import org.eclipse.tea.core.internal.service.Service;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension.TaskingConfig;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension.TaskingConfigProperty;
@@ -95,18 +95,21 @@ public class TaskingPreferencePage extends FieldEditorPreferencePage implements 
 		logo.setImage(
 				Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "resources/tea-full60r.png").createImage());
 
-		for (TaskingConfigurationExtension ext : extensions) {
+		List<TaskingConfigurationExtension> sortedExtensions = new ArrayList<>(extensions);
+		sortedExtensions.sort((a, b) -> {
+			return calculateName(a, a.getClass().getAnnotation(TaskingConfig.class))
+					.compareTo(calculateName(b, b.getClass().getAnnotation(TaskingConfig.class)));
+		});
+
+		for (TaskingConfigurationExtension ext : sortedExtensions) {
 			if (!config.showHeadlessConfig && isAllHeadless(ext)) {
 				continue;
 			}
 
 			Section s = new Section(configComp, ExpandableComposite.TWISTIE);
 			TaskingConfig cfg = ext.getClass().getAnnotation(TaskingConfig.class);
-			if (cfg == null) {
-				s.setText("Unnamed Configuration (" + ext + "):");
-			} else {
-				s.setText(cfg.description() + ":");
-			}
+			String name = calculateName(ext, cfg);
+			s.setText(name + ":");
 
 			s.addExpansionListener(new ExpansionAdapter() {
 				@Override
@@ -174,6 +177,14 @@ public class TaskingPreferencePage extends FieldEditorPreferencePage implements 
 			}));
 		}
 		scrolled.setMinSize(configComp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	}
+
+	private String calculateName(TaskingConfigurationExtension ext, TaskingConfig cfg) {
+		if (cfg == null) {
+			return "Unnamed Configuration (" + ext + ")";
+		} else {
+			return cfg.description();
+		}
 	}
 
 	private void add(FieldEditor editor, List<FieldEditor> perSection) {

@@ -16,11 +16,11 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Creatable;
+import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.tea.core.annotations.TaskChainMenuEntry;
 import org.eclipse.tea.core.internal.model.TaskingModel;
 import org.eclipse.tea.core.internal.model.iface.TaskingContainer;
 import org.eclipse.tea.core.internal.model.iface.TaskingItem;
-import org.eclipse.tea.core.internal.service.Service;
 import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskingAdditionalMenuEntryProvider;
 import org.eclipse.tea.core.services.TaskingAdditionalMenuEntryProvider.TaskingAdditionalMenuEntry;

@@ -25,6 +25,7 @@ public class VisualizationRootNode implements VisualizationNode {
 	private String name;
 	private final List<VisualizationTaskNode> nodes = new ArrayList<>();
 	private final TaskChain chain;
+	private final long totalProgress;
 	private boolean active = true;
 	private TaskExecutionContext tec;
 
@@ -41,6 +42,8 @@ public class VisualizationRootNode implements VisualizationNode {
 		for (Object t : tasks) {
 			nodes.add(ContextInjectionFactory.make(VisualizationTaskNode.class, taskContexts.get(t)));
 		}
+
+		totalProgress = nodes.stream().collect(Collectors.summarizingInt(VisualizationNode::getTotalProgress)).getSum();
 	}
 
 	public List<? extends VisualizationNode> getNodes() {
@@ -77,7 +80,7 @@ public class VisualizationRootNode implements VisualizationNode {
 
 	@Override
 	public int getTotalProgress() {
-		return (int) nodes.stream().collect(Collectors.summarizingInt(VisualizationNode::getTotalProgress)).getSum();
+		return (int) totalProgress;
 	}
 
 	@Override
@@ -86,14 +89,20 @@ public class VisualizationRootNode implements VisualizationNode {
 			return getTotalProgress();
 		}
 
-		return (int) nodes.stream().collect(Collectors.summarizingInt(VisualizationNode::getCurrentProgress)).getSum();
+		int total = 0;
+		for (VisualizationTaskNode node : nodes) {
+			total += node.getCurrentProgress();
+		}
+		return total;
 	}
 
 	@Override
 	public IStatus getStatus() {
 		MultiStatus ms = new MultiStatus(Activator.PLUGIN_ID, 0, name, null);
 
-		nodes.stream().forEach(n -> ms.add(n.getStatus()));
+		for (VisualizationTaskNode node : nodes) {
+			ms.add(node.getStatus());
+		}
 
 		return ms;
 	}

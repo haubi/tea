@@ -20,6 +20,15 @@ public class TreeProgressRenderer extends OwnerDrawLabelProvider {
 
 	private static final Image IMG_WAIT = Activator
 			.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "resources/waiting.png").createImage();
+	private final Color gradColorTop;
+	private final Color gradColorBottom;
+	private final Color textColor;
+
+	public TreeProgressRenderer(Display display) {
+		gradColorTop = display.getSystemColor(SWT.COLOR_DARK_BLUE);
+		gradColorBottom = display.getSystemColor(SWT.COLOR_BLUE);
+		textColor = display.getSystemColor(SWT.COLOR_LIST_FOREGROUND);
+	}
 
 	@Override
 	protected void measure(Event event, Object element) {
@@ -68,8 +77,8 @@ public class TreeProgressRenderer extends OwnerDrawLabelProvider {
 
 	private void drawProgress(Event event, int percentage, GC gc, Rectangle bounds, int alpha) {
 
-		gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_DARK_BLUE));
-		gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
+		gc.setForeground(gradColorTop);
+		gc.setBackground(gradColorBottom);
 
 		int width = (bounds.width - 1) * percentage / 100;
 		Rectangle boundingBox = new Rectangle(event.x, event.y, width - 1, event.height - 1);
@@ -88,7 +97,7 @@ public class TreeProgressRenderer extends OwnerDrawLabelProvider {
 		int offset = Math.max(0, (bounds.height - size.y) / 2);
 		int center = Math.max(0, (bounds.width - size.x) / 2);
 
-		gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_LIST_FOREGROUND));
+		gc.setForeground(textColor);
 		gc.drawText(text, event.x + center, event.y + offset, true);
 	}
 

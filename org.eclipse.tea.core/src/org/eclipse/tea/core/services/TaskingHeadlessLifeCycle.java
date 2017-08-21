@@ -28,7 +28,7 @@ import org.eclipse.tea.core.internal.TaskingEngineApplication;
  * <p>
  * This interface is not used when tasking from the IDE.
  */
-public interface TaskingHeadlessLifeCycle {
+public interface TaskingHeadlessLifeCycle extends Comparable<TaskingHeadlessLifeCycle> {
 
 	public enum StartupAction {
 		CONTINUE, RESTART
@@ -56,6 +56,37 @@ public interface TaskingHeadlessLifeCycle {
 	@Target(ElementType.METHOD)
 	public @interface HeadlessShutdown {
 
+	}
+
+	/**
+	 * Provides information about the priority of contributions. Even though
+	 * depending on order is bad style, it is not avoidable sometimes.
+	 * <p>
+	 * Analogous to OSGi service ranking, higher priority numbers are executed
+	 * first. Default is 1000.
+	 */
+	@Documented
+	@Qualifier
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.TYPE)
+	public @interface HeadlessPrority {
+		int value() default 1000;
+	}
+
+	@Override
+	default int compareTo(TaskingHeadlessLifeCycle o) {
+		HeadlessPrority prioA = getClass().getAnnotation(HeadlessPrority.class);
+		HeadlessPrority prioB = o.getClass().getAnnotation(HeadlessPrority.class);
+
+		int pA = prioA == null ? 1000 : prioA.value();
+		int pB = prioB == null ? 1000 : prioB.value();
+
+		int x = pB - pA;
+		if (x != 0) {
+			return x;
+		}
+
+		return getClass().getSimpleName().compareTo(o.getClass().getSimpleName());
 	}
 
 }

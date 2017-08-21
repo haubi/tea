@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.tea.core.internal.TaskProgressEstimationService;
+import org.eclipse.tea.core.internal.model.TaskingModel;
 import org.eclipse.tea.core.services.TaskProgressTracker;
 import org.eclipse.tea.core.services.TaskProgressTracker.TaskProgressProvider;
 import org.eclipse.tea.core.ui.Activator;
@@ -147,8 +148,8 @@ public class TaskProgressEstimationImpl implements TaskProgressEstimationService
 			}
 		}
 
-		// TODO: use task official name (replace spaces, braces, ...)
-		return task.getClass().getName().replace('$', '.');
+		String name = TaskingModel.getTaskName(task);
+		return name.replaceAll("[^A-Za-z0-9_.]+", "_");
 	}
 
 }

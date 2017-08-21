@@ -89,7 +89,7 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 			Display.getDefault().asyncExec(() -> {
 				boolean autoBuild = MessageDialog.openQuestion(
 						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Automatic Build",
-						"The Eclipse automatic build is disabled. Since the WPoB build was successful,"
+						"The Eclipse automatic build is disabled. Since the build was successful,"
 								+ " enabling the automatic build is recommended."
 								+ " Should the automatic build be enabled now?");
 				setAutoBuild(log, autoBuild);

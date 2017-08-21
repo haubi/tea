@@ -94,7 +94,7 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 		TreeViewerColumn progressText = new TreeViewerColumn(tree, SWT.RIGHT);
 		progressText.getColumn().setText("Status");
 		progressText.getColumn().setWidth(75);
-		progressText.setLabelProvider(new TreeProgressRenderer());
+		progressText.setLabelProvider(new TreeProgressRenderer(tree.getControl().getDisplay()));
 
 		clipboard = new Clipboard(tree.getControl().getDisplay());
 

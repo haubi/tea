@@ -16,11 +16,11 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.tea.core.services.TaskingHeadlessLifeCycle;
+import org.eclipse.tea.core.services.TaskingHeadlessLifeCycle.HeadlessPrority;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.core.ui.Activator;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.WorkbenchAdvisor;
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -31,7 +31,8 @@ import org.osgi.service.component.annotations.Component;
  * Note: this must be ranked higher than any contribution that requires access
  * to the workbench already.
  */
-@Component(property = { Constants.SERVICE_RANKING + "=1000" })
+@HeadlessPrority(2000)
+@Component
 public class WorkbenchStarter implements TaskingHeadlessLifeCycle {
 
 	private static final String PRODUCT_ID = Activator.PLUGIN_ID + ".HeadlessTaskingEngine";

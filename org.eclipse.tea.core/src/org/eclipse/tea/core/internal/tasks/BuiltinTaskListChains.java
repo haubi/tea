@@ -13,7 +13,7 @@ package org.eclipse.tea.core.internal.tasks;
 import java.util.List;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.tea.core.internal.service.Service;
+import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskChain.TaskChainId;
 import org.eclipse.tea.core.services.TaskingLog;

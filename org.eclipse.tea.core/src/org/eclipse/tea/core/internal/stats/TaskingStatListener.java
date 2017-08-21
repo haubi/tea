@@ -28,12 +28,12 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.tea.core.TaskExecutionContext;
 import org.eclipse.tea.core.TaskingInjectionHelper;
 import org.eclipse.tea.core.annotations.lifecycle.FinishTaskChain;
 import org.eclipse.tea.core.internal.listeners.TaskingStatusTracker;
 import org.eclipse.tea.core.internal.model.TaskingModel;
-import org.eclipse.tea.core.internal.service.Service;
 import org.eclipse.tea.core.services.TaskingLifeCycleListener;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.core.services.TaskingStatisticsContribution;

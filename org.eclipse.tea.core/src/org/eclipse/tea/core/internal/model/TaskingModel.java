@@ -13,6 +13,7 @@ package org.eclipse.tea.core.internal.model;
 import java.util.Arrays;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.tea.core.internal.model.iface.TaskingContainer;
@@ -49,7 +50,7 @@ public class TaskingModel {
 	 * @return the best human readable name computable for the task
 	 */
 	public static String getTaskName(Object task) {
-		return toStringOrClassName(task);
+		return toTaskingObjectName(task);
 	}
 
 	/**
@@ -58,18 +59,27 @@ public class TaskingModel {
 	public static String getTaskChainName(TaskChain chain) {
 		TaskChainId id = chain.getClass().getAnnotation(TaskChainId.class);
 		if (id == null) {
-			return TaskingModel.toStringOrClassName(chain);
+			return TaskingModel.toTaskingObjectName(chain);
 		}
 
 		return id.description();
 	}
 
-	private static String toStringOrClassName(Object obj) {
+	private static String toTaskingObjectName(Object obj) {
+		// 1: toString if it is a real instance
 		if (Arrays.asList(obj.getClass().getMethods()).stream()
 				.filter((m) -> m.getName().equals("toString") && !m.getDeclaringClass().equals(Object.class)).findAny()
 				.isPresent()) {
 			return obj.toString();
 		}
+
+		// 2: @Named annotation
+		Named named = obj.getClass().getAnnotation(Named.class);
+		if (named != null) {
+			return named.value();
+		}
+
+		// 3: class name
 		String name = obj.getClass().getSimpleName();
 		if (Strings.isNullOrEmpty(name)) {
 			return obj.getClass().getName();

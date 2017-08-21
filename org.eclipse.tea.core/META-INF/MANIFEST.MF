@@ -12,11 +12,11 @@ Require-Bundle: org.eclipse.osgi.services;resolution:=optional,
  org.eclipse.e4.core.di,
  org.eclipse.e4.core.contexts,
  com.google.guava,
- com.google.gson
+ com.google.gson,
+ org.eclipse.e4.core.di.extensions
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Service-Component: OSGI-INF/org.eclipse.tea.core.internal.service.ServiceSupplier.xml,
- OSGI-INF/org.eclipse.tea.core.internal.context.TaskChainLookupContextFunction.xml,
+Service-Component: OSGI-INF/org.eclipse.tea.core.internal.context.TaskChainLookupContextFunction.xml,
  OSGI-INF/org.eclipse.tea.core.internal.context.TaskingLogLookupContextFunction.xml,
  OSGI-INF/org.eclipse.tea.core.internal.DefaultTaskingLog.xml,
  OSGI-INF/org.eclipse.tea.core.internal.config.CoreConfig.xml,
@@ -39,6 +39,5 @@ Export-Package: org.eclipse.tea.core;
  org.eclipse.tea.core.internal.listeners;x-friends:="org.eclipse.tea.core.ui.live",
  org.eclipse.tea.core.internal.model;x-friends:="org.eclipse.tea.core.ui,org.eclipse.tea.ease,org.eclipse.tea.core.ui.live",
  org.eclipse.tea.core.internal.model.iface;x-friends:="org.eclipse.tea.core.ui,org.eclipse.tea.ease",
- org.eclipse.tea.core.internal.service;x-friends:="org.eclipse.tea.core.ui",
  org.eclipse.tea.core.internal.tasks;x-friends:="org.eclipse.tea.core.ui",
  org.eclipse.tea.core.services

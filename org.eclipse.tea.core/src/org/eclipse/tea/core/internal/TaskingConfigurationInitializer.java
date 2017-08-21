@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.tea.core.internal.service.Service;
+import org.eclipse.e4.core.di.extensions.Service;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension.TaskingConfig;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension.TaskingConfigProperty;

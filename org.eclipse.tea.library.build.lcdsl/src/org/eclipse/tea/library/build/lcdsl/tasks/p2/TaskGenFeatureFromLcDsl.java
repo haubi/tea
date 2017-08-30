@@ -8,7 +8,7 @@
  *  Contributors:
  *      SSI Schaefer IT Solutions GmbH
  *******************************************************************************/
-package org.eclipse.tea.library.build.lcdsl.p2;
+package org.eclipse.tea.library.build.lcdsl.tasks.p2;
 
 import java.io.File;
 import java.io.FileInputStream;

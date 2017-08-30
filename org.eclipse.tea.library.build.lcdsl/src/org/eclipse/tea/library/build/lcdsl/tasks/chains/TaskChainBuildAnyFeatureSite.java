@@ -8,11 +8,12 @@
  *  Contributors:
  *      SSI Schaefer IT Solutions GmbH
  *******************************************************************************/
-package org.eclipse.tea.library.build.lcdsl.chains;
+package org.eclipse.tea.library.build.lcdsl.tasks.chains;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -32,22 +33,25 @@ import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskChain.TaskChainId;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.core.ui.annotations.TaskChainUiInit;
-import org.eclipse.tea.library.build.lcdsl.p2.TaskGenFeatureFromLcDsl;
+import org.eclipse.tea.library.build.lcdsl.tasks.p2.TaskGenFeatureFromLcDsl;
+import org.eclipse.tea.library.build.menu.BuildLibraryMenu;
 import org.eclipse.tea.library.build.model.FeatureBuild;
 import org.eclipse.tea.library.build.model.WorkspaceBuild;
 import org.eclipse.tea.library.build.model.WorkspaceData;
 import org.eclipse.tea.library.build.tasks.jar.TaskRunFeaturePluginJarExport;
 import org.eclipse.tea.library.build.tasks.p2.TaskPublishFeatureUpdateSite;
+import org.eclipse.tea.library.build.tasks.p2.TaskUpdateStrictFeatureVersions;
 import org.eclipse.tea.library.build.ui.SelectProjectDialog;
 import org.osgi.service.component.annotations.Component;
 
-@TaskChainMenuEntry(development = true)
+@TaskChainMenuEntry(development = true, icon = "icons/site_obj.png", path = BuildLibraryMenu.MENU_BUILD, groupingId = BuildLibraryMenu.GROUP_MISC)
 @TaskChainId(description = "Create Update Site from Feature...")
 @Component
 public class TaskChainBuildAnyFeatureSite implements TaskChain {
 
 	private static final String KEY_FEATURE = "feature_to_export";
 	private static final String KEY_SITE_NAME = "feature_site_name";
+	private static final String KEY_STRICT = "feature_strict_versions";
 
 	@TaskChainUiInit
 	public void selectFeature(IEclipseContext context, Shell parentShell, WorkspaceBuild wb) {
@@ -68,14 +72,16 @@ public class TaskChainBuildAnyFeatureSite implements TaskChain {
 					Arrays.stream(ps).map(e -> wb.getFeature(e.getName())).collect(Collectors.toList()));
 		}
 
-		// prompt update site name
+		// TODO prompt update site name, strict mode
 		context.set(KEY_SITE_NAME, "dynamic_site");
+		context.set(KEY_STRICT, Boolean.TRUE);
 	}
 
 	@TaskChainContextInit
 	public void init(TaskExecutionContext c, TaskingLog log, @Named(KEY_FEATURE) List<FeatureBuild> fbs,
-			@Named(KEY_SITE_NAME) String name) {
+			@Named(KEY_SITE_NAME) String name, @Named(KEY_STRICT) Boolean strict) {
 		boolean first = true;
+		List<TaskUpdateStrictFeatureVersions> updates = new ArrayList<>();
 		for (FeatureBuild fb : fbs) {
 			File featureDir = fb.getData().getBundleDir();
 			File propFile = new File(featureDir, "content.properties");
@@ -91,11 +97,19 @@ public class TaskChainBuildAnyFeatureSite implements TaskChain {
 				}
 			}
 
+			if (strict) {
+				c.addTask(TaskUpdateStrictFeatureVersions.create(fb.getFeatureName(), updates));
+			}
+
 			c.addTask(new TaskRunFeaturePluginJarExport(fb.getFeatureName(), !first));
 			first = false;
 		}
 		c.addTask(new TaskPublishFeatureUpdateSite(name,
 				fbs.stream().map(e -> e.getFeatureName()).collect(Collectors.toList())));
+
+		if (strict) {
+			updates.forEach(u -> c.addTask(u.restore()));
+		}
 	}
 
 }

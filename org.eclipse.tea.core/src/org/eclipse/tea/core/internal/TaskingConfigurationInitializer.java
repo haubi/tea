@@ -13,6 +13,8 @@ package org.eclipse.tea.core.internal;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -32,6 +34,7 @@ public class TaskingConfigurationInitializer {
 	protected void initConfiguration(IEclipseContext context, TaskingConfigurationStore store,
 			@Service List<TaskingConfigurationExtension> configurations) throws Exception {
 		List<String> warnings = new ArrayList<>();
+		Map<String, TaskingConfig> keys = new TreeMap<>();
 		for (TaskingConfigurationExtension config : configurations) {
 			// create a fresh instance of the configuration just for this engine
 			// This would be better to do it with PROTOTYPE policy on the
@@ -49,6 +52,13 @@ public class TaskingConfigurationInitializer {
 			for (Field field : config.getClass().getDeclaredFields()) {
 				if (field.getAnnotation(TaskingConfigProperty.class) == null) {
 					continue;
+				}
+
+				String key = TaskingConfigurationStore.getPropertyName(field);
+				TaskingConfig old = keys.put(key, cfg);
+				if (old != null) {
+					warnings.add("duplicate configuration key '" + key + "' defined in " + old.description()
+							+ " and in " + cfg.description());
 				}
 
 				// it is a configuration property. initialize it's value.

@@ -27,4 +27,7 @@ public class TeaBuildConfig implements TaskingConfigurationExtension {
 	@TaskingConfigProperty(description = "Use batch compile mode (experimental)")
 	public boolean batchCompile = false;
 
+	@TaskingConfigProperty(description = "Location of the TEA maven configuration file")
+	public String mavenConfigFilePath;
+
 }

@@ -20,8 +20,11 @@ Require-Bundle: org.eclipse.core.resources,
  com.wamas.ide.launching.ui,
  org.eclipse.tea.core.ui
 Bundle-ActivationPolicy: lazy
-Service-Component: OSGI-INF/org.eclipse.tea.library.build.lcdsl.TeaLcDslElementFactory.xml,
- OSGI-INF/org.eclipse.tea.library.build.lcdsl.TeaLcDslElementWiring.xml,
- OSGI-INF/org.eclipse.tea.library.build.lcdsl.TeaLcDslElementVisitor.xml,
- OSGI-INF/org.eclipse.tea.library.build.lcdsl.chains.TaskChainBuildAnyFeatureSite.xml
-Export-Package: org.eclipse.tea.library.build.lcdsl.p2
+Service-Component: OSGI-INF/org.eclipse.tea.library.build.lcdsl.tasks.chains.TaskChainBuildAnyFeatureSite.xml,
+ OSGI-INF/org.eclipse.tea.library.build.lcdsl.internal.TeaLcDslElementVisitor.xml,
+ OSGI-INF/org.eclipse.tea.library.build.lcdsl.internal.TeaLcDslElementFactory.xml,
+ OSGI-INF/org.eclipse.tea.library.build.lcdsl.internal.TeaLcDslElementWiring.xml
+Export-Package: org.eclipse.tea.library.build.lcdsl.internal;x-internal:=true,
+ org.eclipse.tea.library.build.lcdsl.tasks,
+ org.eclipse.tea.library.build.lcdsl.tasks.chains,
+ org.eclipse.tea.library.build.lcdsl.tasks.p2

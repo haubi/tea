@@ -8,7 +8,7 @@
  *  Contributors:
  *      SSI Schaefer IT Solutions GmbH
  *******************************************************************************/
-package org.eclipse.tea.library.build.lcdsl;
+package org.eclipse.tea.library.build.lcdsl.internal;
 
 import java.util.ArrayList;
 import java.util.List;

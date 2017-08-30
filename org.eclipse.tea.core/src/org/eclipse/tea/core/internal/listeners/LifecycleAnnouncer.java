@@ -76,7 +76,7 @@ public class LifecycleAnnouncer implements TaskingLifeCycleListener {
 	@BeginTask
 	public void beginTask(TaskingLog log, CoreConfig config, @Named(TaskingInjectionHelper.CTX_TASK) Object task,
 			@Optional @Service TaskProgressEstimationService svc) {
-		String id = svc.calculateId(task);
+		String id = svc == null ? null : svc.calculateId(task);
 		if (id != null) {
 			log.info(header(config, "(  GO  ) " + TaskingModel.getTaskName(task) + " [ETA: "
 					+ TimeHelper.formatDetailedDuration(svc.getEstimatedMillis(id)) + "]"));

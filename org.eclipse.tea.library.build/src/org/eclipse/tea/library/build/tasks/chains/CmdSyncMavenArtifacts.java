@@ -15,22 +15,19 @@ import org.eclipse.tea.core.annotations.TaskChainContextInit;
 import org.eclipse.tea.core.annotations.TaskChainMenuEntry;
 import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskChain.TaskChainId;
-import org.eclipse.tea.library.build.tasks.TaskBuildWorkspace;
-import org.eclipse.tea.library.build.tasks.TaskCleanWorkspace;
+import org.eclipse.tea.library.build.menu.BuildLibraryMenu;
+import org.eclipse.tea.library.build.model.WorkspaceBuild;
+import org.eclipse.tea.library.build.tasks.maven.SynchronizeMavenArtifact;
 import org.osgi.service.component.annotations.Component;
 
-/**
- * Simple {@link TaskChain} to clean and build all projects in the workspace.
- */
-@TaskChainMenuEntry(development = true)
-@TaskChainId(description = "Clean and Build all Projects", alias = "TaskChainTeaCleanBuild")
+@TaskChainId(description = "Synchronize Maven Artifacts")
+@TaskChainMenuEntry(path = BuildLibraryMenu.MENU_BUILD, icon = "icons/jar_l_obj.png", groupingId = BuildLibraryMenu.GROUP_BUILD)
 @Component
-public class TaskChainTeaCleanBuild implements TaskChain {
+public class CmdSyncMavenArtifacts implements TaskChain {
 
 	@TaskChainContextInit
-	public void init(TaskExecutionContext c) {
-		c.addTask(TaskCleanWorkspace.class);
-		c.addTask(TaskBuildWorkspace.class);
+	public void init(TaskExecutionContext c, WorkspaceBuild build) {
+		c.addTask(SynchronizeMavenArtifact.class);
 	}
 
 }

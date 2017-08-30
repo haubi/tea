@@ -1,5 +1,6 @@
 # generic rules only. for specific rules, put them into the plugins!
 
+*/target/
 */bin/
 *.tm.epoch
 */tm.out*

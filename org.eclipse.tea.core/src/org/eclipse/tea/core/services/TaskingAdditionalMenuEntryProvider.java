@@ -49,12 +49,18 @@ public interface TaskingAdditionalMenuEntryProvider {
 		}
 
 		protected static String getIconBundle(String iconUri) {
+			if (iconUri == null) {
+				return null;
+			}
 			Assert.isLegal(iconUri.startsWith("platform:/plugin"), "URI must be of platform:/plugin scheme");
 			String sub = iconUri.substring("platform:/plugin/".length());
 			return sub.substring(0, sub.indexOf('/'));
 		}
 
 		protected static String getIconPath(String iconUri) {
+			if (iconUri == null) {
+				return null;
+			}
 			Assert.isLegal(iconUri.startsWith("platform:/plugin"), "URI must be of platform:/plugin scheme");
 			String sub = iconUri.substring("platform:/plugin/".length());
 			return sub.substring(sub.indexOf('/') + 1);

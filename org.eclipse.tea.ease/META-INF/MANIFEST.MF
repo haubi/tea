@@ -19,3 +19,4 @@ Require-Bundle: org.eclipse.tea.core,
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/org.eclipse.tea.ease.internal.ListEaseScripts.xml,
  OSGI-INF/org.eclipse.tea.ease.internal.menu.EaseScriptProvider.xml
+Export-Package: org.eclipse.tea.ease

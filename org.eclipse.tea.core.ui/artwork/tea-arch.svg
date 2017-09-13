@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92+devel unknown"
+   sodipodi:docname="tea-arch.svg">
+  <defs
+     id="defs2">
+    <linearGradient
+       id="linearGradient6644"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop6642" />
+    </linearGradient>
+    <linearGradient
+       id="SVGID_1_"
+       gradientUnits="userSpaceOnUse"
+       x1="131.3853"
+       y1="358.5762"
+       x2="131.3853"
+       y2="432.21109"
+       gradientTransform="matrix(1,0,0,-1,0,793)">
+      <stop
+         offset="0.3033"
+         style="stop-color:#473788"
+         id="stop36" />
+      <stop
+         offset="0.872"
+         style="stop-color:#2C2255"
+         id="stop38" />
+    </linearGradient>
+    <linearGradient
+       id="SVGID_2_"
+       gradientUnits="userSpaceOnUse"
+       x1="131.3853"
+       y1="358.5752"
+       x2="131.3853"
+       y2="432.21011"
+       gradientTransform="matrix(1,0,0,-1,0,793)">
+      <stop
+         offset="0.3033"
+         style="stop-color:#473788"
+         id="stop43" />
+      <stop
+         offset="0.872"
+         style="stop-color:#2C2255"
+         id="stop45" />
+    </linearGradient>
+    <linearGradient
+       id="SVGID_3_"
+       gradientUnits="userSpaceOnUse"
+       x1="131.3853"
+       y1="358.57709"
+       x2="131.3853"
+       y2="432.2084"
+       gradientTransform="matrix(1,0,0,-1,0,793)">
+      <stop
+         offset="0.3033"
+         style="stop-color:#473788"
+         id="stop50" />
+      <stop
+         offset="0.8631"
+         style="stop-color:#2C2255"
+         id="stop52" />
+    </linearGradient>
+    <clipPath
+       id="clipPath4425"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         sodipodi:nodetypes="ccccc"
+         inkscape:connector-curvature="0"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold'"
+         d="m 243.35547,372.19141 0,81.49609 18.10351,0 0,-81.49609 z"
+         id="path4427" />
+    </clipPath>
+    <clipPath
+       id="clipPath4425-8"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         sodipodi:nodetypes="ccccc"
+         inkscape:connector-curvature="0"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold'"
+         d="m 243.35547,372.19141 0,81.49609 18.10351,0 0,-81.49609 z"
+         id="path4427-0" />
+    </clipPath>
+    <clipPath
+       id="clipPath4425-2"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         sodipodi:nodetypes="ccccc"
+         inkscape:connector-curvature="0"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold'"
+         d="m 243.35547,372.19141 v 81.49609 h 18.10351 v -81.49609 z"
+         id="path4427-3" />
+    </clipPath>
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="368.60437"
+       x2="131.61473"
+       y1="412.05713"
+       x1="131.61473"
+       id="linearGradient4391"
+       xlink:href="#linearGradient4385-7-9"
+       inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient4385-7-9"
+       inkscape:collect="always">
+      <stop
+         id="stop4387"
+         offset="0"
+         style="stop-color:#473787;stop-opacity:1;" />
+      <stop
+         id="stop4389"
+         offset="1"
+         style="stop-color:#473787;stop-opacity:0;" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="321.73313"
+     inkscape:cy="908.36859"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1025"
+     inkscape:window-x="1920"
+     inkscape:window-y="1200"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:snap-global="true">
+    <sodipodi:guide
+       position="176.1369,209.39882"
+       orientation="1,0"
+       id="guide6652"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g5206"
+       inkscape:export-filename="/home/mduft/Pictures/tea-arch.png"
+       inkscape:export-xdpi="300.09665"
+       inkscape:export-ydpi="300.09665">
+      <g
+         inkscape:export-ydpi="50.616123"
+         inkscape:export-xdpi="50.616123"
+         inkscape:export-filename="/ssd/workspaces/Release-5_7-ide/tea/org.eclipse.tea.core.ui/resources/tea-full60.png"
+         id="g4447"
+         transform="matrix(0.10465916,0,0,0.10465916,32.088033,-27.77911)">
+        <g
+           transform="translate(-469.72093,223.24371)"
+           inkscape:export-ydpi="12.628908"
+           inkscape:export-xdpi="12.628908"
+           inkscape:export-filename="D:\TEA\workspace\tea\org.eclipse.tea.core\resources\tea.png"
+           id="g4433">
+          <g
+             id="g4414"
+             transform="matrix(1.0438268,0,0,1.0438268,496.00987,-215.0755)">
+            <circle
+               style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#2c2255;fill-opacity:1;fill-rule:evenodd;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+               id="circle4405"
+               cx="131.3795"
+               cy="378.82605"
+               r="48.927113" />
+            <g
+               id="g4409">
+              <path
+                 d="m 79.6,378.829 c 0,-25.824 19.395,-47.281 44.626,-51.055 -0.626,-0.023 -1.255,-0.048 -1.887,-0.048 -28.314,0 -51.269,22.88 -51.269,51.103 0,28.224 22.954,51.103 51.269,51.103 0.634,0 1.263,-0.024 1.891,-0.047 C 98.995,426.111 79.6,404.654 79.6,378.829 Z"
+                 id="path4407"
+                 inkscape:connector-curvature="0"
+                 style="fill:#f7941e" />
+            </g>
+            <circle
+               style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:url(#linearGradient4391);fill-opacity:1;fill-rule:evenodd;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+               id="circle4411"
+               cx="131.3795"
+               cy="378.82605"
+               r="33.102783" />
+          </g>
+          <g
+             id="g4511">
+            <g
+               transform="translate(-3.2829958,-11.869292)"
+               id="g4427">
+              <g
+                 id="g4421"
+                 style="stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none">
+                <rect
+                   ry="5"
+                   rx="5"
+                   y="174.14793"
+                   x="605.17859"
+                   height="45.714287"
+                   width="35"
+                   id="rect4416"
+                   style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+                <path
+                   inkscape:connector-curvature="0"
+                   id="path4418"
+                   d="m 608.42271,202.90357 v 10.16434 c 0,2.82657 1.37422,3.96207 4.07263,3.96207 h 20.36675 c 3.01407,0 4.07262,-1.00924 4.07262,-3.96207 v -10.16082 c -4.29537,1.27343 -9.22664,1.94922 -14.25691,1.95379 -5.03034,-0.006 -9.96099,-0.68281 -14.25509,-1.95731 z"
+                   style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:1.82411301;stroke-miterlimit:4;stroke-dasharray:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+                   sodipodi:nodetypes="cssssccc" />
+              </g>
+              <path
+                 style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+                 d="m 622.58928,173.96935 c 0,0 4.50517,-13.70584 21.69643,-11.51786 9.82143,1.25 13.48214,8.83929 13.48214,8.83929"
+                 id="path4423"
+                 inkscape:connector-curvature="0"
+                 sodipodi:nodetypes="csc" />
+              <path
+                 style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+                 d="m 651.88794,177.51129 5.79819,-6.31335 8.5569,-0.50678 9.69378,20.40358 -14.35508,6.82013 z"
+                 id="path4425"
+                 inkscape:connector-curvature="0"
+                 sodipodi:nodetypes="cccccc" />
+            </g>
+            <rect
+               style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+               id="rect4429"
+               width="30.267883"
+               height="5.466538"
+               x="604.19641"
+               y="165.79012" />
+            <rect
+               y="177.52225"
+               x="604.19641"
+               height="5.466538"
+               width="30.267883"
+               id="rect4431"
+               style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+          </g>
+        </g>
+        <g
+           transform="translate(37.5)"
+           id="g4445"
+           style="font-style:normal;font-weight:normal;font-size:138.85557556px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#2c2255;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1">
+          <g
+             id="g4441">
+            <path
+               inkscape:connector-curvature="0"
+               style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';stroke-width:1.06666672px"
+               d="m 245.61523,510.95898 a 89.831535,89.831535 0 0 1 11.84571,20.67969 c 0.0884,0.12305 0.18212,0.24136 0.26953,0.36524 h 37.58203 v 86.92968 h 27.84375 v -86.92968 h 35.79883 v -21.04493 z"
+               transform="matrix(0.9375,0,0,0.9375,-37.5,-126.5625)"
+               id="path4437" />
+          </g>
+          <path
+             inkscape:connector-curvature="0"
+             id="path4443"
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#f7941e"
+             d="m 298.44467,352.46079 h 70.44479 v 19.72996 h -44.34157 v 18.84856 h 41.69735 v 19.72997 h -41.69735 v 23.1878 h 45.83319 v 19.72996 h -71.93641 z" />
+          <path
+             inkscape:connector-curvature="0"
+             id="path4435"
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold'"
+             d="m 436.48029,435.24529 h -40.81595 l -6.44105,18.44175 h -26.23883 l 37.49372,-101.22625 h 31.12046 l 37.49372,101.22625 H 442.85354 Z M 402.1732,416.46453 h 27.73043 l -13.83132,-40.27354 z" />
+        </g>
+      </g>
+      <g
+         id="g4998">
+        <rect
+           style="color:#000000;overflow:visible;vector-effect:none;fill:none;fill-opacity:0.50989595;fill-rule:evenodd;stroke:#2c2255;stroke-width:0.56435621"
+           id="rect4964"
+           width="158.69638"
+           height="17.256004"
+           x="17.440519"
+           y="66.30442"
+           rx="1.6375962"
+           ry="1.8093531" />
+        <g
+           id="g4990"
+           transform="translate(3.3838334,2.0245142)">
+          <text
+             id="text4976"
+             y="69.350525"
+             x="85.456177"
+             style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             xml:space="preserve"><tspan
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777767px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.26458332px"
+               y="69.350525"
+               x="85.456177"
+               id="tspan4974"
+               sodipodi:role="line">TEA Core</tspan></text>
+          <text
+             id="text4980"
+             y="73.90345"
+             x="93.547508"
+             style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             xml:space="preserve"><tspan
+               id="tspan4982"
+               style="font-size:2.82222223px;text-align:center;text-anchor:middle;stroke-width:0.26458332px"
+               y="73.90345"
+               x="93.547508"
+               sodipodi:role="line">Task Execution Control, Headless application, Lifecycle,</tspan><tspan
+               id="tspan5014"
+               style="font-size:2.82222223px;text-align:center;text-anchor:middle;stroke-width:0.26458332px"
+               y="78.496452"
+               x="93.547508"
+               sodipodi:role="line">Configuration, Statistics, Logging, Progress Tracking</tspan></text>
+        </g>
+      </g>
+      <g
+         transform="translate(0,-14.043189)"
+         id="g5012">
+        <rect
+           ry="1.8093531"
+           rx="1.6375962"
+           y="60.19059"
+           x="17.440519"
+           height="17.256004"
+           width="158.69638"
+           id="rect5000"
+           style="color:#000000;overflow:visible;vector-effect:none;fill:none;fill-opacity:0.32505266;fill-rule:evenodd;stroke:#2c2255;stroke-width:0.56435621" />
+        <g
+           transform="translate(3.383835,-4.0892839)"
+           id="g5010">
+          <text
+             xml:space="preserve"
+             style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             x="83.161743"
+             y="69.350525"
+             id="text5004"><tspan
+               sodipodi:role="line"
+               id="tspan5002"
+               x="83.161743"
+               y="69.350525"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777767px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.26458332px">TEA Core UI</tspan></text>
+          <text
+             xml:space="preserve"
+             style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             x="93.404869"
+             y="73.90345"
+             id="text5008"><tspan
+               sodipodi:role="line"
+               x="93.404869"
+               y="73.90345"
+               style="font-size:2.82222223px;text-align:center;text-anchor:middle;stroke-width:0.26458332px"
+               id="tspan5006">Dynamic IDE Menu, Advanced headless application, E4 Event bridge,</tspan><tspan
+               id="tspan5016"
+               sodipodi:role="line"
+               x="93.404869"
+               y="78.496452"
+               style="font-size:2.82222223px;text-align:center;text-anchor:middle;stroke-width:0.26458332px">TEA Console, Eclipse Preference integration, Progress estimation</tspan></text>
+        </g>
+      </g>
+      <g
+         transform="translate(109.25464,-29.444339)"
+         id="g5102">
+        <rect
+           ry="1.8093531"
+           rx="1.6375962"
+           y="55.434696"
+           x="3.6827307"
+           height="17.256001"
+           width="63.199532"
+           id="rect5090"
+           style="color:#000000;overflow:visible;vector-effect:none;fill:none;fill-opacity:0.23528024;fill-rule:evenodd;stroke:#2c2255;stroke-width:0.56435621" />
+        <g
+           transform="translate(-26.168349,-8.7175694)"
+           id="g5100">
+          <text
+             xml:space="preserve"
+             style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             x="46.388027"
+             y="69.350525"
+             id="text5094"><tspan
+               sodipodi:role="line"
+               id="tspan5092"
+               x="46.388027"
+               y="69.350525"
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777767px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.26458332px">TEA Build Library</tspan></text>
+          <text
+             xml:space="preserve"
+             style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             x="61.43362"
+             y="73.90345"
+             id="text5098"><tspan
+               id="tspan5096"
+               sodipodi:role="line"
+               x="61.43362"
+               y="73.90345"
+               style="font-size:2.82222223px;text-align:center;text-anchor:middle;stroke-width:0.26458332px">Build orchestration, JDT/PDE integration,</tspan><tspan
+               id="tspan5106"
+               sodipodi:role="line"
+               x="61.43362"
+               y="78.496452"
+               style="font-size:2.82222223px;text-align:center;text-anchor:middle;stroke-width:0.26458332px">Maven integration</tspan></text>
+        </g>
+      </g>
+      <g
+         id="g5122"
+         transform="translate(109.25464,-49.601362)">
+        <rect
+           style="color:#000000;overflow:visible;vector-effect:none;fill:none;fill-opacity:0.15783416;fill-rule:evenodd;stroke:#2c2255;stroke-width:0.56435621"
+           id="rect5108"
+           width="63.199532"
+           height="17.256001"
+           x="3.6827307"
+           y="55.434696"
+           rx="1.6375962"
+           ry="1.8093531" />
+        <g
+           id="g5120"
+           transform="translate(-26.168349,-8.7175694)">
+          <text
+             id="text5112"
+             y="69.350525"
+             x="35.051079"
+             style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             xml:space="preserve"><tspan
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777767px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.26458332px"
+               y="69.350525"
+               x="35.051079"
+               id="tspan5110"
+               sodipodi:role="line">TEA Build Library LcDsl integr.</tspan></text>
+          <text
+             id="text5118"
+             y="73.90345"
+             x="61.43362"
+             style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             xml:space="preserve"><tspan
+               style="font-size:2.82222223px;text-align:center;text-anchor:middle;stroke-width:0.26458332px"
+               y="73.90345"
+               x="61.43362"
+               sodipodi:role="line"
+               id="tspan5116">Launch configuration based P2 generators</tspan><tspan
+               id="tspan5143"
+               style="font-size:2.82222223px;text-align:center;text-anchor:middle;stroke-width:0.26458332px"
+               y="78.496452"
+               x="61.43362"
+               sodipodi:role="line">(features, update sites, products)</tspan></text>
+        </g>
+      </g>
+      <g
+         id="g6703">
+        <g
+           transform="translate(5.7617823e-7,-34.200233)"
+           id="g5086">
+          <rect
+             ry="1.8093531"
+             rx="1.6375962"
+             y="60.19059"
+             x="17.440519"
+             height="17.256001"
+             width="42.689075"
+             id="rect5072"
+             style="color:#000000;overflow:visible;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#2c2255;stroke-width:0.56435621" />
+          <g
+             transform="translate(-29.096668,-3.9550694)"
+             id="g5084">
+            <text
+               xml:space="preserve"
+               style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               x="56.214046"
+               y="69.350525"
+               id="text5076"><tspan
+                 sodipodi:role="line"
+                 id="tspan5074"
+                 x="56.214046"
+                 y="69.350525"
+                 style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777767px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.26458332px">TEA LiveView</tspan></text>
+            <text
+               xml:space="preserve"
+               style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               x="68.007126"
+               y="73.90345"
+               id="text5082"><tspan
+                 id="tspan5080"
+                 sodipodi:role="line"
+                 x="68.007126"
+                 y="73.90345"
+                 style="font-size:2.82222223px;text-align:center;text-anchor:middle;stroke-width:0.26458332px">Task Execution Visualization</tspan></text>
+          </g>
+        </g>
+        <g
+           id="g6681"
+           transform="translate(44.979167,-34.200233)">
+          <rect
+             style="color:#000000;overflow:visible;vector-effect:none;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#2c2255;stroke-width:0.56435621"
+             id="rect6669"
+             width="47.474174"
+             height="17.256004"
+             x="17.81723"
+             y="60.19059"
+             rx="1.6375962"
+             ry="1.8093531" />
+          <g
+             id="g6679"
+             transform="translate(-28.719956,-3.9550694)">
+            <text
+               id="text6673"
+               y="69.350525"
+               x="51.655254"
+               style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               xml:space="preserve"><tspan
+                 style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777767px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.26458332px"
+                 y="69.350525"
+                 x="51.655254"
+                 id="tspan6671"
+                 sodipodi:role="line">TEA EASE integration</tspan></text>
+            <text
+               id="text6677"
+               y="73.90345"
+               x="70.250847"
+               style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               xml:space="preserve"><tspan
+                 style="font-size:2.82222223px;text-align:center;text-anchor:middle;stroke-width:0.26458332px"
+                 y="73.90345"
+                 x="70.250847"
+                 sodipodi:role="line"
+                 id="tspan6675">Eclipse EASE scripting modules,</tspan><tspan
+                 id="tspan6686"
+                 style="font-size:2.82222223px;text-align:center;text-anchor:middle;stroke-width:0.26458332px"
+                 y="78.496452"
+                 x="70.250847"
+                 sodipodi:role="line">Support for scripts as TEA tasks</tspan></text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

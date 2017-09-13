@@ -57,4 +57,9 @@ public class EaseScriptTask {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "EASE: " + script;
+	}
+
 }

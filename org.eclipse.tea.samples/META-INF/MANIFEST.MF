@@ -14,7 +14,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.osgi.services,
  org.eclipse.tea.core.ui;resolution:=optional,
  org.eclipse.tea.ease;resolution:=optional,
- org.eclipse.e4.ui.workbench;resolution:=optional
+ org.eclipse.e4.ui.workbench;resolution:=optional,
+ org.eclipse.tea.library.build,
+ org.eclipse.swt,
+ org.eclipse.jface
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/org.eclipse.tea.samples.taskchain.SampleTaskChain.xml,
@@ -23,6 +26,7 @@ Service-Component: OSGI-INF/org.eclipse.tea.samples.taskchain.SampleTaskChain.xm
  OSGI-INF/org.eclipse.tea.samples.config.SampleConfig.xml,
  OSGI-INF/org.eclipse.tea.samples.taskchain.SampleHiddenTaskChain.xml,
  OSGI-INF/org.eclipse.tea.samples.taskchain.SampleStatusTaskChain.xml,
- OSGI-INF/org.eclipse.tea.samples.taskchain.AllSamplesTaskChain.xml
+ OSGI-INF/org.eclipse.tea.samples.taskchain.AllSamplesTaskChain.xml,
+ OSGI-INF/org.eclipse.tea.samples.taskchain.SamplePreferenceImportTaskChain.xml
 Export-Package: org.eclipse.tea.samples.taskchain,
  org.eclipse.tea.samples.tasks

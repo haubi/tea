@@ -32,6 +32,9 @@ import org.eclipse.tea.core.services.TaskingLifeCycleListener;
  * happen that there is a task chain that holds a single proxy task that
  * executes the actual {@link TaskChain} (which will/should have the full
  * lifecycle).
+ * <p>
+ * Another use case is to re-use the TEA infrastructure to execute setup tasks
+ * that should run in the background without user visibility.
  */
 @Documented
 @Retention(RUNTIME)

@@ -8,30 +8,28 @@
  *  Contributors:
  *      SSI Schaefer IT Solutions GmbH
  *******************************************************************************/
-package org.eclipse.tea.core.annotations.lifecycle;
-
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+package org.eclipse.tea.core.annotations;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
-import org.eclipse.tea.core.TaskingInjectionHelper;
-
 /**
- * Annotate method on lifecycle service to be called when task chain execution
- * finishes.
+ * Annotates a task, hinting the framework to reload the global configuration
+ * from files/preferences <em>after</em> this task has run.
  * <p>
- * The actual task can be injected using the named
- * {@link TaskingInjectionHelper#CTX_TASK} argument. The {@link Object} injected
- * is the actual instance of the task.
+ * This can be used by tasks that update configuration for follow up tasks
  */
 @Documented
-@Retention(RUNTIME)
-@Target(METHOD)
 @Qualifier
-public @interface FinishTask {
+@Inherited
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface TaskReloadConfiguration {
+
 }

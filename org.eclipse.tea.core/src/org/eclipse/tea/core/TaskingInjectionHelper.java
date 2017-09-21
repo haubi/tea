@@ -79,6 +79,29 @@ public class TaskingInjectionHelper {
 	}
 
 	/**
+	 * Recursively looks up the context in the hierarchy that contains a local
+	 * value associated with key.
+	 *
+	 * @param ctx
+	 *            the starting context
+	 * @param key
+	 *            the key to look for
+	 * @return the {@link IEclipseContext} that directly contains a value for
+	 *         key
+	 */
+	public static IEclipseContext findContextWith(IEclipseContext ctx, Class<?> key) {
+		if (ctx.getLocal(key) != null) {
+			return ctx;
+		}
+
+		if (ctx.getParent() == null) {
+			return null;
+		}
+
+		return findContextWith(ctx.getParent(), key);
+	}
+
+	/**
 	 * Removes the given class from all context's in the given context parent
 	 * tree.
 	 *
@@ -106,11 +129,30 @@ public class TaskingInjectionHelper {
 	public static IEclipseContext createConfiguredContext(TaskingConfigurationStore store) {
 		IEclipseContext context = getRootContext().createChild("Engine with " + store.toString());
 		context.set(TaskingConfigurationStore.class, store);
+		reConfigureContext(context);
+
+		return context;
+	}
+
+	/**
+	 * This method can be used to initialize or update the configuration objects
+	 * in the given context.
+	 *
+	 * @param child
+	 *            the context to update configuration within. the hierarchy of
+	 *            the given context is searched to find the context containing
+	 *            the required {@link TaskingConfigurationStore}. This will be
+	 *            the context where all configuration objects are placed.
+	 */
+	public static void reConfigureContext(IEclipseContext child) {
+		IEclipseContext context = findContextWith(child, TaskingConfigurationStore.class);
+		if (context == null) {
+			throw new IllegalStateException(
+					"Cannot find " + TaskingConfigurationStore.class.getName() + " in context hierarchy.");
+		}
 		TaskingConfigurationInitializer init = ContextInjectionFactory.make(TaskingConfigurationInitializer.class,
 				context);
 		ContextInjectionFactory.invoke(init, Execute.class, context);
-
-		return context;
 	}
 
 	public static TaskExecutionContext createNewChainContext(TaskingEngine engine, String chainName,

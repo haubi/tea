@@ -26,7 +26,8 @@ Service-Component: OSGI-INF/org.eclipse.tea.core.internal.context.TaskChainLooku
  OSGI-INF/org.eclipse.tea.core.internal.listeners.TaskingStatusTracker.xml,
  OSGI-INF/org.eclipse.tea.core.internal.listeners.WorkspaceSaver.xml,
  OSGI-INF/org.eclipse.tea.core.TaskingCoreGroupingIds.xml,
- OSGI-INF/org.eclipse.tea.core.internal.config.TaskingDevelopmentConfig.xml
+ OSGI-INF/org.eclipse.tea.core.internal.config.TaskingDevelopmentConfig.xml,
+ OSGI-INF/org.eclipse.tea.core.internal.listeners.ConfigurationRefresher.xml
 Export-Package: org.eclipse.tea.core;
   uses:="org.eclipse.core.runtime,
    org.eclipse.e4.core.contexts,

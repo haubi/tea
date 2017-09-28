@@ -375,4 +375,8 @@ final class ManifestHolder {
 		return safeList("Eclipse-RegisterBuddy");
 	}
 
+	public void setGitInfo(String gitUri, String projectPath, String commitId) {
+		putSimple("Eclipse-SourceReferences", "scm:git:" + gitUri + ";path=\"" + projectPath + "\";commitId=" + commitId);
+	}
+
 }

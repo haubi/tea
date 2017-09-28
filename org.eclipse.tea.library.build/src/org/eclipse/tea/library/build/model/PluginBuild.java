@@ -21,6 +21,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.egit.core.project.RepositoryMapping;
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
+import org.eclipse.jgit.transport.RemoteConfig;
+import org.eclipse.jgit.transport.URIish;
+import org.eclipse.tea.library.build.internal.Activator;
 import org.eclipse.tea.library.build.jar.JarManager;
 import org.eclipse.tea.library.build.jar.ZipExec;
 import org.eclipse.tea.library.build.jar.ZipExecFactory;
@@ -218,6 +226,32 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 		String[] classPath = data.getClassPath();
 
 		try {
+			// try to retrieve GIT information if possible - GIT dependency is
+			// optional!
+			try {
+				RepositoryMapping m = RepositoryMapping.getMapping(getData().getProject());
+				if (m != null) {
+					Repository repo = m.getRepository();
+					Set<String> r = repo.getRemoteNames();
+					String remoteName;
+					if (r.size() > 1 && r.contains(Constants.DEFAULT_REMOTE_NAME)) {
+						remoteName = Constants.DEFAULT_REMOTE_NAME;
+					} else {
+						remoteName = r.iterator().next();
+					}
+					RemoteConfig rc = new RemoteConfig(repo.getConfig(), remoteName);
+					List<URIish> uris = rc.getURIs();
+					if (!uris.isEmpty()) {
+						// just pick the first one - cant get any more exact
+						String uri = uris.get(0).toString();
+						data.setGitInfo(uri, m.getRepoRelativePath(getData().getProject()),
+								repo.exactRef(Constants.HEAD).getObjectId().getName());
+					}
+				}
+			} catch (Throwable e) {
+				Activator.log(IStatus.WARNING, "Execption while retrieving GIT information", e);
+			}
+
 			// create the new manifest
 			data.setBundleVersion(buildVersion);
 

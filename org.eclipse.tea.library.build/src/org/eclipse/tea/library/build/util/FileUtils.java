@@ -20,6 +20,8 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -127,24 +129,26 @@ public final class FileUtils {
 			throw new IOException("not a file: " + srcFile);
 		}
 
-		FileInputStream fis = null;
-		FileOutputStream out = null;
-		try {
-			fis = new FileInputStream(srcFile);
-			out = new FileOutputStream(destFile);
-			byte[] buffer = new byte[102400]; // 100K buffer
-			int size;
-			while ((size = fis.read(buffer)) >= 0) {
-				out.write(buffer, 0, size);
-			}
-		} finally {
-			StreamHelper.closeQuietly(fis);
-			StreamHelper.closeQuietly(out);
+		try(FileInputStream fis = new FileInputStream(srcFile); FileOutputStream out = new FileOutputStream(destFile)) {
+			StreamHelper.copyStream(fis, out);
 		}
 
 		long time = srcFile.lastModified();
 		if (!destFile.setLastModified(time)) {
 			throw new IOException("cannot set last modified time: " + destFile);
+		}
+	}
+	
+	/**
+	 * Opens a stream to a remote file and downloads it to the given target.
+	 * 
+	 * @param uri the URI of the file
+	 * @param target the target to place the file to.
+	 */
+	public static void download(String uri, File target) throws Exception {
+		URL url = new URL(uri);
+		try(InputStream is = url.openStream(); FileOutputStream out = new FileOutputStream(target)) {
+			StreamHelper.copyStream(is, out);
 		}
 	}
 

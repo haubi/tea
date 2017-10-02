@@ -11,6 +11,9 @@
 package org.eclipse.tea.library.build.util;
 
 import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Provides static helpers to work with streams
@@ -34,5 +37,19 @@ public class StreamHelper {
 			// ignore
 		}
 	}
+	
+	/**
+	 * Copies an input stream to an output stream fully.
+	 * 
+	 * @throws IOException
+	 */
+	public static void copyStream(InputStream in, OutputStream out) throws IOException {
+		byte[] buffer = new byte[102400]; // 100K buffer
+		int size;
+		while ((size = in.read(buffer)) >= 0) {
+			out.write(buffer, 0, size);
+		}
+	}
+	
 
 }

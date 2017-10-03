@@ -36,7 +36,8 @@ Require-Bundle: org.eclipse.core.resources,
  org.eclipse.core.variables,
  org.eclipse.egit.core,
  org.eclipse.jgit,
- org.eclipse.aether.maven
+ org.eclipse.aether.maven,
+ org.eclipse.jdt.launching
 Import-Package: org.eclipse.aether;version="1.0.3",
  org.eclipse.aether.artifact;version="1.0.3",
  org.eclipse.aether.connector.basic;version="1.0.3",
@@ -80,5 +81,8 @@ Service-Component: OSGI-INF/org.eclipse.tea.library.build.jar.ZipConfig.xml,
  OSGI-INF/org.eclipse.tea.library.build.tasks.chains.ExportAllJars.xml,
  OSGI-INF/org.eclipse.tea.library.build.tasks.chains.CleanProjectsWithErrors.xml,
  OSGI-INF/org.eclipse.tea.library.build.tasks.chains.CleanBuildAllProjects.xml,
- OSGI-INF/org.eclipse.tea.library.build.tasks.chains.CmdSyncMavenArtifacts.xml
+ OSGI-INF/org.eclipse.tea.library.build.tasks.chains.CmdSyncMavenArtifacts.xml,
+ OSGI-INF/org.eclipse.tea.library.build.chain.jdk.TeaJdkLibBuildElementFactory.xml,
+ OSGI-INF/org.eclipse.tea.library.build.chain.jdk.TeaJdkLibWires.xml,
+ OSGI-INF/org.eclipse.tea.library.build.chain.jdk.TeaJdkLibBuildVisitor.xml
 Bundle-Activator: org.eclipse.tea.library.build.internal.Activator

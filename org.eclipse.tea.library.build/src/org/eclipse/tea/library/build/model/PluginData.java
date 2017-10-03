@@ -343,6 +343,9 @@ public class PluginData extends BundleData {
 	}
 
 	public ParameterValue getManifestHeader(String name) {
+		if(manifest == null) {
+			return null;
+		}
 		return manifest.getSingleAttribute(name);
 	}
 

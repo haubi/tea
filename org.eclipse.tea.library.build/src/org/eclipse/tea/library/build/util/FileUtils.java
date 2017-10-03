@@ -20,8 +20,9 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -148,7 +149,8 @@ public final class FileUtils {
 	public static void download(String uri, File target) throws Exception {
 		URL url = new URL(uri);
 		try(InputStream is = url.openStream(); FileOutputStream out = new FileOutputStream(target)) {
-			StreamHelper.copyStream(is, out);
+			ReadableByteChannel rbc = Channels.newChannel(is);
+			out.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 		}
 	}
 

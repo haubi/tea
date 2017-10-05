@@ -51,44 +51,33 @@ public class TaskImportPreferences {
 		try {
 			InputStream in = new FileInputStream(file.getAbsolutePath());
 			IPreferencesService preferencesService = Platform.getPreferencesService();
+			IExportedPreferences readPreferences = preferencesService.readPreferences(in);
 
-			if (force) {
-				Display.getDefault().syncExec(() -> {
-					try {
-						preferencesService.importPreferences(in);
-					} catch (CoreException e) {
-						log.error("Error importing preferences: " + file, e);
-					}
-				});
-			} else {
-				IExportedPreferences readPreferences = preferencesService.readPreferences(in);
+			PreferenceVisitor visitor = new PreferenceVisitor();
+			readPreferences.accept(visitor);
 
-				PreferenceVisitor visitor = new PreferenceVisitor();
-				readPreferences.accept(visitor);
+			IPreferenceFilter filter = new IPreferenceFilter() {
 
-				IPreferenceFilter filter = new IPreferenceFilter() {
+				@Override
+				public String[] getScopes() {
+					String[] scopes = new String[visitor.filteredNodes.keySet().size()];
+					scopes = visitor.filteredNodes.keySet().toArray(scopes);
+					return scopes;
+				}
 
-					@Override
-					public String[] getScopes() {
-						String[] scopes = new String[visitor.filteredNodes.keySet().size()];
-						scopes = visitor.filteredNodes.keySet().toArray(scopes);
-						return scopes;
-					}
+				@Override
+				public Map<String, PreferenceFilterEntry[]> getMapping(String scope) {
+					return visitor.filteredNodes.get(scope);
+				}
 
-					@Override
-					public Map<String, PreferenceFilterEntry[]> getMapping(String scope) {
-						return visitor.filteredNodes.get(scope);
-					}
-
-				};
-				Display.getDefault().syncExec(() -> {
-					try {
-						preferencesService.applyPreferences(readPreferences, new IPreferenceFilter[] { filter });
-					} catch (CoreException e) {
-						log.error("Error importing preferences: " + file, e);
-					}
-				});
-			}
+			};
+			Display.getDefault().syncExec(() -> {
+				try {
+					preferencesService.applyPreferences(readPreferences, new IPreferenceFilter[] { filter });
+				} catch (CoreException e) {
+					log.error("Error importing preferences: " + file, e);
+				}
+			});
 		} catch (Exception e) {
 			log.error("Error importing preferences: " + file, e);
 		}
@@ -163,7 +152,7 @@ public class TaskImportPreferences {
 				String setValue = setNode.get(key, null);
 				String defValue = defNode.get(key, null);
 
-				if (setValue != null) {
+				if (setValue != null && !force) {
 					if (defValue != null && setValue.equals(defValue)) {
 						preferenceFilterEntries.add(new PreferenceFilterEntry(key));
 					}

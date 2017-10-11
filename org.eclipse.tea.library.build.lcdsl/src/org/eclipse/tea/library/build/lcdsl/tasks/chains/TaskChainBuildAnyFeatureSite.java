@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import javax.inject.Named;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -44,7 +45,7 @@ import org.eclipse.tea.library.build.tasks.p2.TaskUpdateStrictFeatureVersions;
 import org.eclipse.tea.library.build.ui.SelectProjectDialog;
 import org.osgi.service.component.annotations.Component;
 
-@TaskChainMenuEntry(development = true, icon = "icons/site_obj.png", path = BuildLibraryMenu.MENU_BUILD, groupingId = BuildLibraryMenu.GROUP_MISC)
+@TaskChainMenuEntry(icon = "icons/site_obj.png", path = BuildLibraryMenu.MENU_BUILD, groupingId = BuildLibraryMenu.GROUP_MISC)
 @TaskChainId(description = "Create Update Site from Feature...")
 @Component
 public class TaskChainBuildAnyFeatureSite implements TaskChain {
@@ -70,6 +71,8 @@ public class TaskChainBuildAnyFeatureSite implements TaskChain {
 			IProject[] ps = dlg.getMultiResult();
 			context.set(KEY_FEATURE,
 					Arrays.stream(ps).map(e -> wb.getFeature(e.getName())).collect(Collectors.toList()));
+		} else {
+			throw new OperationCanceledException();
 		}
 
 		// TODO prompt update site name, strict mode

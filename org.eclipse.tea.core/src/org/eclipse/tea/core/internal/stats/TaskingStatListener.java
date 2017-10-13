@@ -62,6 +62,7 @@ public class TaskingStatListener implements TaskingLifeCycleListener {
 		}
 
 		StatDTO dto = new StatDTO();
+		dto.timestamp = System.currentTimeMillis();
 		dto.duration = tracker.getDuration(context);
 		dto.taskChainClass = context.getUnderlyingChain().getClass().getName();
 		dto.taskChainName = TaskingModel.getTaskChainName(context.getUnderlyingChain());
@@ -200,6 +201,7 @@ public class TaskingStatListener implements TaskingLifeCycleListener {
 
 	@SuppressWarnings("unused")
 	private static final class StatDTO {
+		public long timestamp;
 		public String taskChainClass;
 		public String taskChainName;
 		public long duration;

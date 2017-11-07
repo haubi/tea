@@ -54,7 +54,6 @@ import org.osgi.service.component.annotations.Component;
 public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 
 	private boolean autoBuildOriginalState = false;
-	private int unprotectedDepth;
 	private static AtomicInteger nestCount = new AtomicInteger(0);
 	private static final Map<IProject, ElementTree> suppressedProjects = new HashMap<>();
 
@@ -67,10 +66,6 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 		if (nestCount.getAndIncrement() == 0) {
 			log.debug("Disabling automatic build...");
 			autoBuildOriginalState = setAutoBuild(log, false);
-
-			getWorkspace().prepareOperation(null, null);
-			getWorkspace().beginOperation(true);
-			unprotectedDepth = getWorkspace().getWorkManager().beginUnprotected();
 		}
 	}
 
@@ -97,9 +92,6 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 		} else {
 			setAutoBuild(log, autoBuildOriginalState);
 		}
-
-		getWorkspace().getWorkManager().endUnprotected(unprotectedDepth);
-		getWorkspace().endOperation(null, false);
 	}
 
 	/**

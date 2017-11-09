@@ -18,15 +18,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import org.eclipse.tea.core.services.TaskingMenuDecoration;
-import org.osgi.framework.Constants;
 
 /**
  * Annotates a task chain for the TEA (Tasking Engine Advanced).
- * <p>
- * The order in which menus appear can be influenced to some degree by settings
- * the {@link Constants#SERVICE_RANKING} property on the TaskChain itself, as
- * this influences the order in which menu items are created (including their
- * sub-menu-path!).
  */
 @Documented
 @Retention(RUNTIME)

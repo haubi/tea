@@ -27,8 +27,6 @@ import org.eclipse.tea.core.services.TaskingAdditionalMenuEntryProvider.TaskingA
 import org.eclipse.tea.core.services.TaskingMenuDecoration;
 import org.eclipse.tea.core.services.TaskingMenuDecoration.TaskingMenuGroupingId;
 import org.eclipse.tea.core.services.TaskingMenuDecoration.TaskingMenuPathDecoration;
-import org.osgi.framework.Constants;
-import org.osgi.service.component.annotations.Component;
 
 /**
  * Aids in creating a {@link TaskingModel}'s root node.
@@ -101,34 +99,6 @@ public class TaskingModelCreator {
 		}
 
 		return root;
-	}
-
-	/**
-	 * @param serviceClass
-	 *            any service class that has a {@link Component} annotation
-	 * @return the {@link Constants#SERVICE_RANKING} (parsed to int) of the
-	 *         {@link Component} annotation on the given {@link Class}.
-	 */
-	public static int getServiceRanking(Class<?> serviceClass) {
-		Component comp = serviceClass.getAnnotation(Component.class);
-		if (comp != null && comp.property().length != 0) {
-			for (String prop : comp.property()) {
-				if (prop.startsWith(Constants.SERVICE_RANKING)) {
-					return parseRanking(prop.substring(prop.indexOf("=")).trim());
-				}
-			}
-		}
-		return 0;
-	}
-
-	private static int parseRanking(String p) {
-		int result = 0;
-		try {
-			result = Integer.parseInt(p.toString());
-		} catch (Exception e) {
-			// invalid ranking - ignore - OSGi will warn in this case.
-		}
-		return result;
 	}
 
 }

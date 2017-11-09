@@ -12,11 +12,10 @@ package org.eclipse.tea.core.ui.config;
 
 import org.eclipse.tea.core.services.TaskingConfigurationExtension;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension.TaskingConfig;
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 
 @TaskingConfig(description = "TEA Console Configuration")
-@Component(service = TaskingConfigurationExtension.class, property = { Constants.SERVICE_RANKING + "=900" })
+@Component
 public class TaskingConsoleConfig implements TaskingConfigurationExtension {
 
 	@TaskingConfigProperty(description = "Use colored streams")

@@ -12,14 +12,13 @@ package org.eclipse.tea.core.internal.stats;
 
 import org.eclipse.tea.core.services.TaskingConfigurationExtension;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension.TaskingConfig;
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 
 /**
  * Holds configuration for statistics reporting to a remote server.
  */
 @TaskingConfig(description = "TEA Statistics Reporting")
-@Component(property = { Constants.SERVICE_RANKING + "=700" })
+@Component
 public class TaskingStatConfig implements TaskingConfigurationExtension {
 
 	@TaskingConfigProperty(description = "POST JSON to Server")

@@ -12,14 +12,13 @@ package org.eclipse.tea.core.internal.config;
 
 import org.eclipse.tea.core.services.TaskingConfigurationExtension;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension.TaskingConfig;
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 
 /**
  * Holds configuration for TEA related to development of TEA itself.
  */
 @TaskingConfig(description = "TEA Development Options")
-@Component(service = TaskingConfigurationExtension.class, property = { Constants.SERVICE_RANKING + "=1000" })
+@Component
 public class TaskingDevelopmentConfig implements TaskingConfigurationExtension {
 
 	@TaskingConfigProperty(description = "Show TaskChains intended for development/debugging")

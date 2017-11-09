@@ -51,6 +51,7 @@ import org.eclipse.tea.core.services.TaskChain.TaskChainId;
 import org.eclipse.tea.core.services.TaskProgressTracker;
 import org.eclipse.tea.core.services.TaskProgressTracker.TaskProgressProvider;
 import org.eclipse.tea.core.services.TaskingLifeCycleListener;
+import org.eclipse.tea.core.services.TaskingLifeCycleListener.TaskingLifeCyclePriority;
 import org.eclipse.tea.core.services.TaskingLog;
 
 /**
@@ -79,6 +80,27 @@ public class TaskExecutionContext {
 			// register listener for internal direct access
 			context.set(l.getClass().getName(), l);
 		}
+
+		this.listeners.sort((a, b) -> {
+			int prioA = 10;
+			int prioB = 10;
+
+			TaskingLifeCyclePriority pA = a.getClass().getAnnotation(TaskingLifeCyclePriority.class);
+			TaskingLifeCyclePriority pB = b.getClass().getAnnotation(TaskingLifeCyclePriority.class);
+
+			if (pA != null) {
+				prioA = pA.value();
+			}
+			if (pB != null) {
+				prioB = pB.value();
+			}
+
+			int x = prioB - prioA;
+			if (x != 0) {
+				return x;
+			}
+			return a.getClass().getName().compareTo(b.getClass().getName());
+		});
 
 		// make ourself available to the task chain
 		context.set(TaskExecutionContext.class, this);

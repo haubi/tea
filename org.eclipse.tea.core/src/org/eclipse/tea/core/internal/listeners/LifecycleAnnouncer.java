@@ -31,8 +31,8 @@ import org.eclipse.tea.core.internal.config.CoreConfig;
 import org.eclipse.tea.core.internal.model.TaskingModel;
 import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskingLifeCycleListener;
+import org.eclipse.tea.core.services.TaskingLifeCycleListener.TaskingLifeCyclePriority;
 import org.eclipse.tea.core.services.TaskingLog;
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -42,7 +42,8 @@ import org.osgi.service.component.annotations.Component;
  * Also prints a summary of task execution after a {@link TaskChain} has
  * finished executing
  */
-@Component(property = { Constants.SERVICE_RANKING + "=900" })
+@Component
+@TaskingLifeCyclePriority(90)
 public class LifecycleAnnouncer implements TaskingLifeCycleListener {
 
 	private static final int WIDTH = 100;

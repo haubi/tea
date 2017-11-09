@@ -12,14 +12,13 @@ package org.eclipse.tea.core.internal.config;
 
 import org.eclipse.tea.core.services.TaskingConfigurationExtension;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension.TaskingConfig;
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 
 /**
  * Holds core TEA configuration.
  */
 @TaskingConfig(description = "TEA Core Configuration")
-@Component(property = { Constants.SERVICE_RANKING + "=900" })
+@Component
 public class CoreConfig implements TaskingConfigurationExtension {
 
 	@TaskingConfigProperty(description = "Measure memory usage after each task")

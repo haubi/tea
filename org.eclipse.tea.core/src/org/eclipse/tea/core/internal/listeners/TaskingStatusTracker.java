@@ -29,13 +29,14 @@ import org.eclipse.tea.core.annotations.lifecycle.FinishTask;
 import org.eclipse.tea.core.annotations.lifecycle.FinishTaskChain;
 import org.eclipse.tea.core.internal.model.TaskingModel;
 import org.eclipse.tea.core.services.TaskingLifeCycleListener;
-import org.osgi.framework.Constants;
+import org.eclipse.tea.core.services.TaskingLifeCycleListener.TaskingLifeCyclePriority;
 import org.osgi.service.component.annotations.Component;
 
 /**
  * Tracks status and duration of tasks executed in a task chain
  */
-@Component(property = { Constants.SERVICE_RANKING + "=1000" })
+@Component
+@TaskingLifeCyclePriority(100)
 public class TaskingStatusTracker implements TaskingLifeCycleListener {
 
 	private final Map<Key, IStatus> statusMap = new HashMap<>();

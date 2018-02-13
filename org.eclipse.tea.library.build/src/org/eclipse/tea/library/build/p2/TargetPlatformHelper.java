@@ -11,8 +11,8 @@
 package org.eclipse.tea.library.build.p2;
 
 import java.io.File;
+import java.net.URI;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -41,14 +41,22 @@ public class TargetPlatformHelper {
 		final ITargetPlatformService service = getTargetPlatformService();
 		ITargetDefinition definition = null;
 		try {
-			IResource tpDef = null;
-			if (bep != null) {
-				tpDef = bep.findMember(tp);
+			URI tpDef = null;
+			if (tp.startsWith("/")) {
+				File f = new File(tp);
+				if (f.isFile()) {
+					tpDef = f.toURI();
+				}
+			} else if (bep != null) {
+				IResource member = bep.findMember(tp);
+				if (member.exists() && member.getType() == IResource.FILE) {
+					tpDef = member.getLocationURI();
+				}
 			}
 
 			log.debug("looking up target platform, trying file: " + tpDef);
 
-			if (tpDef == null || !tpDef.exists() || tpDef.getType() != IResource.FILE || !(tpDef instanceof IFile)) {
+			if (tpDef == null) {
 				// the following code is more or less the same as used by SDC to
 				// find installed
 				// local targets
@@ -58,7 +66,7 @@ public class TargetPlatformHelper {
 				definition = createTargetFromLocation(service, installLoc);
 			} else {
 				log.debug("loading target from: " + tpDef);
-				ITargetHandle target = service.getTarget((IFile) tpDef);
+				ITargetHandle target = service.getTarget(tpDef);
 				definition = target.getTargetDefinition();
 			}
 		} catch (Exception e) {

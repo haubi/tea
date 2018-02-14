@@ -17,12 +17,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.util.FileUtils;
+
+import com.google.common.base.Splitter;
 
 /**
  * ZipExec implementation which calls the JRE ZIP library.
@@ -42,9 +48,11 @@ public class InternalZipExec extends BaseZipExec {
 			FileOutputStream fos = new FileOutputStream(zipFile);
 			ZipOutputStream zos = new ZipOutputStream(fos);
 			try {
+				Map<ZipEntry, File> entries = new TreeMap<>((a, b) -> a.getName().compareTo(b.getName()));
 				for (ZipExecPart part : parts) {
-					addZip(part, zos);
+					addZip(part, entries);
 				}
+				write(zos, entries);
 			} finally {
 				zos.close();
 			}
@@ -53,18 +61,18 @@ public class InternalZipExec extends BaseZipExec {
 		}
 	}
 
-	private void addZip(ZipExecPart part, ZipOutputStream zos) {
+	private void addZip(ZipExecPart part, Map<ZipEntry, File> entries) {
 		for (String relPath : part.relativePaths) {
 			if (".".equals(relPath)) {
-				addEntry(part, zos, part.sourceDirectory, null);
+				addEntry(part, entries, part.sourceDirectory, null);
 			} else {
 				File source = new File(part.sourceDirectory, relPath);
-				addEntry(part, zos, source, relPath);
+				addEntry(part, entries, source, relPath);
 			}
 		}
 	}
 
-	private void addEntry(ZipExecPart part, ZipOutputStream zos, File source, String entryName) {
+	private void addEntry(ZipExecPart part, Map<ZipEntry, File> entries, File source, String entryName) {
 		if (!source.exists()) {
 			// requested input does not exist. this is worth a warning only.
 			// command line zip ignores it completely.
@@ -91,33 +99,58 @@ public class InternalZipExec extends BaseZipExec {
 				}
 				File child = new File(source, childName);
 				if (entryName == null) {
-					addEntry(part, zos, child, childName);
+					addEntry(part, entries, child, childName);
 				} else {
-					addEntry(part, zos, child, entryName + '/' + childName);
+					addEntry(part, entries, child, entryName + '/' + childName);
 				}
 			}
 			return;
 		}
 
 		// add file
-		try {
-			ZipEntry ze = new ZipEntry(entryName);
-			ze.setTime(source.lastModified());
-			// TODO what about file permissions?
+		ZipEntry ze = new ZipEntry(entryName);
+		ze.setTime(source.lastModified());
+		entries.put(ze, source);
+	}
 
-			zos.putNextEntry(ze);
-			FileInputStream fis = new FileInputStream(source);
-			try {
-				int count;
-				while ((count = fis.read(BUFFER)) >= 0) {
-					zos.write(BUFFER, 0, count);
+	private void write(ZipOutputStream zos, Map<ZipEntry, File> entries) {
+		// sort entries, create entries for directories
+		entries.keySet().stream().sorted((a, b) -> a.getName().compareTo(b.getName())).forEach((e) -> {
+			List<String> segments = Splitter.on('/').splitToList(e.getName());
+			if (segments.size() > 1) {
+				String rel = null;
+				for (int i = 0; i < segments.size() - 1; ++i) {
+					String seg = segments.get(i);
+					if (rel == null) {
+						rel = seg + "/";
+					} else {
+						rel = rel + seg + "/";
+					}
+					ZipEntry de = new ZipEntry(rel);
+					de.setTime(System.currentTimeMillis());
+					entries.put(de, null);
 				}
-			} finally {
-				fis.close();
 			}
-			zos.closeEntry();
-		} catch (Exception e) {
-			throw new IllegalStateException("cannot add " + entryName, e);
+		});
+
+		for (Entry<ZipEntry, File> ze : entries.entrySet()) {
+			try {
+				zos.putNextEntry(ze.getKey());
+				if (!ze.getKey().isDirectory()) {
+					FileInputStream fis = new FileInputStream(ze.getValue());
+					try {
+						int count;
+						while ((count = fis.read(BUFFER)) >= 0) {
+							zos.write(BUFFER, 0, count);
+						}
+					} finally {
+						fis.close();
+					}
+				}
+				zos.closeEntry();
+			} catch (Exception e) {
+				throw new IllegalStateException("cannot add " + ze.getValue(), e);
+			}
 		}
 	}
 

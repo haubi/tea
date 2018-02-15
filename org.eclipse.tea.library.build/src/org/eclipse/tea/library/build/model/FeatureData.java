@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.tea.library.build.services.TeaBuildVersionService;
 import org.eclipse.tea.library.build.util.FileUtils;
 import org.eclipse.tea.library.build.util.StreamHelper;
+import org.eclipse.tea.library.build.util.StringHelper;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -112,6 +113,17 @@ public class FeatureData extends BundleData {
 		// can happen when building FeatureData from a workspace project without
 		// manifest.
 		return super.getBundleName();
+	}
+
+	public String getBundleLabel() {
+		if (document != null) {
+			final Element rootElement = document.getDocumentElement();
+			String lbl = trim(rootElement.getAttribute("label"));
+			if (!StringHelper.isNullOrEmpty(lbl)) {
+				return lbl;
+			}
+		}
+		return getBundleName();
 	}
 
 	@Override
@@ -303,7 +315,7 @@ public class FeatureData extends BundleData {
 		// create the root element and add it to the document
 		Element root = doc.createElement("feature");
 		root.setAttribute("id", getBundleName());
-		root.setAttribute("label", getBundleName());
+		root.setAttribute("label", getBundleLabel());
 		root.setAttribute("version", getBundleVersion());
 		root.setAttribute("provider-name", getBundleVendor());
 		doc.appendChild(root);

@@ -49,7 +49,7 @@ public class TargetPlatformHelper {
 				}
 			} else if (bep != null) {
 				IResource member = bep.findMember(tp);
-				if (member.exists() && member.getType() == IResource.FILE) {
+				if (member != null && member.exists() && member.getType() == IResource.FILE) {
 					tpDef = member.getLocationURI();
 				}
 			}

@@ -172,6 +172,15 @@ public class TaskExecutionContext {
 	}
 
 	/**
+	 * @param chain
+	 *            a TaskChain which should be initialized and executed lazily at
+	 *            this point in the task chain.
+	 */
+	public void addLazyChain(TaskChain chain) {
+		tasks.add(new TaskLazyChainWrapper(this, chain));
+	}
+
+	/**
 	 * Executes the tasks in the context. Exposes status and progress handling
 	 * to tasks, manages life cycle events.
 	 */

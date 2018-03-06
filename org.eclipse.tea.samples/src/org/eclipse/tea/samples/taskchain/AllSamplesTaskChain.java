@@ -7,6 +7,7 @@ import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskChain.TaskChainId;
 import org.eclipse.tea.samples.menu.SampleMenuDecoration;
 import org.eclipse.tea.samples.tasks.SampleAutoProgressTask;
+import org.eclipse.tea.samples.tasks.SampleCalculateState;
 import org.eclipse.tea.samples.tasks.SampleCancellableTask;
 import org.eclipse.tea.samples.tasks.SampleConfiguredTask;
 import org.eclipse.tea.samples.tasks.SampleDirectStatusAccessTask;
@@ -16,6 +17,7 @@ import org.eclipse.tea.samples.tasks.SampleNamedTask;
 import org.eclipse.tea.samples.tasks.SampleNamedTaskAnnotation;
 import org.eclipse.tea.samples.tasks.SampleOutputCaptureTask;
 import org.eclipse.tea.samples.tasks.SampleSimpleTask;
+import org.eclipse.tea.samples.tasks.SampleTaskPrintState;
 import org.osgi.service.component.annotations.Component;
 
 @TaskChainId(description = "All Sample Tasks")
@@ -36,6 +38,14 @@ public class AllSamplesTaskChain implements TaskChain {
 
 		t.addTask(SampleAutoProgressTask.class);
 		t.addTask(new SampleExplicitProgressTask(30));
+
+		t.addTask(SampleCalculateState.class);
+		t.addLazyChain(new TaskChain() {
+			@TaskChainContextInit
+			public void init(TaskExecutionContext c) {
+				c.addTask(new SampleTaskPrintState(SampleCalculateState.myState));
+			}
+		});
 	}
 
 }

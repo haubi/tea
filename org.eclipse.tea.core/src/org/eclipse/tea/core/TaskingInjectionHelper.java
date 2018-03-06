@@ -173,7 +173,12 @@ public class TaskingInjectionHelper {
 	 */
 	public static TaskExecutionContext createNewChainContext(TaskingEngine engine, TaskChain chain,
 			IProgressMonitor monitor) {
-		IEclipseContext chainContext = engine.getContext().createChild(chain.getClass().getName());
+		return createNewChainContext(engine.getContext(), chain, monitor);
+	}
+
+	static TaskExecutionContext createNewChainContext(IEclipseContext parent, TaskChain chain,
+			IProgressMonitor monitor) {
+		IEclipseContext chainContext = parent.createChild(chain.getClass().getName());
 		chainContext.set(TaskChain.class, chain);
 		chainContext.set(IProgressMonitor.class, monitor);
 

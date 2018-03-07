@@ -13,9 +13,11 @@ package org.eclipse.tea.core.ui;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.tea.core.TaskExecutionContext;
@@ -59,13 +61,27 @@ public final class TaskingEngineJob extends Job {
 		if (!TaskingInjectionHelper.isHeadless(engine.getContext())) {
 			engine.getContext().set(Shell.class, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 
-			// this is run from the UI thread intentionally
-			ContextInjectionFactory.invoke(chain, TaskChainUiInit.class, engine.getContext(), null);
+			try {
+				// this is run from the UI thread intentionally
+				ContextInjectionFactory.invoke(chain, TaskChainUiInit.class, engine.getContext(), null);
+			} catch (InjectionException e) {
+				if (e.getCause() instanceof OperationCanceledException) {
+					// UI init cancelled, should not run chain
+					this.actualResult = Status.CANCEL_STATUS;
+				} else {
+					throw e;
+				}
+			}
 		}
 	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		if (actualResult != null) {
+			// something happened during initialization.
+			return actualResult;
+		}
+
 		TaskExecutionContext context;
 		if (chain instanceof TaskChain) {
 			context = TaskingInjectionHelper.createNewChainContext(engine, (TaskChain) chain, monitor);

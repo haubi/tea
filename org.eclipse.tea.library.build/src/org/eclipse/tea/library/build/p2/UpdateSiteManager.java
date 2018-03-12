@@ -18,12 +18,14 @@ import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.jar.JarManager;
 import org.eclipse.tea.library.build.jar.ZipExecFactory;
 import org.eclipse.tea.library.build.util.FileUtils;
+import org.eclipse.tea.library.build.util.StringHelper;
 
 /**
  * Holds information about update sites in the build.
  */
 public final class UpdateSiteManager {
 
+	private static final String ALL_SITES = "all";
 	private final Map<String, UpdateSite> sites = new TreeMap<>();
 	private final JarManager jarManager;
 	private final File out;
@@ -42,12 +44,20 @@ public final class UpdateSiteManager {
 	 * @return update site information
 	 */
 	public UpdateSite getSite(String guid) {
+		guid = safeGuid(guid);
 		UpdateSite site = sites.get(guid);
 		if (site == null) {
 			site = new UpdateSite(out, guid, jarManager);
 			sites.put(guid, site);
 		}
 		return site;
+	}
+
+	private String safeGuid(String guid) {
+		if (StringHelper.isNullOrEmpty(guid)) {
+			return ALL_SITES;
+		}
+		return guid;
 	}
 
 	public void createUpdateSiteZips(TaskingLog console) {

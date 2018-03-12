@@ -11,6 +11,7 @@
 package org.eclipse.tea.core;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -32,14 +33,14 @@ class TaskLazyChainWrapper {
 	}
 
 	@Execute
-	public void execute(TaskingLog log) {
+	public IStatus execute(TaskingLog log) {
 		IEclipseContext ec = parent.getContext().createChild(toString());
 		TaskingEngine engine = ContextInjectionFactory.make(TaskingEngine.class, ec);
 		TaskExecutionContext ctx = TaskingInjectionHelper.createNewChainContext(
 				ec.createChild(TaskingModel.getTaskChainName(child)), child,
 				parent.getContext().get(IProgressMonitor.class));
 
-		engine.runTaskChain(ctx);
+		return engine.runTaskChain(ctx);
 	}
 
 	@Override

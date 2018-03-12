@@ -84,5 +84,6 @@ Service-Component: OSGI-INF/org.eclipse.tea.library.build.jar.ZipConfig.xml,
  OSGI-INF/org.eclipse.tea.library.build.tasks.chains.CmdSyncMavenArtifacts.xml,
  OSGI-INF/org.eclipse.tea.library.build.chain.jdk.TeaJdkLibBuildElementFactory.xml,
  OSGI-INF/org.eclipse.tea.library.build.chain.jdk.TeaJdkLibWires.xml,
- OSGI-INF/org.eclipse.tea.library.build.chain.jdk.TeaJdkLibBuildVisitor.xml
+ OSGI-INF/org.eclipse.tea.library.build.chain.jdk.TeaJdkLibBuildVisitor.xml,
+ OSGI-INF/org.eclipse.tea.library.build.lifecycle.CacheDirectoryCleanup.xml
 Bundle-Activator: org.eclipse.tea.library.build.internal.Activator

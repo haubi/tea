@@ -78,7 +78,7 @@ public class TaskRunFeaturePluginJarExport extends TaskRunJarExport {
 		log.info("Features directory: " + distFeatureDirectory);
 		FeatureBuild feature = wb.getFeature(featureName);
 		log.info("execJarCommand: " + feature.getFeatureName());
-		jarManager.execJarCommands(feature, distFeatureDirectory);
+		execJarCached(jarManager, distFeatureDirectory, feature);
 	}
 
 	/**

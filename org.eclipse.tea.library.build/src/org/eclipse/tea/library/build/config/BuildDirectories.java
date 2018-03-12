@@ -50,6 +50,9 @@ public class BuildDirectories implements TaskingConfigurationExtension {
 	@TaskingConfigProperty(description = "Local Maven repository")
 	public String buildDirMaven = "08_MAVEN";
 
+	@TaskingConfigProperty(description = "General Purpose Cache directories")
+	public String buildDirCache = "09_CACHE";
+
 	public File getOutputDirectory() {
 		return getAndCreateWorkspaceDir(buildDirOutput);
 	}
@@ -86,6 +89,14 @@ public class BuildDirectories implements TaskingConfigurationExtension {
 
 	public File getMavenDirectory() {
 		return getAndCreateWorkspaceDir(buildDirMaven);
+	}
+
+	public File getNewCacheDirectory(String cacheName) {
+		return new File(getBaseCacheDirectory(), cacheName + "-" + Long.valueOf(System.currentTimeMillis()));
+	}
+
+	public File getBaseCacheDirectory() {
+		return getAndCreateWorkspaceDir(buildDirCache);
 	}
 
 	/**

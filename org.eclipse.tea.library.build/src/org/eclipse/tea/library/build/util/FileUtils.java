@@ -24,6 +24,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -130,7 +131,8 @@ public final class FileUtils {
 			throw new IOException("not a file: " + srcFile);
 		}
 
-		try(FileInputStream fis = new FileInputStream(srcFile); FileOutputStream out = new FileOutputStream(destFile)) {
+		try (FileInputStream fis = new FileInputStream(srcFile);
+				FileOutputStream out = new FileOutputStream(destFile)) {
 			StreamHelper.copyStream(fis, out);
 		}
 
@@ -139,16 +141,34 @@ public final class FileUtils {
 			throw new IOException("cannot set last modified time: " + destFile);
 		}
 	}
-	
+
+	/**
+	 * Tries to create a hardlink at destFile, falls back to copying in case
+	 * something happens.
+	 *
+	 * @param srcFile
+	 * @param destFile
+	 * @throws IOException
+	 */
+	public static void hardLinkOrCopy(File srcFile, File destFile) throws IOException {
+		try {
+			Files.createLink(destFile.toPath(), srcFile.toPath());
+		} catch (Exception e) {
+			copyFile(srcFile, destFile);
+		}
+	}
+
 	/**
 	 * Opens a stream to a remote file and downloads it to the given target.
-	 * 
-	 * @param uri the URI of the file
-	 * @param target the target to place the file to.
+	 *
+	 * @param uri
+	 *            the URI of the file
+	 * @param target
+	 *            the target to place the file to.
 	 */
 	public static void download(String uri, File target) throws Exception {
 		URL url = new URL(uri);
-		try(InputStream is = url.openStream(); FileOutputStream out = new FileOutputStream(target)) {
+		try (InputStream is = url.openStream(); FileOutputStream out = new FileOutputStream(target)) {
 			ReadableByteChannel rbc = Channels.newChannel(is);
 			out.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 		}

@@ -27,6 +27,7 @@ import org.eclipse.tea.library.build.chain.plugin.TeaBuildPluginElement;
 import org.eclipse.tea.library.build.config.BuildDirectories;
 import org.eclipse.tea.library.build.jar.JarManager;
 import org.eclipse.tea.library.build.jar.ZipConfig;
+import org.eclipse.tea.library.build.model.BundleBuild;
 import org.eclipse.tea.library.build.model.PluginBuild;
 import org.eclipse.tea.library.build.model.WorkspaceBuild;
 import org.eclipse.tea.library.build.util.FileUtils;
@@ -42,6 +43,8 @@ public class TaskRunJarExport {
 
 	private final boolean composite;
 
+	private static TemporaryJarCache cache;
+
 	private static final String PLUGINS_DIRECTORY = "plugins";
 
 	public TaskRunJarExport() {
@@ -50,6 +53,33 @@ public class TaskRunJarExport {
 
 	public TaskRunJarExport(boolean composite) {
 		this.composite = composite;
+	}
+
+	/**
+	 * Create a cache to improve JAR creation performance if a single JAR file
+	 * is requested multiple times.
+	 * <p>
+	 * Callers MUST make sure to call {@link #cleanCache(TaskingLog)} as well.
+	 *
+	 * @param dir
+	 *            a temporary directory to use to cache JAR file creation
+	 *            results.
+	 */
+	public static void initCache(File dir) {
+		cache = new TemporaryJarCache(dir);
+	}
+
+	/**
+	 * Clears a cache previously initialized with {@link #initCache(File)}
+	 *
+	 * @param log
+	 *            used to log cache statistics.
+	 */
+	public static void cleanCache(TaskingLog log) {
+		if (cache != null) {
+			cache.clear(log);
+		}
+		cache = null;
 	}
 
 	/**
@@ -120,8 +150,7 @@ public class TaskRunJarExport {
 							throw new RuntimeException(pb.getPluginName() + " has errors");
 						}
 
-						jarManager.execJarCommands(pb, distDirectory);
-
+						execJarCached(jarManager, distDirectory, pb);
 					} catch (Exception e) {
 						log.info(pb.getPluginName() + " " + e.toString());
 						return new Status(Status.ERROR, getClass().getName(), "unexpected exception during jar export",
@@ -129,6 +158,7 @@ public class TaskRunJarExport {
 					}
 					return Status.OK_STATUS;
 				}
+
 			};
 			job.setSystem(true);
 			job.schedule();
@@ -153,6 +183,14 @@ public class TaskRunJarExport {
 		}
 	}
 
+	protected static void execJarCached(JarManager jarManager, File distDirectory, BundleBuild<?> bb) throws Exception {
+		if (cache != null) {
+			cache.execJarCommands(jarManager, bb, distDirectory);
+		} else {
+			jarManager.execJarCommands(bb, distDirectory);
+		}
+	}
+
 	/**
 	 * @return the number of running checkout jobs that belong to the given
 	 *         family
@@ -170,6 +208,53 @@ public class TaskRunJarExport {
 
 	public static String getPluginJarDirectory() {
 		return PLUGINS_DIRECTORY;
+	}
+
+	static class TemporaryJarCache {
+
+		private final File dir;
+
+		private long missCnt = 0;
+		private long hitCnt = 0;
+		private long skipCnt = 0;
+
+		TemporaryJarCache(File dir) {
+			this.dir = dir;
+
+			if (!dir.isDirectory()) {
+				FileUtils.mkdirs(dir);
+			}
+		}
+
+		private File getCached(JarManager jm, BundleBuild<?> build) throws Exception {
+			String jarFileName = build.getJarFileName(jm.getBundleVersion(build.getData()));
+			File cached = new File(dir, jarFileName);
+
+			if (cached.exists()) {
+				hitCnt++;
+				return cached;
+			}
+
+			missCnt++;
+			return jm.execJarCommands(build, dir);
+		}
+
+		File execJarCommands(JarManager jm, BundleBuild<?> build, File destDir) throws Exception {
+			File cached = getCached(jm, build);
+			File destFile = new File(destDir, cached.getName());
+			if (!destFile.exists() || cached.length() != destFile.length()) {
+				FileUtils.hardLinkOrCopy(cached, destFile);
+			} else {
+				skipCnt++;
+			}
+			return destFile;
+		}
+
+		void clear(TaskingLog log) {
+			log.info("clearing JAR cache: miss=" + missCnt + ", hit=" + hitCnt + ", skip=" + skipCnt);
+			FileUtils.deleteDirectory(dir);
+		}
+
 	}
 
 }

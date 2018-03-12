@@ -242,6 +242,11 @@ public class TaskExecutionContext {
 					executeSingleTask(log, task, taskCtx);
 
 				} finally {
+					// override status if cancelled
+					if (rootMonitor.isCanceled()) {
+						taskCtx.set(IStatus.class, Status.CANCEL_STATUS);
+					}
+
 					// in case the task set it's own status
 					IStatus taskStatus = taskCtx.get(IStatus.class);
 					status.add(taskStatus);

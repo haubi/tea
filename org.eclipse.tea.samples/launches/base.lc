@@ -1,0 +1,20 @@
+abstract eclipse configuration TEA-Sample-Base {
+	feature org.eclipse.tea.core_feature;
+	feature org.eclipse.tea.lcdsl.library_feature;
+	feature org.eclipse.tea.library_feature;
+	feature org.eclipse.tea.ui_feature;
+	feature org.eclipse.tea.scripting_feature;
+	
+	feature com.wamas.ide.launchview.feature;
+	feature com.wamas.ide.launching.feature;
+	
+	feature org.eclipse.ease.feature;
+	feature org.eclipse.ease.python.jython.feature;
+	
+	feature org.eclipse.pde;
+	feature org.eclipse.jdt;
+	
+	feature org.eclipse.sdk;
+	
+	plugin org.eclipse.tea.samples;
+}

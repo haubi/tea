@@ -1,0 +1,5 @@
+eclipse configuration TEA-Sample-IDE : TEA-Sample-Base {
+	product org.eclipse.sdk.ide;
+	
+	workspace "${workspace_loc}/runtime-ws/tea-ide";
+}

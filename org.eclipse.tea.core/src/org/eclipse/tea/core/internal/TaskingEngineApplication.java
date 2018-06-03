@@ -58,13 +58,12 @@ public class TaskingEngineApplication implements IApplication {
 			}
 		}
 
-		if (argPropertiesFile == null) {
-			throw new RuntimeException("configuration file not set, must give -configuration argument");
-		}
-
-		File propFile = new File(argPropertiesFile);
-		if (!propFile.exists()) {
-			throw new RuntimeException("configuration file does not exist: " + propFile);
+		File propFile = null;
+		if (argPropertiesFile != null) {
+			propFile = new File(argPropertiesFile);
+			if (!propFile.exists()) {
+				throw new RuntimeException("configuration file does not exist: " + propFile);
+			}
 		}
 
 		IEclipseContext rootContext = TaskingInjectionHelper.getRootContext();

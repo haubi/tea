@@ -31,11 +31,13 @@ public class PropertyConfigurationStore implements TaskingConfigurationStore {
 
 	public PropertyConfigurationStore(File file) throws IOException {
 		properties = new Properties();
-		try (InputStream is = new FileInputStream(file)) {
-			properties.load(is);
-		}
+		if (file != null && file.exists()) {
+			try (InputStream is = new FileInputStream(file)) {
+				properties.load(is);
+			}
 
-		properties.put("configurationSource", file.getAbsolutePath());
+			properties.put("configurationSource", file.getAbsolutePath());
+		}
 	}
 
 	@Override

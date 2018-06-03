@@ -1,0 +1,5 @@
+eclipse configuration TEA-Samples-Headless : TEA-Sample-Base {
+	product org.eclipse.tea.core.ui.HeadlessTaskingEngine;
+	
+	argument "-taskchain" "Sample";
+}

@@ -66,17 +66,17 @@ public class TaskingModel {
 	}
 
 	private static String toTaskingObjectName(Object obj) {
-		// 1: toString if it is a real instance
+		// 1: @Named annotation
+		Named named = obj.getClass().getAnnotation(Named.class);
+		if (named != null) {
+			return named.value();
+		}
+		
+		// 2: toString if it is a real instance
 		if (Arrays.asList(obj.getClass().getMethods()).stream()
 				.filter((m) -> m.getName().equals("toString") && !m.getDeclaringClass().equals(Object.class)).findAny()
 				.isPresent()) {
 			return obj.toString();
-		}
-
-		// 2: @Named annotation
-		Named named = obj.getClass().getAnnotation(Named.class);
-		if (named != null) {
-			return named.value();
 		}
 
 		// 3: class name

@@ -19,11 +19,15 @@ import org.osgi.service.component.annotations.Component;
 @Component
 public class SampleStatContribution implements TaskingStatisticsContribution {
 
-	@TaskingStatisticProvider(qualifier = "important")
-	public Map<String, String> getAdditionalInfo() {
-		Map<String, String> test = new TreeMap<>();
-		test.put("Some", "Value");
-		test.put("To", "Remember");
+	@TaskingStatisticProvider(qualifier = "weather")
+	public Map<String, Object> getAdditionalInfo() {
+		Map<String, Object> test = new TreeMap<>();
+		Map<String, String> temp = new TreeMap<>();
+		temp.put("celsius", "34");
+		temp.put("fahrenh", "93");
+		
+		test.put("temps", temp);
+		test.put("hot", "true");
 		return test;
 	}
 

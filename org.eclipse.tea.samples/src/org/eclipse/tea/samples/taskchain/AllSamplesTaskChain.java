@@ -10,6 +10,7 @@ import org.eclipse.tea.samples.tasks.SampleAutoProgressTask;
 import org.eclipse.tea.samples.tasks.SampleCalculateState;
 import org.eclipse.tea.samples.tasks.SampleCancellableTask;
 import org.eclipse.tea.samples.tasks.SampleConfiguredTask;
+import org.eclipse.tea.samples.tasks.SampleNestedStatusTask;
 import org.eclipse.tea.samples.tasks.SampleDirectStatusAccessTask;
 import org.eclipse.tea.samples.tasks.SampleE4CtxTask;
 import org.eclipse.tea.samples.tasks.SampleExplicitProgressTask;
@@ -31,6 +32,7 @@ public class AllSamplesTaskChain implements TaskChain {
 		t.addTask(SampleConfiguredTask.class);
 		t.addTask(SampleCancellableTask.class);
 		t.addTask(SampleDirectStatusAccessTask.class);
+		t.addTask(SampleNestedStatusTask.class);
 		t.addTask(SampleE4CtxTask.class);
 		t.addTask(SampleNamedTask.class);
 		t.addTask(SampleNamedTaskAnnotation.class);

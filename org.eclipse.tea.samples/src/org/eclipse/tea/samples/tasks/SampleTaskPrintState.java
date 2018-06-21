@@ -23,7 +23,7 @@ public class SampleTaskPrintState {
 	@Execute
 	public IStatus run(TaskingLog log) {
 		log.info(state);
-		return Status.CANCEL_STATUS;
+		return new Status(IStatus.WARNING, "org.eclipse.tea.samples", "Something smells fishy");
 	}
 
 }

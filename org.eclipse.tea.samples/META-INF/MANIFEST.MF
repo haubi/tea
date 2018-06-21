@@ -21,12 +21,12 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/org.eclipse.tea.samples.taskchain.SampleTaskChain.xml,
- OSGI-INF/org.eclipse.tea.samples.stat.SampleStatContribution.xml,
  OSGI-INF/org.eclipse.tea.samples.menu.SampleMenuDecoration.xml,
  OSGI-INF/org.eclipse.tea.samples.config.SampleConfig.xml,
  OSGI-INF/org.eclipse.tea.samples.taskchain.SampleHiddenTaskChain.xml,
  OSGI-INF/org.eclipse.tea.samples.taskchain.SampleStatusTaskChain.xml,
  OSGI-INF/org.eclipse.tea.samples.taskchain.AllSamplesTaskChain.xml,
- OSGI-INF/org.eclipse.tea.samples.taskchain.SamplePreferenceImportTaskChain.xml
+ OSGI-INF/org.eclipse.tea.samples.taskchain.SamplePreferenceImportTaskChain.xml,
+ OSGI-INF/org.eclipse.tea.samples.stat.SampleStatContribution.xml
 Export-Package: org.eclipse.tea.samples.taskchain,
  org.eclipse.tea.samples.tasks

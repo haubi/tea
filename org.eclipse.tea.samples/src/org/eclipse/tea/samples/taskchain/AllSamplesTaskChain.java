@@ -14,6 +14,7 @@ import org.eclipse.tea.samples.tasks.SampleNestedStatusTask;
 import org.eclipse.tea.samples.tasks.SampleDirectStatusAccessTask;
 import org.eclipse.tea.samples.tasks.SampleE4CtxTask;
 import org.eclipse.tea.samples.tasks.SampleExplicitProgressTask;
+import org.eclipse.tea.samples.tasks.SampleMarkerStatusTask;
 import org.eclipse.tea.samples.tasks.SampleNamedTask;
 import org.eclipse.tea.samples.tasks.SampleNamedTaskAnnotation;
 import org.eclipse.tea.samples.tasks.SampleOutputCaptureTask;
@@ -37,6 +38,7 @@ public class AllSamplesTaskChain implements TaskChain {
 		t.addTask(SampleNamedTask.class);
 		t.addTask(SampleNamedTaskAnnotation.class);
 		t.addTask(SampleOutputCaptureTask.class);
+		t.addTask(SampleMarkerStatusTask.class);
 
 		t.addTask(SampleAutoProgressTask.class);
 		t.addTask(new SampleExplicitProgressTask(30));

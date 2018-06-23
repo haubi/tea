@@ -5,8 +5,9 @@ package org.eclipse.tea.core.ui.live.internal.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.tea.core.MarkerStatus;
 
 public class VisualizationStatusNode {
 
@@ -53,6 +54,13 @@ public class VisualizationStatusNode {
 
 	public List<VisualizationStatusNode> getChildren() {
 		return children;
+	}
+	
+	public IMarker getMarker() {
+		if(status instanceof MarkerStatus) {
+			return ((MarkerStatus) status).getMarker();
+		}
+		return null;
 	}
 
 }

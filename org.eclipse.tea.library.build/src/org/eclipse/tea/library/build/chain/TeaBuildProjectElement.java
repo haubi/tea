@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.tea.core.MarkerStatus;
 import org.eclipse.tea.library.build.internal.Activator;
 
 /**
@@ -55,12 +56,12 @@ public abstract class TeaBuildProjectElement extends TeaBuildElement {
 		if (project != null) {
 			try {
 				for (IMarker marker : project.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE)) {
-					markers.add(new Status(mapSeverity(marker.getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR)),
+					markers.add(new MarkerStatus(mapSeverity(marker.getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR)),
 							Activator.PLUGIN_ID,
 							marker.getAttribute(IMarker.LOCATION,
 									marker.getResource().getProjectRelativePath().toOSString()) + ":"
 									+ marker.getAttribute(IMarker.LINE_NUMBER, 0) + ": "
-									+ marker.getAttribute(IMarker.MESSAGE, "")));
+									+ marker.getAttribute(IMarker.MESSAGE, ""), marker));
 				}
 			} catch (CoreException e) {
 				markers.add(new Status(IStatus.ERROR, Activator.PLUGIN_ID,

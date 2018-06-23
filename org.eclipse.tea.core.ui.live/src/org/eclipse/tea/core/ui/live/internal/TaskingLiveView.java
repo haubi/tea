@@ -9,6 +9,10 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -23,9 +27,13 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.services.EMenuService;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
@@ -46,6 +54,13 @@ import org.eclipse.tea.core.ui.live.internal.model.VisualizationNode;
 import org.eclipse.tea.core.ui.live.internal.model.VisualizationRootNode;
 import org.eclipse.tea.core.ui.live.internal.model.VisualizationStatusNode;
 import org.eclipse.tea.core.ui.live.internal.model.VisualizationTaskNode;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.ide.ResourceUtil;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -112,6 +127,23 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 
 		part.setToolbar(MMenuFactory.INSTANCE.createToolBar());
 		part.getToolbar().getChildren().add(clear);
+
+		// on double click, check whether we can jump somewhere
+		tree.addDoubleClickListener(this::doubleClick);
+
+		// also on double click, check whether an item can and should be expanded...
+		tree.addDoubleClickListener(event -> {
+			ISelection selection = event.getSelection();
+			if (selection instanceof ITreeSelection) {
+				ITreeSelection ss = (ITreeSelection) selection;
+				if (ss.size() == 1) {
+					Object obj = ss.getFirstElement();
+					if (tree.isExpandable(obj)) {
+						tree.setExpandedState(obj, !tree.getExpandedState(obj));
+					}
+				}
+			}
+		});
 
 		// menus and stuff is persistent, but we want dynamic.
 		part.getMenus().clear();
@@ -195,6 +227,48 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 
 		// initialize event handling
 		broker.subscribe(EventBrokerBridge.EVENT_TOPIC_BASE + "*", null, this, true);
+	}
+
+	private void doubleClick(DoubleClickEvent event) {
+		IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+		if (sel.isEmpty() || sel.size() > 1) {
+			return; // only handle single item double click.
+		}
+
+		Object clicked = sel.getFirstElement();
+		if (clicked instanceof VisualizationStatusNode) {
+			VisualizationStatusNode sn = (VisualizationStatusNode) clicked;
+			if (sn.getMarker() != null) {
+				openMarkerInEditor(sn.getMarker());
+			}
+		}
+	}
+
+	/**
+	 * Open the supplied marker in an editor in page borrowed mostly from
+	 * org.eclipse.ui.internal.views.markers.ExtendedMarkersView.
+	 */
+	public static void openMarkerInEditor(IMarker marker) {
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+		IEditorPart editor = page.getActiveEditor();
+		if (editor != null) {
+			IEditorInput input = editor.getEditorInput();
+			IFile file = ResourceUtil.getFile(input);
+			if (file != null) {
+				if (marker.getResource().equals(file) && OpenStrategy.activateOnOpen()) {
+					page.activate(editor);
+				}
+			}
+		}
+
+		if (marker != null && marker.getResource() instanceof IFile) {
+			try {
+				IDE.openEditor(page, marker, OpenStrategy.activateOnOpen());
+			} catch (PartInitException e) {
+				Activator.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Cannot open Editor for marker", e));
+			}
+		}
 	}
 
 	private String getIconUri(String icon) {

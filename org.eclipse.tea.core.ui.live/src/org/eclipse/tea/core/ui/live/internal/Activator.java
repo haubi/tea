@@ -1,5 +1,7 @@
 package org.eclipse.tea.core.ui.live.internal;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -24,6 +26,10 @@ public class Activator extends AbstractUIPlugin {
 
 	public static BundleContext getBundleContext() {
 		return context;
+	}
+	
+	public static void log(IStatus status) {
+		Platform.getLog(getBundleContext().getBundle()).log(status);
 	}
 
 }

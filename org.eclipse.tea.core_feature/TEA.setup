@@ -132,6 +132,16 @@
             url="https://dl.bintray.com/py4j/py4j-eclipse/0.10.4"/>
       </repositoryList>
     </targlet>
+    <targlet
+        name="E4 Tools">
+      <requirement
+          name="org.eclipse.e4.tools.spies.feature.feature.group"/>
+      <repositoryList
+          name="E4Spies">
+        <repository
+            url="http://download.eclipse.org/e4/snapshots/org.eclipse.e4.tools/latest/"/>
+      </repositoryList>
+    </targlet>
   </setupTask>
   <setupTask
       xsi:type="setup.workingsets:WorkingSetTask"

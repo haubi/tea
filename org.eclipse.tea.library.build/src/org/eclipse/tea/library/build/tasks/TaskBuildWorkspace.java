@@ -49,6 +49,12 @@ public class TaskBuildWorkspace {
 		TeaBuildChain chain = TeaBuildChain.make(taskContext,
 				Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects()));
 
+		if (config.batchCompile) {
+			// to allow parallel builds to happen at all during batch execution,
+			// remove build order in workspace.
+			setWorkspaceBuildOrder(null);
+		}
+
 		IStatus result = chain.execute(tracker, config.failureThreshold);
 
 		List<String> buildOrder = new ArrayList<>();
@@ -56,7 +62,7 @@ public class TaskBuildWorkspace {
 		if (result.getSeverity() > IStatus.WARNING) {
 			log.error("Errors during build: " + result);
 		} else {
-			setWorkspaceBuildeOrder(buildOrder);
+			setWorkspaceBuildOrder(buildOrder);
 		}
 
 		return result;
@@ -69,13 +75,13 @@ public class TaskBuildWorkspace {
 	 * through.
 	 *
 	 * @param buildOrder
-	 *            the order to set.
+	 *            the order to set, <code>null</code> to clear.
 	 */
-	private void setWorkspaceBuildeOrder(List<String> buildOrder) throws CoreException {
+	private void setWorkspaceBuildOrder(List<String> buildOrder) throws CoreException {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceDescription description = workspace.getDescription();
 
-		description.setBuildOrder(buildOrder.toArray(new String[buildOrder.size()]));
+		description.setBuildOrder(buildOrder == null ? null : buildOrder.toArray(new String[buildOrder.size()]));
 		description.setMaxBuildIterations(3);
 
 		workspace.setDescription(description);

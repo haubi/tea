@@ -170,10 +170,6 @@ public class TeaProductAction extends ProductAction implements IPDEBuildConstant
 			bundles.put(bundleId, new BundleInfo(bundleId, null, null, -1, true));
 		}
 		{
-			String bundleId = BUNDLE_UPDATE_CONFIGURATOR;
-			bundles.put(bundleId, new BundleInfo(bundleId, null, null, 4, true));
-		}
-		{
 			String bundleId = BUNDLE_CORE_RUNTIME;
 			bundles.put(bundleId, new BundleInfo(bundleId, null, null, 4, true));
 		}

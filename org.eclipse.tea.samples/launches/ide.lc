@@ -2,6 +2,7 @@ eclipse configuration TEA-Sample-IDE : TEA-Sample-Base {
 	product org.eclipse.sdk.ide;
 	
 	optional feature org.eclipse.e4.tools.spies.feature;
+	optional feature org.eclipse.tea.samples.all;
 	
 	workspace "${workspace_loc}/runtime-ws/tea-ide";
 }

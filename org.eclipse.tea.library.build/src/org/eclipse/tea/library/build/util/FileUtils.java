@@ -364,6 +364,18 @@ public final class FileUtils {
 		}
 	}
 
+	/**
+	 * Same as {@link #moveFile(File, File)} but for directories.
+	 */
+	public static void moveDirectory(File source, File target) throws IOException {
+		deleteDirectory(target);
+
+		if (!source.renameTo(target)) {
+			copyDirectory(source, target);
+			deleteDirectory(source);
+		}
+	}
+
 	public static void touchFile(File f) throws IOException {
 		if (f.exists()) {
 			if (!f.setLastModified(System.currentTimeMillis())) {

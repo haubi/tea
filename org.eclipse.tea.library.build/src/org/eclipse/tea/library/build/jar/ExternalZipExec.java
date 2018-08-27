@@ -40,7 +40,7 @@ public class ExternalZipExec extends BaseZipExec {
 	private void addZip(ZipExecPart part) {
 		List<String> cmdTokens = new ArrayList<>();
 		cmdTokens.add(zipExe.getAbsolutePath());
-		cmdTokens.add("-rq");
+		cmdTokens.add("-rqX");
 		cmdTokens.add(zipFile.getAbsolutePath());
 
 		final Collection<String> elements = part.relativePaths;

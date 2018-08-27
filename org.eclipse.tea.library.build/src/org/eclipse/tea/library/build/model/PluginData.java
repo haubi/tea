@@ -267,7 +267,7 @@ public class PluginData extends BundleData {
 	public void setBundleActivator(String activator) {
 		manifest.setActivator(activator);
 	}
-	
+
 	public void setGitInfo(String repoUri, String projectPath, String commitId) {
 		manifest.setGitInfo(repoUri, projectPath, commitId);
 	}
@@ -343,7 +343,7 @@ public class PluginData extends BundleData {
 	}
 
 	public ParameterValue getManifestHeader(String name) {
-		if(manifest == null) {
+		if (manifest == null) {
 			return null;
 		}
 		return manifest.getSingleAttribute(name);
@@ -417,6 +417,8 @@ public class PluginData extends BundleData {
 			return;
 		}
 
+		long timeStamp = getManifestFile().lastModified();
+
 		// re-read the manifest, manipulate and write the changes.
 		ManifestHolder temp = readManifestFromDirectory(bundleDir);
 		Map<String, String> updates = getExternalizeClasspath();
@@ -454,6 +456,7 @@ public class PluginData extends BundleData {
 
 		try {
 			temp.write(getManifestFile());
+			getManifestFile().setLastModified(timeStamp);
 		} catch (Exception e) {
 			throw new RuntimeException("cannot update manifest for binary deployment", e);
 		}

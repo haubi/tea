@@ -15,6 +15,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
@@ -109,7 +111,15 @@ public class InternalZipExec extends BaseZipExec {
 
 		// add file
 		ZipEntry ze = new ZipEntry(entryName);
-		ze.setTime(source.lastModified());
+		try {
+			BasicFileAttributes attr = Files.readAttributes(source.toPath(), BasicFileAttributes.class);
+			ze.setLastModifiedTime(attr.lastModifiedTime());
+			ze.setLastAccessTime(attr.lastAccessTime());
+			ze.setCreationTime(attr.creationTime());
+		} catch (Exception e) {
+			System.out.println("cannot apply source file timestamps");
+		}
+
 		entries.put(ze, source);
 	}
 

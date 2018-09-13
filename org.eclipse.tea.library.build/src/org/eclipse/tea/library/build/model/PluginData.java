@@ -411,11 +411,8 @@ public class PluginData extends BundleData {
 	/**
 	 * ATTENTION: this method may ONLY be called while building JAR files. The
 	 * MANIFEST.MF file MUST be backed up and restored after the operation.
-	 *
-	 * @param cpUpdates
-	 *            additional classpath replacements.
 	 */
-	public void updateManifestForBinaryDeployment(Map<String, String> cpUpdates) {
+	public void updateManifestForBinaryDeployment() {
 		if (getManifestFile() == null || manifest == null) {
 			return;
 		}
@@ -429,11 +426,6 @@ public class PluginData extends BundleData {
 
 		if (temp == null) {
 			return;
-		}
-
-		// additional remappings
-		if (cpUpdates != null) {
-			updates.putAll(cpUpdates);
 		}
 
 		String[] cp = manifest.getClassPath();

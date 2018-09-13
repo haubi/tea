@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +25,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.egit.core.project.RepositoryMapping;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.tea.library.build.internal.Activator;
@@ -34,8 +34,6 @@ import org.eclipse.tea.library.build.jar.ZipExec;
 import org.eclipse.tea.library.build.jar.ZipExecFactory;
 import org.eclipse.tea.library.build.jar.ZipExecPart;
 import org.eclipse.tea.library.build.util.FileUtils;
-
-import com.google.common.io.Files;
 
 /**
  * Provides information about building a RCP plugin.
@@ -283,6 +281,10 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 		}
 	}
 
+	public boolean isPreserveBinaryStructure() {
+		return Boolean.parseBoolean(data.getSimpleManifestValue("Preserve-Binary-Structure"));
+	}
+
 	private File doExecJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, boolean withBinInc)
 			throws Exception {
 		final File jarFile = new File(distDirectory, getJarFileName(buildVersion));
@@ -290,70 +292,36 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 		// remove the jar file
 		FileUtils.delete(jarFile);
 
-		Map<String, List<String>> binaryFolders = data.getBinaryFolders();
-		String[] binInc = data.getBinaryIncludes();
-		Map<String, List<String>> libNameToFolders = new TreeMap<>();
-		Map<String, String> libNameToJarName = new TreeMap<>();
-		for (String inc : binInc) {
-			List<String> paths = binaryFolders.get(inc);
-			if (paths != null && !paths.isEmpty()) {
-				libNameToFolders.put(inc, paths);
-				if (data.manifest.getNeedUnpack()) {
-					if (inc.equals(".")) {
-						libNameToJarName.put(".", "bin.jar");
-					} else {
-						libNameToJarName.put(inc, inc + ".jar");
-					}
-				}
-			}
-		}
-
 		// update the manifest for binary deployment
-		data.updateManifestForBinaryDeployment(libNameToJarName);
+		data.updateManifestForBinaryDeployment();
 
 		// create the ZIP executor
 		final ZipExec exec = zip.createZipExec();
 		exec.setZipFile(jarFile);
 		exec.setJarMode(true);
 
-		File tmpDir = Files.createTempDir();
-		tmpDir.mkdirs();
-		for (Map.Entry<String, List<String>> entry : libNameToFolders.entrySet()) {
-			String jarName = libNameToJarName.get(entry.getKey());
-			ZipExec nestedExec = null;
-			if (jarName != null) {
-				File tmp = new File(tmpDir, jarName);
-				nestedExec = zip.createZipExec();
-				nestedExec.setZipFile(tmp);
-				nestedExec.setJarMode(true);
-				ZipExecPart part = new ZipExecPart();
-				part.sourceDirectory = tmp.getParentFile();
-				part.relativePaths.add(tmp.getName());
-				part.excludeGit = true;
-				exec.addPart(part);
-			}
-			for (String path : entry.getValue()) {
-				File binDir = new File(data.getBundleDir(), path);
-				if (binDir.isDirectory() && binDir.list().length > 0) {
-					if (nestedExec != null) {
-						ZipExecPart nested = new ZipExecPart();
-						nested.sourceDirectory = binDir;
-						nested.relativePaths.add(".");
-						nestedExec.addPart(nested);
-					} else {
+		// run ZIP on 'bin' directories
+		Map<String, List<String>> binaryFolders = data.getBinaryFolders();
+		String[] binInc = data.getBinaryIncludes();
+
+		for (String inc : binInc) {
+			List<String> paths = binaryFolders.get(inc);
+			if (paths != null && !paths.isEmpty()) {
+				for (String path : paths) {
+					File binDir = new File(data.getBundleDir(), path);
+					if (binDir.isDirectory() && binDir.list().length > 0) {
 						ZipExecPart part = new ZipExecPart();
-						part.sourceDirectory = binDir;
-						part.relativePaths.add(".");
+						if (isPreserveBinaryStructure()) {
+							part.sourceDirectory = data.getBundleDir();
+							part.relativePaths.add(path);
+						} else {
+							part.sourceDirectory = binDir;
+							part.relativePaths.add(".");
+						}
 						part.excludeGit = true;
+
 						exec.addPart(part);
 					}
-				}
-			}
-			if (nestedExec != null) {
-				try {
-					nestedExec.createZip();
-				} catch (Exception ex) {
-					throw new RuntimeException("Unable to zip plug-in '" + data.getBundleName() + "'", ex);
 				}
 			}
 		}
@@ -379,8 +347,6 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 			exec.createZip();
 		} catch (Exception ex) {
 			throw new RuntimeException("Unable to zip plug-in '" + data.getBundleName() + "'", ex);
-		} finally {
-			FileUtils.deleteDirectory(tmpDir);
 		}
 
 		return jarFile;

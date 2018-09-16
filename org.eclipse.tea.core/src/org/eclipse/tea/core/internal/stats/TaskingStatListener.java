@@ -76,8 +76,11 @@ public class TaskingStatListener implements TaskingLifeCycleListener {
 
 		// add additional informations if present from any contribution
 		for (TaskingStatisticsContribution c : contributions) {
-			dto.contributions.put(getContributionQualifier(c),
-					ContextInjectionFactory.invoke(c, TaskingStatisticProvider.class, context.getContext()));
+			Object contribution = ContextInjectionFactory.invoke(c, TaskingStatisticProvider.class,
+					context.getContext());
+			if (contribution != null) {
+				dto.contributions.put(getContributionQualifier(c), contribution);
+			}
 		}
 
 		try {

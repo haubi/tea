@@ -33,9 +33,11 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.PreferenceFilterEntry;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.tea.core.annotations.TaskReloadConfiguration;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.osgi.service.prefs.BackingStoreException;
 
+@TaskReloadConfiguration
 public class TaskImportPreferences {
 
 	private final File file;

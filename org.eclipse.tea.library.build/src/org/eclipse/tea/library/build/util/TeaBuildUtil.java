@@ -126,7 +126,7 @@ public class TeaBuildUtil {
 					// can be compiler confusion and dependencies between
 					// generated artifacts.
 
-					log.info(logTxt + ": fast recompile");
+					log.info(logTxt + ": fast recompile (" + status + ")");
 
 					project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 					status = getStatus(element);

@@ -12,8 +12,11 @@ package org.eclipse.tea.library.build.lcdsl.tasks.p2;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -30,6 +33,7 @@ import org.eclipse.tea.library.build.model.WorkspaceBuild;
 import org.eclipse.tea.library.build.model.WorkspaceData;
 
 import com.wamas.ide.launching.generator.DependencyResolver;
+import com.wamas.ide.launching.generator.DependencyResolver.StartLevel;
 import com.wamas.ide.launching.lcDsl.LaunchConfig;
 import com.wamas.ide.launching.ui.LcDslHelper;
 
@@ -93,6 +97,18 @@ public class TaskGenFeatureFromLcDsl {
 
 	public static Set<PluginBuild> getPluginsForFeature(TaskingLog log, IProject featurePrj, WorkspaceBuild wb,
 			boolean errorIfNotExists) throws IOException {
+		Set<PluginBuild> allPlugins = new TreeSet<>();
+		for (BundleDescription bd : getAllDependencies(log, featurePrj)) {
+			PluginBuild sourcePlugin = wb.getSourcePlugin(bd.getSymbolicName());
+			if (sourcePlugin != null) {
+				allPlugins.add(sourcePlugin);
+			}
+		}
+		return allPlugins;
+	}
+
+	public static List<BundleDescription> getAllDependencies(TaskingLog log, IProject featurePrj)
+			throws FileNotFoundException, IOException {
 		File featureDir = featurePrj.getLocation().toFile();
 
 		// load properties
@@ -113,23 +129,21 @@ public class TaskGenFeatureFromLcDsl {
 		}
 
 		// find launch configurations and gather all dependencies
-		Set<PluginBuild> allPlugins = new TreeSet<>();
+		List<BundleDescription> bds = new ArrayList<>();
 		for (String lcName : dependencies.split(",")) {
 			LaunchConfig lc = LcDslHelper.getInstance().findLaunchConfig(lcName);
 			if (lc == null) {
 				log.info("cannot find launch configuration " + lcName);
-				return Collections.emptySet();
+				return Collections.emptyList();
 			}
 
-			for (Map.Entry<BundleDescription, ?> entry : DependencyResolver.findDependencies(lc, true).entrySet()) {
-				PluginBuild sourcePlugin = wb.getSourcePlugin(entry.getKey().getSymbolicName());
-				if (sourcePlugin != null) {
-					allPlugins.add(sourcePlugin);
-				}
+			for (Map.Entry<BundleDescription, StartLevel> entry : DependencyResolver.findDependencies(lc, true)
+					.entrySet()) {
+				bds.add(entry.getKey());
 			}
 		}
 
-		return allPlugins;
+		return bds;
 	}
 
 }

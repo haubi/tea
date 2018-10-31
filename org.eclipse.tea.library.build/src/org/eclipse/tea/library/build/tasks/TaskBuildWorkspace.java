@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.tea.library.build.tasks;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -57,12 +56,8 @@ public class TaskBuildWorkspace {
 
 		IStatus result = chain.execute(tracker, config.failureThreshold);
 
-		List<String> buildOrder = new ArrayList<>();
-
 		if (result.getSeverity() > IStatus.WARNING) {
 			log.error("Errors during build: " + result);
-		} else {
-			setWorkspaceBuildOrder(buildOrder);
 		}
 
 		return result;

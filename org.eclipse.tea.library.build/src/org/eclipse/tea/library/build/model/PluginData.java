@@ -189,6 +189,14 @@ public class PluginData extends BundleData {
 		manifest.setRequiredExecutionEnvironment(values);
 	}
 
+	public final void setAutomaticModuleName(String value) {
+		manifest.setAutomaticModuleName(value);
+	}
+
+	public final String getAutomaticModuleName() {
+		return manifest.getAutomaticModuleName();
+	}
+
 	@Override
 	public final String getBundleVersion() {
 		if (manifest == null) {

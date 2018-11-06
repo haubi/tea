@@ -223,6 +223,14 @@ final class ManifestHolder {
 		putList("Bundle-RequiredExecutionEnvironment", values);
 	}
 
+	void setAutomaticModuleName(String value) {
+		putSimple("Automatic-Module-Name", value);
+	}
+
+	String getAutomaticModuleName() {
+		return getSimple("Automatic-Module-Name");
+	}
+
 	String getBundleVersion() {
 		return getSimple("Bundle-Version");
 	}
@@ -376,7 +384,8 @@ final class ManifestHolder {
 	}
 
 	public void setGitInfo(String gitUri, String projectPath, String commitId) {
-		putSimple("Eclipse-SourceReferences", "scm:git:" + gitUri + ";path=\"" + projectPath + "\";commitId=" + commitId);
+		putSimple("Eclipse-SourceReferences",
+				"scm:git:" + gitUri + ";path=\"" + projectPath + "\";commitId=" + commitId);
 	}
 
 }

@@ -25,6 +25,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.providers.file.FileWagon;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -41,6 +43,7 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.spi.locator.ServiceLocator;
+import org.eclipse.aether.transport.wagon.WagonProvider;
 import org.eclipse.aether.transport.wagon.WagonTransporterFactory;
 import org.eclipse.core.internal.variables.StringVariableManager;
 import org.eclipse.core.resources.IProject;
@@ -58,6 +61,9 @@ import org.eclipse.tea.library.build.util.FileUtils;
 import org.eclipse.tea.library.build.util.StringHelper;
 
 import com.google.common.base.Charsets;
+
+import io.takari.aether.wagon.OkHttpWagon;
+import io.takari.aether.wagon.OkHttpsWagon;
 
 @SuppressWarnings("restriction")
 public class SynchronizeMavenArtifact {
@@ -308,6 +314,7 @@ public class SynchronizeMavenArtifact {
 		DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
 		locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
 		locator.addService(TransporterFactory.class, WagonTransporterFactory.class);
+		locator.addService(WagonProvider.class, InternalWagonProvider.class);
 		locator.setErrorHandler(new ErrorHandler() {
 
 			@Override
@@ -317,6 +324,28 @@ public class SynchronizeMavenArtifact {
 			}
 		});
 		return locator;
+	}
+
+	private static class InternalWagonProvider implements WagonProvider {
+
+		@Override
+		public Wagon lookup(String roleHint) throws Exception {
+			switch (roleHint) {
+			case "file":
+				return new FileWagon();
+			case "http":
+				return new OkHttpWagon();
+			case "https":
+				return new OkHttpsWagon();
+			default:
+				return null;
+			}
+		}
+
+		@Override
+		public void release(Wagon wagon) {
+		}
+
 	}
 
 	/**

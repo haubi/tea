@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
@@ -113,9 +114,15 @@ public class InternalZipExec extends BaseZipExec {
 		ZipEntry ze = new ZipEntry(entryName);
 		try {
 			BasicFileAttributes attr = Files.readAttributes(source.toPath(), BasicFileAttributes.class);
-			ze.setLastModifiedTime(attr.lastModifiedTime());
-			ze.setLastAccessTime(attr.lastAccessTime());
-			ze.setCreationTime(attr.creationTime());
+			if (!isJar) {
+				ze.setLastModifiedTime(attr.lastModifiedTime());
+				ze.setLastAccessTime(attr.lastAccessTime());
+				ze.setCreationTime(attr.creationTime());
+			} else {
+				ze.setLastModifiedTime(FileTime.fromMillis(0));
+				ze.setLastAccessTime(FileTime.fromMillis(0));
+				ze.setCreationTime(FileTime.fromMillis(0));
+			}
 		} catch (Exception e) {
 			System.out.println("cannot apply source file timestamps");
 		}
@@ -137,7 +144,13 @@ public class InternalZipExec extends BaseZipExec {
 						rel = rel + seg + "/";
 					}
 					ZipEntry de = new ZipEntry(rel);
-					de.setTime(System.currentTimeMillis());
+					if (!isJar) {
+						de.setTime(System.currentTimeMillis());
+					} else {
+						de.setLastModifiedTime(FileTime.fromMillis(0));
+						de.setLastAccessTime(FileTime.fromMillis(0));
+						de.setCreationTime(FileTime.fromMillis(0));
+					}
 					entries.put(de, null);
 				}
 			}

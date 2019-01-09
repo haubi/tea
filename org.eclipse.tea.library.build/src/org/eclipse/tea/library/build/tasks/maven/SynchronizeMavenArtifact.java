@@ -25,6 +25,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.wagon.ConnectionException;
+import org.apache.maven.wagon.StreamWagon;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.providers.file.FileWagon;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -344,6 +346,13 @@ public class SynchronizeMavenArtifact {
 
 		@Override
 		public void release(Wagon wagon) {
+			if (wagon instanceof StreamWagon) {
+				try {
+					((StreamWagon) wagon).closeConnection();
+				} catch (ConnectionException e) {
+					throw new RuntimeException("Cannot close connection", e);
+				}
+			}
 		}
 
 	}

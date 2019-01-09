@@ -276,10 +276,6 @@ public class PluginData extends BundleData {
 		manifest.setActivator(activator);
 	}
 
-	public void setGitInfo(String repoUri, String projectPath, String commitId) {
-		manifest.setGitInfo(repoUri, projectPath, commitId);
-	}
-
 	public List<String> getBinaryClassPath() {
 		if (jarFile != null) {
 			return Collections.singletonList(jarFile.getAbsolutePath());

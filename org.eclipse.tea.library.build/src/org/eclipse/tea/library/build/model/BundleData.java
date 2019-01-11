@@ -102,7 +102,7 @@ public abstract class BundleData {
 		if (manifest != null) {
 			ParameterValue symName = manifest.getSymbolicName();
 			if (symName != null) {
-				bundleName = symName.value;
+				bundleName = symName.getValue();
 				if (projectName != null && !bundleName.equals(projectName)) {
 					Activator.log(IStatus.WARNING,
 							"Missmatch of names: projectName=" + projectName + "  bundleName=" + bundleName, null);

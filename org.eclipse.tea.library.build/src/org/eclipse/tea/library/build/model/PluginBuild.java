@@ -117,17 +117,17 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 		mavenDependencies = new TreeSet<>();
 
 		for (ParameterValue pv : data.getDependencies()) {
-			addSourceDependency(ws, pv.value);
+			addSourceDependency(ws, pv.getValue());
 		}
 
 		for (ParameterValue pv : data.getMavenDependencies()) {
-			addMavenDependency(ws, pv.value);
+			addMavenDependency(ws, pv.getValue());
 		}
 
 		// check fragments
 		ParameterValue fragmentHost = data.getFragmentHost();
 		if (fragmentHost != null) {
-			PluginBuild host = addSourceDependency(ws, fragmentHost.value);
+			PluginBuild host = addSourceDependency(ws, fragmentHost.getValue());
 			if (host != null) {
 				host.fragments.add(this);
 			} else {

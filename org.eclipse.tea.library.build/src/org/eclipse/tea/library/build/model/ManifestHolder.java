@@ -115,7 +115,7 @@ final class ManifestHolder {
 		if (pv == null) {
 			return null;
 		}
-		return pv.value;
+		return pv.getValue();
 	}
 
 	private boolean getBoolean(String name) {
@@ -268,7 +268,7 @@ final class ManifestHolder {
 	 */
 	boolean getNeedUnpack() {
 		ParameterValue value = firstValue("Eclipse-BundleShape");
-		if (value != null && value.value != null && value.value.equals("dir")) {
+		if (value != null && value.getValue() != null && value.getValue().equals("dir")) {
 			return true;
 		}
 

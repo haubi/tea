@@ -28,10 +28,10 @@ public class TeaJdkLibBuildElementFactory implements TeaBuildElementFactory {
 	public Collection<TeaBuildElement> createElements(TeaBuildChain chain, IProject prj) {
 		PluginData data = new PluginData(prj);
 		ParameterValue pv = data.getManifestHeader("Build-JdkLib");
-		if(pv != null) {
-			String libName = pv.value;
+		if (pv != null) {
+			String libName = pv.getValue();
 			String path = pv.getStringParameter("path");
-			
+
 			return Collections.singletonList(new TeaJdkLibBuildElement(prj, libName, path));
 		}
 		return null;

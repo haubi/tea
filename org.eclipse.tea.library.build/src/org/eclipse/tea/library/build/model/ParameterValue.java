@@ -37,7 +37,7 @@ public final class ParameterValue {
 		private static final Param EMPTY = new Param("", "");
 	}
 
-	public String value;
+	private String value;
 	private final Map<String, Param> parameters;
 
 	ParameterValue(String fullString) {
@@ -135,6 +135,14 @@ public final class ParameterValue {
 			return null;
 		}
 		return param.value;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 	public void write(Writer ps) throws IOException {

@@ -220,7 +220,7 @@ public class PluginData extends BundleData {
 
 	public final String getBuddyPolicy() {
 		ParameterValue buddyPolicy = manifest.getBuddyPolicy();
-		return buddyPolicy == null ? null : buddyPolicy.value;
+		return buddyPolicy == null ? null : buddyPolicy.getValue();
 	}
 
 	public final ParameterValue[] getBuddyRegistrations() {
@@ -324,7 +324,7 @@ public class PluginData extends BundleData {
 		}
 
 		for (ParameterValue val : exports) {
-			if (!val.value.equals(id)) {
+			if (!val.getValue().equals(id)) {
 				continue;
 			}
 
@@ -368,7 +368,7 @@ public class PluginData extends BundleData {
 	private Map<String, String> getExternalizeClasspath() {
 		Map<String, String> result = new TreeMap<>();
 		for (ParameterValue v : getManifestHeaderList("Externalize-ClassPath")) {
-			String from = v.value;
+			String from = v.getValue();
 			String to = v.getStringParameter("map");
 
 			result.put(from, to);
@@ -384,7 +384,7 @@ public class PluginData extends BundleData {
 	private Map<String, String> getWamasExternalizeClasspath() {
 		Map<String, String> result = new TreeMap<>();
 		for (ParameterValue v : getManifestHeaderList("WAMAS-Externalize-ClassPath")) {
-			String from = v.value;
+			String from = v.getValue();
 			String to = v.getStringParameter("map");
 
 			result.put(from, to);
@@ -397,7 +397,7 @@ public class PluginData extends BundleData {
 		if (pv == null) {
 			return null;
 		}
-		return pv.value;
+		return pv.getValue();
 	}
 
 	/**
@@ -454,7 +454,7 @@ public class PluginData extends BundleData {
 		ParameterValue[] nc = temp.getNativeCode();
 		if (prefix != null && nc.length > 0) {
 			for (int i = 0; i < nc.length; ++i) {
-				nc[i].value = prefix + nc[i].value;
+				nc[i].setValue(prefix + nc[i].getValue());
 			}
 		}
 

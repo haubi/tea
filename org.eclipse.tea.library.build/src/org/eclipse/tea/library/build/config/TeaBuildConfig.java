@@ -30,4 +30,7 @@ public class TeaBuildConfig implements TaskingConfigurationExtension {
 	@TaskingConfigProperty(description = "Location of the TEA maven configuration file")
 	public String mavenConfigFilePath;
 
+	@TaskingConfigProperty(description = "Products to export", headlessOnly = true, name = "products")
+	public String productsToExport;
+
 }

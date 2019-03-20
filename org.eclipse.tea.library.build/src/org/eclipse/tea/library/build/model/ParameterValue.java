@@ -37,7 +37,7 @@ public final class ParameterValue {
 		private static final Param EMPTY = new Param("", "");
 	}
 
-	private String value;
+	public String value; // public for binary compat with older versions.
 	private final Map<String, Param> parameters;
 
 	ParameterValue(String fullString) {

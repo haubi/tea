@@ -13,6 +13,8 @@ package org.eclipse.tea.library.build.tasks.p2;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.equinox.app.IApplication;
@@ -42,6 +44,8 @@ public class TaskRunProductExport {
 
 	private final String siteName, productFeature, productFileName;
 	private PlatformTriple[] buildPlatforms = PlatformTriple.getAllPlatforms();
+	private final Map<PlatformTriple, File> outputs = new HashMap<>();
+	private final boolean zip;
 
 	/**
 	 * Creates a new product by exporting it from a given update site
@@ -52,14 +56,14 @@ public class TaskRunProductExport {
 	 *            the id of the feature that contains the product file
 	 * @param productFileName
 	 *            the name of the product file (something like myApp.product)
-	 * @param dummy
-	 *            only to have exactly the same parameters as
-	 *            TaskPublishProductUpdateSite
+	 * @param zip
+	 *            Whether to ZIP the result, or leave as a directory
 	 */
-	public TaskRunProductExport(String siteName, String productFeature, String productFileName, boolean dummy) {
+	public TaskRunProductExport(String siteName, String productFeature, String productFileName, boolean zip) {
 		this.siteName = siteName;
 		this.productFeature = productFeature;
 		this.productFileName = productFileName;
+		this.zip = zip;
 	}
 
 	@Override
@@ -99,12 +103,27 @@ public class TaskRunProductExport {
 			// export product for the given platform
 			log.info("Building product '" + productDir.getName() + "'");
 			createProduct(productId, site.directory, new File(productDir, productName), platform, logger);
-			log.info("Archiving product '" + archivedProductFile.getName() + "'");
-			createArchive(jm.getZipExecFactory(), productDir, archivedProductFile);
 
-			// cleanup unpacked version again
-			FileUtils.deleteDirectory(productDir);
+			if (zip) {
+				log.info("Archiving product '" + archivedProductFile.getName() + "'");
+				createArchive(jm.getZipExecFactory(), productDir, archivedProductFile);
+
+				// cleanup unpacked version again
+				FileUtils.deleteDirectory(productDir);
+
+				outputs.put(platform, archivedProductFile);
+			} else {
+				outputs.put(platform, productDir);
+			}
 		}
+	}
+
+	public File getOutput(PlatformTriple platform) {
+		return outputs.get(platform);
+	}
+
+	public String getProductFeatureName() {
+		return productFeature;
 	}
 
 	/**

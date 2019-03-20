@@ -69,9 +69,14 @@ public abstract class AbstractProductBuild {
 	}
 
 	public void addProductTasks(TaskExecutionContext c, String updateSite) {
-		final TaskRunProductExport task = new TaskRunProductExport(updateSite, productBundle, productDefinition, false);
+		addProductTasks(c, updateSite, true);
+	}
+
+	public TaskRunProductExport addProductTasks(TaskExecutionContext c, String updateSite, boolean zip) {
+		final TaskRunProductExport task = new TaskRunProductExport(updateSite, productBundle, productDefinition, zip);
 		task.setPlatformsToBuild(getPlatformsToBuild());
 		c.addTask(task);
+		return task;
 	}
 
 	public PlatformTriple[] getPlatformsToBuild() {

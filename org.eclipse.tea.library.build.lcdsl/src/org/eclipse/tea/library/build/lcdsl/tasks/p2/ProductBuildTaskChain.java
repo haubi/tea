@@ -116,7 +116,7 @@ public class ProductBuildTaskChain implements TaskChain {
 		c.addTask(cache.getCleanup());
 	}
 
-	private static final class ProductSelectionDialog extends TitleAreaDialog {
+	public static final class ProductSelectionDialog extends TitleAreaDialog {
 
 		private CheckboxTableViewer tv;
 		private List<AbstractProductBuild> selected;

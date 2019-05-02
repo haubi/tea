@@ -73,9 +73,14 @@ public abstract class AbstractProductBuild {
 	}
 
 	public TaskRunProductExport addProductTasks(TaskExecutionContext c, String updateSite, boolean zip) {
+		final TaskRunProductExport task = createProductExportTask(updateSite, zip);
+		c.addTask(task);
+		return task;
+	}
+
+	public TaskRunProductExport createProductExportTask(String updateSite, boolean zip) {
 		final TaskRunProductExport task = new TaskRunProductExport(updateSite, productBundle, productDefinition, zip);
 		task.setPlatformsToBuild(getPlatformsToBuild());
-		c.addTask(task);
 		return task;
 	}
 

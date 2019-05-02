@@ -108,6 +108,12 @@ public class TaskExecutionContext {
 		// initialize this context
 		ContextInjectionFactory.invoke(chain, TaskChainContextInit.class, context);
 
+		// in case the context contains background-able tasks
+		Object barrierTask = BackgroundTask.allBarrier(tasks);
+		if (barrierTask != null) {
+			addTask(barrierTask);
+		}
+
 		// only notify about context creation if there is something to do. an
 		// empty context will not have any effect on anything and will, in fact,
 		// not be executed at all by the engine.
@@ -169,6 +175,10 @@ public class TaskExecutionContext {
 		} else {
 			tasks.add(o);
 		}
+	}
+
+	public void addTaskAt(int index, Object o) {
+		tasks.add(index, o);
 	}
 
 	/**

@@ -65,15 +65,17 @@ public class TargetPlatformHelper {
 		ITargetDefinition definition = null;
 		try {
 			URI tpDef = null;
-			if (tp.startsWith("/")) {
-				File f = new File(tp);
-				if (f.isFile()) {
-					tpDef = f.toURI();
-				}
-			} else if (bep != null) {
+			if (bep != null) {
 				IResource member = bep.findMember(tp);
 				if (member != null && member.exists() && member.getType() == IResource.FILE) {
 					tpDef = member.getLocationURI();
+				}
+			}
+
+			if (tpDef == null) {
+				File f = new File(tp);
+				if (f.isFile()) {
+					tpDef = f.toURI();
 				}
 			}
 

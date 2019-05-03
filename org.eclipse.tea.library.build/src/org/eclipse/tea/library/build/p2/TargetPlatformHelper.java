@@ -38,6 +38,29 @@ public class TargetPlatformHelper {
 			throw new IllegalStateException("no target platform set, skipping");
 		}
 
+		ITargetDefinition definition = findTargetDefinition(log, tp, bep);
+
+		if (definition == null) {
+			throw new IllegalStateException("cannot resolve target definition");
+		}
+
+		log.debug("loading target definition");
+		final LoadTargetDefinitionJob job = new LoadTargetDefinitionJob(definition);
+		job.setUser(user);
+		job.addJobChangeListener(new JobChangeAdapter() {
+
+			@Override
+			public void done(IJobChangeEvent event) {
+				if (event.getResult() != Status.OK_STATUS) {
+					Activator.log(IStatus.ERROR, "failed to set the target platform: " + event.getResult(), null);
+				}
+			}
+		});
+		job.schedule();
+		return job;
+	}
+
+	public static ITargetDefinition findTargetDefinition(TaskingLog log, String tp, IProject bep) {
 		final ITargetPlatformService service = getTargetPlatformService();
 		ITargetDefinition definition = null;
 		try {
@@ -72,25 +95,7 @@ public class TargetPlatformHelper {
 		} catch (Exception e) {
 			throw new IllegalStateException("cannot resolve target definition", e);
 		}
-
-		if (definition == null) {
-			throw new IllegalStateException("cannot resolve target definition");
-		}
-
-		log.debug("loading target definition");
-		final LoadTargetDefinitionJob job = new LoadTargetDefinitionJob(definition);
-		job.setUser(user);
-		job.addJobChangeListener(new JobChangeAdapter() {
-
-			@Override
-			public void done(IJobChangeEvent event) {
-				if (event.getResult() != Status.OK_STATUS) {
-					Activator.log(IStatus.ERROR, "failed to set the target platform: " + event.getResult(), null);
-				}
-			}
-		});
-		job.schedule();
-		return job;
+		return definition;
 	}
 
 	private static ITargetDefinition createTargetFromLocation(final ITargetPlatformService service, File installLoc)

@@ -61,36 +61,42 @@ public class WorkspaceData {
 	public WorkspaceData(IWorkspace workspace, TaskingLog console, TeaBuildVersionService bvService) {
 		final IWorkspaceRoot root = workspace.getRoot();
 		for (IProject project : root.getProjects()) {
-			if (!project.exists()) {
-				console.error("project doesn't exist: " + project.getName());
-				continue;
-			}
-			if (!project.isOpen()) {
-				console.warn("project is closed: " + project.getName());
-				continue;
-			}
-
-			final IProjectDescription desc;
 			try {
-				desc = project.getDescription();
-			} catch (CoreException ex) {
-				throw new IllegalStateException(ex);
-			}
-			if (isPluginProject(project)) {
-				PluginData pd = new PluginData(project);
-				plugins.put(pd.getBundleName(), pd);
-				continue;
-			}
-			if (isFeatureProject(project)) {
-				FeatureData fd = new FeatureData(project, bvService);
-				features.put(fd.getBundleName(), fd);
-				continue;
-			}
+				if (!project.exists()) {
+					console.error("project doesn't exist: " + project.getName());
+					continue;
+				}
+				if (!project.isOpen()) {
+					console.warn("project is closed: " + project.getName());
+					continue;
+				}
 
-			if (desc.hasNature(JAVA_NATURE)) {
-				console.warn("skipping plain Java project: " + project.getName());
+				final IProjectDescription desc;
+				try {
+					desc = project.getDescription();
+				} catch (CoreException ex) {
+					throw new IllegalStateException(ex);
+				}
+				if (isPluginProject(project)) {
+					PluginData pd = new PluginData(project);
+					plugins.put(pd.getBundleName(), pd);
+					continue;
+				}
+				if (isFeatureProject(project)) {
+					FeatureData fd = new FeatureData(project, bvService);
+					features.put(fd.getBundleName(), fd);
+					continue;
+				}
+
+				if (desc.hasNature(JAVA_NATURE)) {
+					console.warn("skipping plain Java project: " + project.getName());
+				}
+				unknownProjects.add(project);
+
+			} catch (Throwable t) {
+				console.error(t.getMessage(), t);
+				throw t;
 			}
-			unknownProjects.add(project);
 		}
 
 	}

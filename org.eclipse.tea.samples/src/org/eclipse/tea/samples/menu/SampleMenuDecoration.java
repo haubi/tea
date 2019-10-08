@@ -11,14 +11,13 @@
 package org.eclipse.tea.samples.menu;
 
 import org.eclipse.tea.core.services.TaskingMenuDecoration;
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 
 @Component(service = TaskingMenuDecoration.class)
 public class SampleMenuDecoration implements TaskingMenuDecoration {
 
 	public static final String SAMPLE_MENU = "Samples";
-	
+
 	@TaskingMenuPathDecoration(menuPath = SAMPLE_MENU)
 	public static final String SAMPLE_ICON = "resources/sample.gif";
 

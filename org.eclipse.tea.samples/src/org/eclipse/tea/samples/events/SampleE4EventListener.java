@@ -8,13 +8,13 @@ import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.core.ui.internal.listeners.EventBrokerBridge;
 import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
+//import org.osgi.service.component.annotations.Component;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
 @SuppressWarnings("restriction")
-// uncomment this to enable the listener.
-//@Component(immediate = true)
+// uncomment this and the import to enable the listener.
+// @Component(immediate = true)
 public class SampleE4EventListener implements EventHandler {
 
 	@Activate

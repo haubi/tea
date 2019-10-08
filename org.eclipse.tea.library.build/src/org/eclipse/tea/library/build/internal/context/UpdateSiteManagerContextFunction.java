@@ -25,7 +25,6 @@ import org.osgi.service.component.annotations.Component;
  * Assures that there is exactly one {@link UpdateSiteManager} per
  * {@link TaskExecutionContext}.
  */
-@SuppressWarnings("restriction")
 @Component(service = IContextFunction.class, property = {
 		"service.context.key=org.eclipse.tea.library.build.p2.UpdateSiteManager" })
 public class UpdateSiteManagerContextFunction extends ContextFunction {

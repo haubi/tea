@@ -222,6 +222,9 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 					}
 				}
 			}
+
+			// Now schedule the job
+			((Job) o).schedule();
 		} catch (Exception e) {
 			System.err.println("cannot avoid autobuild");
 			e.printStackTrace();

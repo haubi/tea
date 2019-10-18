@@ -46,3 +46,4 @@ Export-Package: org.eclipse.tea.core;
  org.eclipse.tea.core.internal.stats;x-internal:=true,
  org.eclipse.tea.core.internal.tasks;x-friends:="org.eclipse.tea.core.ui",
  org.eclipse.tea.core.services
+Import-Package: javax.inject;version="1.0.0"

@@ -25,6 +25,12 @@ public interface TeaBuildVersionService {
 	public String getBuildVersion();
 
 	/**
+	 * @return a version string used for "official" display purposes. E.g. a
+	 *         branded project specific version of a main deliverable.
+	 */
+	public String getDisplayVersion();
+
+	/**
 	 * Provides a format for qualifiers which are used to replace the
 	 * 'qualifier' in version strings
 	 *
@@ -43,6 +49,11 @@ public interface TeaBuildVersionService {
 		@Override
 		public String getBuildVersion() {
 			return "1.0.0.qualifier";
+		}
+
+		@Override
+		public String getDisplayVersion() {
+			return getBuildVersion();
 		}
 
 		@Override

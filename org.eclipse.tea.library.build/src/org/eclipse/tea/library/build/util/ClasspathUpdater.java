@@ -87,7 +87,7 @@ public class ClasspathUpdater {
 					continue;
 				}
 
-				IClasspathEntry[] entries = ClasspathComputer.getClasspath(project, model, null, false, true);
+				IClasspathEntry[] entries = ClasspathComputer.getClasspath(project, model, null, true, true);
 
 				// add source attachments where possible. PDE cannot do it,
 				// because of reasons... :(

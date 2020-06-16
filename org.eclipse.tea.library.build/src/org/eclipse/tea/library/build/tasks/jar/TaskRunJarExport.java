@@ -147,6 +147,11 @@ public class TaskRunJarExport {
 
 						IStatus status = TeaBuildUtil.getStatus(new TeaBuildPluginElement(pb));
 						if (status.getSeverity() > IStatus.WARNING) {
+							for (IStatus s : status.getChildren()) {
+								if (s.getSeverity() > IStatus.WARNING) {
+									log.debug(s.getMessage());
+								}
+							}
 							throw new RuntimeException(pb.getPluginName() + " has errors");
 						}
 

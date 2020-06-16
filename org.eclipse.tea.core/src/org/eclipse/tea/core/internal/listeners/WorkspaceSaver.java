@@ -12,12 +12,14 @@ package org.eclipse.tea.core.internal.listeners;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.tea.core.services.TaskingHeadlessLifeCycle;
+import org.eclipse.tea.core.services.TaskingHeadlessLifeCycle.HeadlessPrority;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.osgi.service.component.annotations.Component;
 
 /**
  * Makes sure the workspace is saved when execution of all tasks is done.
  */
+@HeadlessPrority(200)
 @Component
 public class WorkspaceSaver implements TaskingHeadlessLifeCycle {
 

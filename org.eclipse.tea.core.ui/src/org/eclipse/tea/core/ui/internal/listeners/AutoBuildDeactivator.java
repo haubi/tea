@@ -65,7 +65,7 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 	public synchronized void begin(TaskingLog log) throws CoreException {
 		if (nestCount.getAndIncrement() == 0) {
 			log.debug("Disabling automatic build...");
-			autoBuildOriginalState = setAutoBuild(log, false);
+			autoBuildOriginalState = setAutoBuild(log, false, false);
 		}
 	}
 
@@ -87,10 +87,10 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 						"The Eclipse automatic build is disabled. Since the build was successful,"
 								+ " enabling the automatic build is recommended."
 								+ " Should the automatic build be enabled now?");
-				setAutoBuild(log, autoBuild);
+				setAutoBuild(log, autoBuild, true); // suppress in headed mode
 			});
 		} else {
-			setAutoBuild(log, autoBuildOriginalState);
+			setAutoBuild(log, autoBuildOriginalState, !TaskingInjectionHelper.isHeadless(context.getContext()));
 		}
 	}
 
@@ -144,7 +144,7 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 		}
 	}
 
-	private boolean setAutoBuild(TaskingLog log, boolean autoBuild) {
+	private boolean setAutoBuild(TaskingLog log, boolean autoBuild, boolean suppressBuild) {
 		boolean originalState = false;
 		synchronized (suppressedProjects) {
 			try {
@@ -156,7 +156,7 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 
 				// we have 100ms worst case to react (scheduling delay of auto
 				// build).
-				if (!suppressedProjects.isEmpty()) {
+				if (!suppressedProjects.isEmpty() && suppressBuild) {
 					suppressBuild(suppressedProjects);
 				}
 			} catch (Exception e) {

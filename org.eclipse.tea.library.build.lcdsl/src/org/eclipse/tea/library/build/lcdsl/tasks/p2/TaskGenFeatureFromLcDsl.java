@@ -133,8 +133,7 @@ public class TaskGenFeatureFromLcDsl {
 		for (String lcName : dependencies.split(",")) {
 			LaunchConfig lc = LcDslHelper.getInstance().findLaunchConfig(lcName);
 			if (lc == null) {
-				log.info("cannot find launch configuration " + lcName);
-				return Collections.emptyList();
+				throw new IllegalStateException("Cannot find launch configuartion " + lcName);
 			}
 
 			for (Map.Entry<BundleDescription, StartLevel> entry : DependencyResolver.findDependencies(lc, true)

@@ -53,6 +53,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.config.BuildDirectories;
 import org.eclipse.tea.library.build.config.TeaBuildConfig;
@@ -88,6 +89,10 @@ public class SynchronizeMavenArtifact {
 		if (properties == null) {
 			return;
 		}
+
+		// close jar files providing Annotations, see
+		// https://bugs.eclipse.org/565436
+		AptConfig.setFactoryPath(null, AptConfig.getFactoryPath(null));
 
 		ServiceLocator locator = createServiceLocator(log);
 		RepositorySystem system = locator.getService(RepositorySystem.class);

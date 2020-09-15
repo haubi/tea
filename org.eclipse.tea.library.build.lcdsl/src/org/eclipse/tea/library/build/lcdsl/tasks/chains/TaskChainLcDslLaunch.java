@@ -14,7 +14,6 @@ import org.eclipse.tea.core.TaskExecutionContext;
 import org.eclipse.tea.core.annotations.TaskChainContextInit;
 import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskChain.TaskChainId;
-import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.lcdsl.tasks.TaskLcDslLaunch;
 import org.eclipse.tea.library.build.lcdsl.tasks.config.LcDslLaunchConfig;
 import org.osgi.service.component.annotations.Component;
@@ -24,7 +23,7 @@ import org.osgi.service.component.annotations.Component;
 public class TaskChainLcDslLaunch implements TaskChain {
 
 	@TaskChainContextInit
-	public void init(TaskExecutionContext c, LcDslLaunchConfig cfg, TaskingLog log) {
+	public void init(TaskExecutionContext c, LcDslLaunchConfig cfg) {
 		c.addTask(new TaskLcDslLaunch(cfg.launchConfig, true));
 	}
 

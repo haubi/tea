@@ -19,5 +19,7 @@ Require-Bundle: org.eclipse.tea.core,
  com.google.guava
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/org.eclipse.tea.ease.internal.ListEaseScripts.xml,
- OSGI-INF/org.eclipse.tea.ease.internal.menu.EaseScriptProvider.xml
+ OSGI-INF/org.eclipse.tea.ease.internal.menu.EaseScriptProvider.xml,
+ OSGI-INF/org.eclipse.tea.ease.chains.TaskChainRunEaseScript.xml,
+ OSGI-INF/org.eclipse.tea.ease.config.EaseScriptConfig.xml
 Export-Package: org.eclipse.tea.ease

@@ -14,7 +14,7 @@ import org.eclipse.tea.core.services.TaskingConfigurationExtension;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension.TaskingConfig;
 import org.osgi.service.component.annotations.Component;
 
-@TaskingConfig(description = "TEA Core Configuration")
+@TaskingConfig(description = "LcDSL Launch Configuration")
 @Component
 public class LcDslLaunchConfig implements TaskingConfigurationExtension {
 

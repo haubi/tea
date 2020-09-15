@@ -38,8 +38,17 @@ public class ListEaseScripts implements TaskChain {
 
 	public static final class ListScripts {
 		@Execute
-		public void list(TaskingLog log) {
+		public void list(TaskingLog log) throws Exception {
 			final IRepositoryService repo = PlatformUI.getWorkbench().getService(IRepositoryService.class);
+
+			log.info("Waiting for script locations to load");
+			repo.update(true);
+			while (repo.getScripts().isEmpty()) {
+				Thread.sleep(100);
+			}
+			// we have NO way of knowing whether things are fully loaded... :|
+			Thread.sleep(500);
+			log.info("...loaded");
 
 			for (IScript script : repo.getScripts()) {
 				log.info(script.getPath().toString());

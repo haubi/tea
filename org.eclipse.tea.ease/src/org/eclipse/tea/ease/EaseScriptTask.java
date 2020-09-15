@@ -39,6 +39,15 @@ public class EaseScriptTask {
 		final IScriptService scriptService = PlatformUI.getWorkbench().getService(IScriptService.class);
 		final IRepositoryService repoService = PlatformUI.getWorkbench().getService(IRepositoryService.class);
 
+		log.info("Waiting for script locations to load");
+		repoService.update(true);
+		while (repoService.getScripts().isEmpty()) {
+			Thread.sleep(100);
+		}
+		// we have NO way of knowing whether things are fully loaded... :|
+		Thread.sleep(500);
+		log.info("...loaded");
+
 		IScript s = repoService.getScript(script);
 		if (s == null) {
 			throw new RuntimeException("no script named " + script);

@@ -22,7 +22,9 @@ Require-Bundle: org.eclipse.core.resources,
  org.eclipse.tea.core.ui
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/org.eclipse.tea.library.build.lcdsl.tasks.chains.TaskChainBuildAnyFeatureSite.xml,
- OSGI-INF/org.eclipse.tea.library.build.lcdsl.tasks.p2.ProductBuildTaskChain.xml
+ OSGI-INF/org.eclipse.tea.library.build.lcdsl.tasks.p2.ProductBuildTaskChain.xml,
+ OSGI-INF/org.eclipse.tea.library.build.lcdsl.tasks.chains.TaskChainLcDslLaunch.xml,
+ OSGI-INF/org.eclipse.tea.library.build.lcdsl.tasks.config.LcDslLaunchConfig.xml
 Export-Package: org.eclipse.tea.library.build.lcdsl.tasks,
  org.eclipse.tea.library.build.lcdsl.tasks.chains,
  org.eclipse.tea.library.build.lcdsl.tasks.p2

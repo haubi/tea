@@ -68,7 +68,7 @@
     <repository>
       <id>ease-nightly</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/ease/update/nightly</url>
+      <url>http://download.eclipse.org/ease/integration/nightly</url>
     </repository>
   </repositories>
 

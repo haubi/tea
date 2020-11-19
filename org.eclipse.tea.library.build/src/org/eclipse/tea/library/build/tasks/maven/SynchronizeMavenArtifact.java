@@ -54,6 +54,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jdt.apt.core.util.AptConfig;
+import org.eclipse.jdt.internal.core.JavaModelManager;
+import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.config.BuildDirectories;
 import org.eclipse.tea.library.build.config.TeaBuildConfig;
@@ -90,20 +92,41 @@ public class SynchronizeMavenArtifact {
 			return;
 		}
 
-		// close jar files providing Annotations, see
-		// https://bugs.eclipse.org/565436
-		AptConfig.setFactoryPath(null, AptConfig.getFactoryPath(null));
+		// Close jar files potentially in use by the Indexer:
+		// The Indexer actually leaves closing real files to finalization,
+		// see https://bugs.eclipse.org/567661
+		// and https://bugs.eclipse.org/406170
+		// Although discardJobs() does wait for the Indexer jobs to
+		// terminate, the resources may take a little longer to get ready
+		// for finalization. But instead of sleeping, we do something else.
+		IndexManager indexManager = JavaModelManager.getIndexManager();
+		indexManager.disable();
 
-		ServiceLocator locator = createServiceLocator(log);
-		RepositorySystem system = locator.getService(RepositorySystem.class);
-		RepositorySystemSession session = createSession(log, system);
-		List<RemoteRepository> remotes = createRemoteRepositories();
+		try {
+			indexManager.discardJobs(null);
 
-		Collection<PluginBuild> pbs = wb.getSourcePlugIns();
-		for (PluginBuild pb : pbs) {
-			if (!pb.getMavenExternalJarDependencies().isEmpty() && !pb.getData().isBinary()) {
-				runSingle(log, pb, system, session, remotes);
+			// close jar files providing Annotations, see
+			// https://bugs.eclipse.org/565436
+			AptConfig.setFactoryPath(null, AptConfig.getFactoryPath(null));
+
+			ServiceLocator locator = createServiceLocator(log);
+			RepositorySystem system = locator.getService(RepositorySystem.class);
+			RepositorySystemSession session = createSession(log, system);
+			List<RemoteRepository> remotes = createRemoteRepositories();
+
+			Collection<PluginBuild> pbs = wb.getSourcePlugIns();
+
+			// Try to close the Indexer's file handles now.
+			System.gc();
+			System.runFinalization();
+
+			for (PluginBuild pb : pbs) {
+				if (!pb.getMavenExternalJarDependencies().isEmpty() && !pb.getData().isBinary()) {
+					runSingle(log, pb, system, session, remotes);
+				}
 			}
+		} finally {
+			indexManager.enable();
 		}
 	}
 

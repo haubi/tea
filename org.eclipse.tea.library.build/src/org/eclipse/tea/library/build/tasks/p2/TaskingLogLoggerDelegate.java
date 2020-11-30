@@ -30,14 +30,22 @@ public class TaskingLogLoggerDelegate implements ILog {
 
 	@Override
 	public void log(IStatus status) {
+		log(status, "");
+	}
+
+	private void log(IStatus status, String indent) {
 		if (status.matches(IStatus.ERROR)) {
-			log.info("ERROR: " + status.getMessage());
+			log.info(indent + "ERROR: " + status.getMessage(), status.getException());
 		} else if (status.matches(IStatus.WARNING)) {
-			log.info("WARNING: " + status.getMessage());
+			log.info(indent + "WARNING: " + status.getMessage(), status.getException());
 		} else if (status.matches(IStatus.INFO)) {
-			log.info("INFO: " + status.getMessage());
+			log.info(indent + "INFO: " + status.getMessage(), status.getException());
 		} else {
-			log.info(status.getMessage());
+			log.info(status.getMessage(), status.getException());
+		}
+
+		for (IStatus child : status.getChildren()) {
+			log(child, indent + "  ");
 		}
 	}
 

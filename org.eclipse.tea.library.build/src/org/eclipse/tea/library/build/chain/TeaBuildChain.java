@@ -132,6 +132,13 @@ public class TeaBuildChain {
 		return chain;
 	}
 
+	public List<String> getBuildOrder() {
+		return groupedElements.values().stream()
+				.flatMap(teaBuildElement -> teaBuildElement.stream().filter(e -> e instanceof TeaBuildProjectElement)
+						.map(e -> ((TeaBuildProjectElement) e).getProject().getName()))
+				.collect(Collectors.toList());
+	}
+
 	/**
 	 * Retrieve the {@link TeaBuildElement} for the given name. This can be used
 	 * to lookup specific elements e.g. for dependency wiring.

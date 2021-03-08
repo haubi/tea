@@ -48,11 +48,7 @@ public class TaskBuildWorkspace {
 		TeaBuildChain chain = TeaBuildChain.make(taskContext,
 				Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects()));
 
-		if (config.batchCompile) {
-			// to allow parallel builds to happen at all during batch execution,
-			// remove build order in workspace.
-			setWorkspaceBuildOrder(null);
-		}
+		setWorkspaceBuildOrder(chain.getBuildOrder());
 
 		IStatus result = chain.execute(tracker, config.failureThreshold);
 

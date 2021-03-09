@@ -138,27 +138,32 @@ public class TaskingContainerImpl implements TaskingContainer {
 	}
 
 	private GroupingNode getGroupingNode(String id, Map<String, GroupingNode> allNodes) {
-		return allNodes.computeIfAbsent(id, (key) -> {
-			GroupingNode node = new GroupingNode(key);
+		GroupingNode groupingNode = allNodes.get(id);
+		if (groupingNode != null) {
+			return groupingNode;
+		}
+		String key = id;
 
-			// prevent endless recursion.
-			if (key.equals(TaskingMenuDecoration.NO_GROUPING)) {
-				return node;
-			}
+		GroupingNode node = new GroupingNode(key);
+		allNodes.put(id, node);
 
-			// if the grouping is defined, use metadata, otherwise we assume it
-			// is after the NO_GROUPING node.
-			TaskingMenuGroupingId defined = definedGroupingIds.get(key);
-			if (defined == null) {
-				getGroupingNode(TaskingMenuDecoration.NO_GROUPING, allNodes).after.add(node);
-			} else if (!Strings.isNullOrEmpty(defined.afterGroupingId())) {
-				getGroupingNode(defined.afterGroupingId(), allNodes).after.add(node);
-			} else {
-				getGroupingNode(defined.beforeGroupingId(), allNodes).before.add(node);
-			}
-
+		// prevent endless recursion.
+		if (key.equals(TaskingMenuDecoration.NO_GROUPING)) {
 			return node;
-		});
+		}
+
+		// if the grouping is defined, use metadata, otherwise we assume it
+		// is after the NO_GROUPING node.
+		TaskingMenuGroupingId defined = definedGroupingIds.get(key);
+		if (defined == null) {
+			getGroupingNode(TaskingMenuDecoration.NO_GROUPING, allNodes).after.add(node);
+		} else if (!Strings.isNullOrEmpty(defined.afterGroupingId())) {
+			getGroupingNode(defined.afterGroupingId(), allNodes).after.add(node);
+		} else {
+			getGroupingNode(defined.beforeGroupingId(), allNodes).before.add(node);
+		}
+
+		return node;
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -484,6 +485,16 @@ public final class FileUtils {
 		}
 
 		return r;
+	}
+
+	public static boolean equals(File f1, File f2) {
+		try {
+			byte[] b1 = java.nio.file.Files.readAllBytes(f1.toPath());
+			byte[] b2 = java.nio.file.Files.readAllBytes(f2.toPath());
+			return Arrays.equals(b1, b2);
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
 }

@@ -299,14 +299,29 @@ public class SynchronizeMavenArtifact {
 			}
 		}
 
-		// force refresh of file/link in any case.
-		FileUtils.delete(targetFile);
-
+		boolean copyNeeded = true;
+		// refresh of file/link:
 		try {
-			targetFile = java.nio.file.Files.createSymbolicLink(targetFile.toPath(), file.toPath()).toFile();
-			log.info("symlink created: " + targetFile);
-		} catch (IOException e) {
-			FileUtils.copyFileToDirectory(file, target);
+			FileUtils.delete(targetFile);
+		} catch (java.lang.IllegalStateException e) { // cannot delete
+			if (FileUtils.equals(targetFile, file)) {
+				// ignore
+				log.info("Could not update file. Probably in use. Can be ignored since contents is the same: "
+						+ targetFile);
+				copyNeeded = false;
+			} else {
+				throw e;
+			}
+		}
+
+		if (copyNeeded) {
+			try {
+				targetFile = java.nio.file.Files.createSymbolicLink(targetFile.toPath(), file.toPath()).toFile();
+			} catch (IOException e) {
+				log.info("Failed to create symlink for: " + targetFile + " (" + e.getClass().getName() + " "
+						+ e.getMessage() + ")");
+				FileUtils.copyFileToDirectory(file, target);
+			}
 		}
 	}
 

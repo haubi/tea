@@ -66,9 +66,9 @@
       <url>https://mduft.github.io/lcdsl-latest</url>
     </repository>
     <repository>
-      <id>ease-nightly</id>
+      <id>ease-release</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/ease/integration/nightly</url>
+      <url>http://download.eclipse.org/ease/release/latest</url>
     </repository>
   </repositories>
 

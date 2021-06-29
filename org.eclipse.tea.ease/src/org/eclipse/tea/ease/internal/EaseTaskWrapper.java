@@ -70,7 +70,7 @@ public final class EaseTaskWrapper {
 		}
 
 		// last try to use whatever it is as script.
-		scriptEngine.inject(task);
+		scriptEngine.inject(task, false);
 	}
 
 	@Override

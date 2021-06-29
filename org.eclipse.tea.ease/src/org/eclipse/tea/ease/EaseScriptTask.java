@@ -60,10 +60,8 @@ public class EaseScriptTask {
 		engine.setOutputStream(log.info());
 		engine.setCloseStreamsOnTerminate(false);
 
-		ScriptResult result = engine.executeSync(s.getResource());
-		if (result.hasException()) {
-			throw result.getException();
-		}
+		ScriptResult result = engine.execute(s.getResource());
+		result.get(); // waits and throws in case.
 	}
 
 	@Override

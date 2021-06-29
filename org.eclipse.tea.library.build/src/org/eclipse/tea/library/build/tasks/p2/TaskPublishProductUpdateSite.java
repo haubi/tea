@@ -123,6 +123,21 @@ public class TaskPublishProductUpdateSite {
 
 		final UpdateSite site = um.getSite(siteName);
 
+		// ensure the feature is existing
+		final FeatureBuild feature = wb.getFeature(productFeature);
+		if (feature == null) {
+			throw new RuntimeException("Cannot find feature " + productFeature + "'");
+		}
+
+		// check if there are binaries in the feature.
+		Properties props = readProperties(feature);
+		String customBin = props.getProperty("customBinaries");
+		boolean hasBin = false;
+
+		if (customBin != null) {
+			hasBin = true;
+		}
+
 		final Set<File> featureLocations = new LinkedHashSet<>();
 		final Set<File> pluginLocations = new LinkedHashSet<>();
 		File deltaPack = null;
@@ -160,18 +175,12 @@ public class TaskPublishProductUpdateSite {
 			}
 		}
 
-		if (deltaPack == null) {
+		if (deltaPack == null && !hasBin) {
 			throw new IllegalStateException(
 					"Cannot find delta-pack. Do you have the correct Target Platform activated?");
 		}
 
 		log.info("found " + (featureLocations.size() - fSize) + " locations from target platform");
-
-		// ensure the feature is existing
-		final FeatureBuild feature = wb.getFeature(productFeature);
-		if (feature == null) {
-			throw new RuntimeException("Cannot find feature " + productFeature + "'");
-		}
 
 		// ensure that the product file is existing
 		final File productFile = new File(feature.getData().getBundleDir(), productFileName);
@@ -203,7 +212,8 @@ public class TaskPublishProductUpdateSite {
 		actions.add(new FeaturesAction(featureLocations.toArray(new File[featureLocations.size()])));
 		actions.add(new BundlesAction(pluginLocations.toArray(new File[pluginLocations.size()])));
 
-		actions.add(new TeaProductAction(productDescriptor, getExecutablesDir(deltaPack)));
+		actions.add(new TeaProductAction(productDescriptor, getExecutablesDir(deltaPack),
+				hasBin ? new File(feature.getData().getBundleDir(), customBin) : null));
 		actions.add(new RootIUAction(feature.getFeatureName(), Version.parseVersion(featureVersion),
 				feature.getFeatureName()));
 
@@ -274,20 +284,25 @@ public class TaskPublishProductUpdateSite {
 	 * content of the update site
 	 */
 	protected File createCategoryFile(JarManager jarManager, WorkspaceBuild wb, FeatureBuild feature) throws Exception {
-		File propertyFile = new File(feature.getData().getBundleDir(), "wpob.properties");
-		if (!propertyFile.exists() || !propertyFile.canRead()) {
-			throw new RuntimeException("Unable to find '" + propertyFile + "'");
-		}
-		Properties properties = FileUtils.readProperties(propertyFile);
+		Properties properties = readProperties(feature);
 		String categoryName = properties.getProperty("category");
 		if (categoryName == null || categoryName.isEmpty()) {
-			throw new RuntimeException("Missing 'category' entry in '" + propertyFile + "'");
+			throw new RuntimeException("Missing 'category' entry in 'wpob.properties'");
 		}
 		File dirName = BuildDirectories.get().getOutputDirectory();
 		File categoryFile = new File(dirName, "category.xml");
 		UpdateSiteCategory.generateCategoryXml(categoryFile,
 				Collections.singletonMap(feature.getFeatureName(), "Default"), wb, jarManager);
 		return categoryFile;
+	}
+
+	private Properties readProperties(FeatureBuild feature) {
+		File propertyFile = new File(feature.getData().getBundleDir(), "wpob.properties");
+		if (!propertyFile.exists() || !propertyFile.canRead()) {
+			throw new RuntimeException("Unable to find '" + propertyFile + "'");
+		}
+		Properties properties = FileUtils.readProperties(propertyFile);
+		return properties;
 	}
 
 	/**

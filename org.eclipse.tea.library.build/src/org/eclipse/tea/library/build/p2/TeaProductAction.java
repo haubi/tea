@@ -56,6 +56,9 @@ import org.eclipse.pde.internal.build.IPDEBuildConstants;
 @SuppressWarnings("restriction")
 public class TeaProductAction extends ProductAction implements IPDEBuildConstants {
 
+	private final File platformExecutables;
+	private final File overrideExecutables;
+
 	/**
 	 * Creates a new product publishing action
 	 *
@@ -64,8 +67,11 @@ public class TeaProductAction extends ProductAction implements IPDEBuildConstant
 	 * @param executables
 	 *            the location of the feature containing the executables
 	 */
-	public TeaProductAction(IProductDescriptor product, File executables) {
+	public TeaProductAction(IProductDescriptor product, File executables, File overrideExecutables) {
 		super(null, product, "tooling", executables);
+
+		this.platformExecutables = executables;
+		this.overrideExecutables = overrideExecutables;
 	}
 
 	@Override
@@ -147,8 +153,8 @@ public class TeaProductAction extends ProductAction implements IPDEBuildConstant
 
 	@Override
 	protected IPublisherAction createApplicationExecutableAction(String[] configSpecs) {
-		return new TeaApplicationLauncherAction(id, version, flavor, executableName, getExecutablesLocation(),
-				configSpecs);
+		return new TeaApplicationLauncherAction(id, version, flavor, executableName, platformExecutables, configSpecs,
+				overrideExecutables);
 	}
 
 	/**

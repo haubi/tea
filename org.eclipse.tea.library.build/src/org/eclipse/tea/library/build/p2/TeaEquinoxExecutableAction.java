@@ -21,13 +21,19 @@ import org.eclipse.equinox.p2.publisher.eclipse.IBrandingAdvice;
 @SuppressWarnings("restriction")
 public class TeaEquinoxExecutableAction extends EquinoxExecutableAction {
 
+	private final boolean fullBrand;
+
 	public TeaEquinoxExecutableAction(ExecutablesDescriptor executables, String configSpec, String idBase,
-			Version version, String flavor) {
+			Version version, String flavor, boolean fullBrand) {
 		super(executables, configSpec, idBase, version, flavor);
+
+		this.fullBrand = fullBrand;
 	}
 
 	@Override
 	protected void fullBrandExecutables(ExecutablesDescriptor descriptor, IBrandingAdvice advice) {
-		super.fullBrandExecutables(descriptor, new TeaBrandingAdvice(advice));
+		if (fullBrand) {
+			super.fullBrandExecutables(descriptor, new TeaBrandingAdvice(advice));
+		}
 	}
 }

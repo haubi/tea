@@ -63,6 +63,8 @@ public class TaskingPreferenceInitializer extends AbstractPreferenceInitializer 
 
 					if (f.getType().equals(String.class)) {
 						Activator.getInstance().getPreferenceStore().setDefault(propertyName, (String) v);
+					} else if (f.getType().equals(Integer.class) || f.getType().equals(int.class)) {
+						Activator.getInstance().getPreferenceStore().setDefault(propertyName, (Integer) v);
 					} else if (f.getType().equals(Long.class) || f.getType().equals(long.class)) {
 						Activator.getInstance().getPreferenceStore().setDefault(propertyName, (Long) v);
 					} else if (f.getType().equals(Boolean.class) || f.getType().equals(boolean.class)) {

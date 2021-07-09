@@ -53,10 +53,49 @@ public class TaskBuildWorkspace {
 		IStatus result = chain.execute(tracker, config.failureThreshold);
 
 		if (result.getSeverity() > IStatus.WARNING) {
-			log.error("Errors during build: " + result);
+			log.error("Errors during build: " + formatStatus(result, ""));
+
 		}
 
 		return result;
+	}
+
+	private String formatStatus(IStatus status, String indent) {
+		StringBuilder builder = new StringBuilder();
+
+		builder.append(indent).append(formatSeverity(status.getSeverity())).append(": ");
+		if (status.getPlugin() != null) {
+			builder.append(status.getPlugin()).append(": ");
+		}
+		if (status.getCode() != 0) {
+			builder.append("code=").append(status.getCode()).append(": ");
+		}
+		builder.append(status.getMessage());
+		if (status.getException() != null) {
+			builder.append(" (").append(status.getException().toString()).append(")");
+		}
+
+		for (IStatus child : status.getChildren()) {
+			builder.append('\n').append(formatStatus(child, indent + "  "));
+		}
+
+		return builder.toString();
+	}
+
+	private String formatSeverity(int severity) {
+		if (severity == IStatus.OK) {
+			return "OK";
+		} else if (severity == IStatus.ERROR) {
+			return "ERROR";
+		} else if (severity == IStatus.WARNING) {
+			return "WARNING";
+		} else if (severity == IStatus.INFO) {
+			return "INFO";
+		} else if (severity == IStatus.CANCEL) {
+			return "CANCEL";
+		} else {
+			return "severity=" + severity;
+		}
 	}
 
 	/**

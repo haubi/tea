@@ -75,13 +75,14 @@ public class TeaApplicationLauncherAction extends ApplicationLauncherAction {
 
 		String launcherName = null;
 		for (File file : result.listFiles()) {
-			if (file.getName().toLowerCase().equals("eclipsec.exe")) {
-				// ignore for compat.
+			if (file.getName().toLowerCase().endsWith("c.exe") || file.getName().toLowerCase().endsWith("c")) {
+				// ignore for compat. eclipsec.exe (older versions), myprodc.exe
+				// (newer versions). also catch unix files which just end with c
 				continue;
 			}
 
 			if (file.getName().toLowerCase().endsWith(".exe")) {
-				launcherName = file.getName().substring(file.getName().length() - 4);
+				launcherName = file.getName().substring(0, file.getName().length() - 4);
 			} else {
 				launcherName = file.getName();
 			}

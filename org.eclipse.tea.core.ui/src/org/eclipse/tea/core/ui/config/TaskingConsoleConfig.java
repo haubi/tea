@@ -21,7 +21,7 @@ public class TaskingConsoleConfig implements TaskingConfigurationExtension {
 	@TaskingConfigProperty(description = "Use colored streams")
 	public Boolean useColors = true;
 
-	@TaskingConfigProperty(description = "Adapt colors to dark theme")
+	@TaskingConfigProperty(description = "Force colors to dark theme")
 	public Boolean useDarkColors = false;
 
 }

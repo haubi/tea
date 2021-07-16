@@ -12,6 +12,7 @@ package org.eclipse.tea.core.ui;
 
 import java.io.PrintStream;
 
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
@@ -35,6 +36,7 @@ import org.osgi.service.component.annotations.Component;
  * If this class is used outside the IDE, all output goes to {@code System.out}
  * or {@code System.err}.
  */
+@SuppressWarnings("restriction")
 @Component(service = TaskingLog.class)
 @TaskingLogQualifier(headless = false)
 public class TaskingConsole extends TaskingLog {
@@ -86,7 +88,11 @@ public class TaskingConsole extends TaskingLog {
 			}
 
 			if (config.useColors) {
-				if (config.useDarkColors) {
+
+				boolean isDarkTheme = ((IThemeEngine) Display.getDefault().getData("org.eclipse.e4.ui.css.swt.theme"))
+						.getActiveTheme().getLabel().equals("Dark");
+
+				if (config.useDarkColors || isDarkTheme) {
 					sInfo.setColor(new Color(null, 164, 164, 164));
 					sStd.setColor(new Color(null, 255, 255, 255));
 					sWrn.setColor(new Color(null, 255, 190, 50));

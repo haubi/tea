@@ -42,7 +42,8 @@ public class TreeProgressRenderer extends OwnerDrawLabelProvider {
 	}
 
 	private void drawVisNode(Event event, VisualizationNode node) {
-		int percentage = (node.getCurrentProgress() * 100 / node.getTotalProgress());
+		int totalProgress = node.getTotalProgress();
+		int percentage = (totalProgress == 0 ? 100 : node.getCurrentProgress() * 100 / totalProgress);
 
 		GC gc = event.gc;
 		Color foreground = gc.getForeground();

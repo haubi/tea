@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -78,6 +79,7 @@ public class SynchronizeMavenArtifact {
 			RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN);
 	private final static RepositoryPolicy SNAPSHOT_POLICY = new RepositoryPolicy(true,
 			RepositoryPolicy.UPDATE_POLICY_ALWAYS, RepositoryPolicy.CHECKSUM_POLICY_WARN);
+	private static String lastExceptionName;
 	private MavenConfig properties;
 
 	@Override
@@ -101,6 +103,7 @@ public class SynchronizeMavenArtifact {
 		// for finalization. But instead of sleeping, we do something else.
 		IndexManager indexManager = JavaModelManager.getIndexManager();
 		indexManager.disable();
+		lastExceptionName = null;
 
 		try {
 			indexManager.discardJobs(null);
@@ -275,7 +278,12 @@ public class SynchronizeMavenArtifact {
 			File file = result.getArtifact().getFile();
 			addFileToProjectsMavenFolder(log, target, resolved, result, file);
 		} catch (Exception e) {
-			log.error("cannot resolve " + mvn.getGroupId() + ":" + mvn.getArtifactId() + ":" + mvn.getVersion());
+			String c = mvn.getClassifier();
+			if (!"sources".equals(c)) {
+				String classifier = c == null || c.isEmpty() ? "" : (":" + c);
+				log.error("cannot resolve " + mvn.getGroupId() + ":" + mvn.getArtifactId() + classifier + ":"
+						+ mvn.getVersion());
+			}
 			throw new RuntimeException("failed to synchronize " + rq.getArtifact().getArtifactId(), e);
 		}
 	}
@@ -318,8 +326,19 @@ public class SynchronizeMavenArtifact {
 			try {
 				targetFile = java.nio.file.Files.createSymbolicLink(targetFile.toPath(), file.toPath()).toFile();
 			} catch (IOException e) {
-				log.info("Failed to create symlink for: " + targetFile + " (" + e.getClass().getName() + " "
-						+ e.getMessage() + ")");
+				String exName = e.getClass().getName();
+				// don't spam missing rights for symlink creation
+				if (!Objects.equals(exName, lastExceptionName)) {
+					lastExceptionName = exName;
+					// Windows 10:
+					// "$file: Dem Client fehlt ein erforderliches Recht.\r\n"
+					String msg = e.getMessage();
+					if (msg != null) {
+						msg = msg.replace("\n", "\\n");
+						msg = msg.replace("\r", "\\r");
+					}
+					log.warn("cannot create symlink for: " + targetFile + " (" + exName + " " + msg + ")");
+				}
 				FileUtils.copyFileToDirectory(file, target);
 			}
 		}

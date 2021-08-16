@@ -412,6 +412,12 @@ public class PluginData extends BundleData {
 		return getSimpleManifestValue("Prefix-NativeCode");
 	}
 
+	public boolean isJarBundleShape() {
+		String x = getSimpleManifestValue("Eclipse-BundleShape");
+		return !"dir".equals(x); // "jar" or null
+		// no support for PDEs old "unpack" guessing
+	}
+
 	/**
 	 * ATTENTION: this method may ONLY be called while building JAR files. The
 	 * MANIFEST.MF file MUST be backed up and restored after the operation.

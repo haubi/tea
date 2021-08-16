@@ -39,6 +39,9 @@ public abstract class BundleBuild<T extends BundleData> {
 	public abstract File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion,
 			JarManager jarManager) throws Exception;
 
+	public abstract File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion,
+			JarManager jarManager, boolean withSources) throws Exception;
+
 	/**
 	 * Returns the JAR filename for the specified build version
 	 *

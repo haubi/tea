@@ -202,6 +202,13 @@ public class FeatureBuild extends BundleBuild<FeatureData> {
 		return pluginElement;
 	}
 
+	@Override
+	public File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, JarManager jarManager,
+			boolean withSources) throws Exception {
+		// ignore withSources
+		return execJarCommands(zip, distDirectory, buildVersion, jarManager);
+	}
+
 	/**
 	 * Creates the JAR file for this feature.
 	 */

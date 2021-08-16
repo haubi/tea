@@ -106,8 +106,13 @@ public final class JarManager {
 	 * @return JAR file
 	 */
 	public File execJarCommands(BundleBuild<?> bundle, File destDirectory) throws Exception {
+		boolean withSource = false;
+		return execJarCommands(bundle, destDirectory, withSource);
+	}
+
+	public File execJarCommands(BundleBuild<?> bundle, File destDirectory, boolean withSource) throws Exception {
 		String version = createNewVersion(bundle.getData());
-		return bundle.execJarCommands(zipExecFactory, destDirectory, version, this);
+		return bundle.execJarCommands(zipExecFactory, destDirectory, version, this, withSource);
 	}
 
 }

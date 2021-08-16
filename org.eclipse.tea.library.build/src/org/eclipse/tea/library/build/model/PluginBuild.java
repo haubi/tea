@@ -194,6 +194,12 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 		return execJarCommands(zip, distDirectory, buildVersion, true);
 	}
 
+	@Override
+	public File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, JarManager jarManager,
+			boolean withSources) throws Exception {
+		return execJarCommands(zip, distDirectory, buildVersion, true, withSources);
+	}
+
 	/**
 	 * Creates the JAR file for this plugin. If withBinInc is
 	 * <code>false</code>, no binary includes will be added to the jar.
@@ -202,11 +208,18 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 	 */
 	public File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, boolean withBinInc)
 			throws Exception {
+		boolean withSource = false;
+		return execJarCommands(zip, distDirectory, buildVersion, withBinInc, withSource);
+	}
+
+	public File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, boolean withBinInc,
+			boolean withSource) throws Exception {
+
 		final String oldBundleVersion = data.getBundleVersion();
 		final File manifest = data.getManifestFile();
 		if (oldBundleVersion == null || manifest == null) {
 			// simply create the JAR
-			return doExecJarCommands(zip, distDirectory, buildVersion, withBinInc);
+			return doExecJarCommands(zip, distDirectory, buildVersion, withBinInc, withSource);
 		}
 
 		// backup the manifest file
@@ -236,7 +249,7 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 			}
 
 			// create the JAR
-			return doExecJarCommands(zip, distDirectory, buildVersion, withBinInc);
+			return doExecJarCommands(zip, distDirectory, buildVersion, withBinInc, withSource);
 		} finally {
 			// restore the old manifest
 			FileUtils.copyFile(backup, manifest);
@@ -251,8 +264,8 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 		return Boolean.parseBoolean(data.getSimpleManifestValue("Preserve-Binary-Structure"));
 	}
 
-	private File doExecJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, boolean withBinInc)
-			throws Exception {
+	private File doExecJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, boolean withBinInc,
+			boolean withSource) throws Exception {
 		final File jarFile = new File(distDirectory, getJarFileName(buildVersion));
 
 		// remove the jar file
@@ -277,7 +290,11 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 					File binDir = new File(data.getBundleDir(), path);
 					if (binDir.isDirectory() && binDir.list().length > 0) {
 						ZipExecPart part = new ZipExecPart();
-						if (isPreserveBinaryStructure()) {
+						if (isPreserveBinaryStructure() && !withSource) {
+							// FIXME acx needs a plugin suitable form
+							// "Cannot nest
+							// 'com.wamas.acx4.mfs_5.13.0.N/build-eclipse/main'
+							// inside library"
 							part.sourceDirectory = data.getBundleDir();
 							part.relativePaths.add(path);
 						} else {
@@ -305,6 +322,23 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 				incPart.sourceDirectory = data.getBundleDir();
 				incPart.excludeGit = true;
 				exec.addPart(incPart);
+			}
+		}
+
+		// run ZIP on source directories
+		String[] srcFolders = data.getSourceFolders();
+		if (withSource) {
+			for (String path : srcFolders) {
+				// typically "src" or "src-gen" or "src/main/java"
+				ZipExecPart part = new ZipExecPart();
+				File binDir = new File(data.getBundleDir(), path);
+				if (binDir.isDirectory() && binDir.list().length > 0) {
+					// keep the "src" folder
+					part.sourceDirectory = data.getBundleDir();
+					part.relativePaths.add(path);
+					part.excludeGit = true;
+					exec.addPart(part);
+				}
 			}
 		}
 

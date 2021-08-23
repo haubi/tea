@@ -82,6 +82,7 @@ public class TeaBuildPluginVisitor implements TeaBuildVisitor {
 			// Step 1: compile all projects, each by itself
 			elements.stream().filter(TeaBuildPluginElement.class::isInstance).map(TeaBuildPluginElement.class::cast)
 					.forEach(p -> {
+						tracker.setTaskName(p.getName());
 						if (!p.isAllDependenciesBuilt()) {
 							results.put(p, Status.CANCEL_STATUS);
 							log.warn("skipping " + p.getName() + " due to errors in dependencies.");

@@ -25,13 +25,14 @@ import org.eclipse.tea.library.build.model.WorkspaceData;
 /**
  * Cleans and refreshes all {@link IProject}s in the workspace.
  */
-@Named("Clean & refresh all projects")
+@Named("Clean and refresh all projects") // Progress Monitor shows & as _
 public class TaskCleanWorkspace {
 
 	@Execute
 	public void run(TaskProgressTracker tracker) throws Exception {
 		// refresh all projects
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+			tracker.setTaskName(project.getName());
 			fullCleanAndRefresh(project);
 
 			tracker.worked(1);

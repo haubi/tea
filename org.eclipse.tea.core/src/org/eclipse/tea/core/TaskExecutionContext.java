@@ -210,8 +210,9 @@ public class TaskExecutionContext {
 
 		notifyAll(BeginTaskChain.class, context);
 
-		SubMonitor rootMonitor = SubMonitor.convert(monitor, "Executing " + TaskingModel.getTaskChainName(chain),
-				totalAmount);
+		// monitor!=null=> taskChainName is already in monitor
+		SubMonitor rootMonitor = SubMonitor.convert(monitor,
+				monitor != null ? "" : TaskingModel.getTaskChainName(chain), totalAmount);
 
 		// execute tasks
 		try {
@@ -223,9 +224,8 @@ public class TaskExecutionContext {
 
 				// setup dedicated progress monitor, based on previous work
 				// amount calculation
-				SubMonitor taskMonitor = rootMonitor.split(amount);
-				taskMonitor.beginTask("Execute Task", amount);
-				taskMonitor.subTask(TaskingModel.getTaskName(task));
+				String taskName = TaskingModel.getTaskName(task);
+				SubMonitor taskMonitor = SubMonitor.convert(rootMonitor, taskName, amount);
 
 				TaskProgressTracker tracker = new TaskProgressTrackerImpl(task, taskMonitor);
 				taskCtx.set(TaskProgressExtendedTracker.class, (TaskProgressExtendedTracker) tracker);

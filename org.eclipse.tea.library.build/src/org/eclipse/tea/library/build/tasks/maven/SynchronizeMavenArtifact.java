@@ -57,6 +57,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
+import org.eclipse.tea.core.services.TaskProgressTracker;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.config.BuildDirectories;
 import org.eclipse.tea.library.build.config.TeaBuildConfig;
@@ -88,7 +89,8 @@ public class SynchronizeMavenArtifact {
 	}
 
 	@Execute
-	public void run(TaskingLog log, TeaBuildConfig cfg, WorkspaceBuild wb) throws Exception {
+	public void run(TaskingLog log, TaskProgressTracker tracker, TeaBuildConfig cfg, WorkspaceBuild wb)
+			throws Exception {
 		properties = getMavenConfig(log, cfg);
 		if (properties == null) {
 			return;
@@ -125,7 +127,7 @@ public class SynchronizeMavenArtifact {
 
 			for (PluginBuild pb : pbs) {
 				if (!pb.getMavenExternalJarDependencies().isEmpty() && !pb.getData().isBinary()) {
-					runSingle(log, pb, system, session, remotes);
+					runSingle(log, tracker, pb, system, session, remotes);
 				}
 			}
 		} finally {
@@ -150,7 +152,7 @@ public class SynchronizeMavenArtifact {
 		return new MavenConfig(file);
 	}
 
-	private void runSingle(TaskingLog log, PluginBuild hostPlugin, RepositorySystem system,
+	private void runSingle(TaskingLog log, TaskProgressTracker tracker, PluginBuild hostPlugin, RepositorySystem system,
 			RepositorySystemSession session, List<RemoteRepository> remotes) throws Exception {
 		File target = new File(hostPlugin.getPluginDirectory(), "maven");
 
@@ -161,6 +163,8 @@ public class SynchronizeMavenArtifact {
 
 		Set<File> valid = new TreeSet<>(Comparator.comparing(File::getName));
 		for (MavenExternalJarBuild artifact : hostPlugin.getMavenExternalJarDependencies()) {
+			tracker.setTaskName(artifact.getCoordinates());
+			tracker.worked(1);
 			log.info("synchronize nexus coordinate " + artifact.getCoordinates() + " into "
 					+ hostPlugin.getPluginName());
 

@@ -374,4 +374,29 @@ public abstract class BundleData {
 	public void addDependency(String pluginName, boolean optional) {
 		manifest.addDependency(pluginName, optional);
 	}
+
+	public ParameterValue getManifestHeader(String name) {
+		if (manifest == null) {
+			return null;
+		}
+		return manifest.getSingleAttribute(name);
+	}
+
+	public ParameterValue[] getManifestHeaderList(String name) {
+		return manifest.getListAttribute(name);
+	}
+
+	String getSimpleManifestValue(String name) {
+		ParameterValue pv = getManifestHeader(name);
+		if (pv == null) {
+			return null;
+		}
+		return pv.getValue();
+	}
+
+	public boolean isJarBundleShape() {
+		String x = getSimpleManifestValue("Eclipse-BundleShape");
+		return !"dir".equals(x); // "jar" or null
+		// no support for PDEs old "unpack" guessing
+	}
 }

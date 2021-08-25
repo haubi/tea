@@ -346,17 +346,6 @@ public class PluginData extends BundleData {
 		return imports;
 	}
 
-	public ParameterValue getManifestHeader(String name) {
-		if (manifest == null) {
-			return null;
-		}
-		return manifest.getSingleAttribute(name);
-	}
-
-	public ParameterValue[] getManifestHeaderList(String name) {
-		return manifest.getListAttribute(name);
-	}
-
 	public final String getDescription() {
 		return description;
 	}
@@ -390,14 +379,6 @@ public class PluginData extends BundleData {
 			result.put(from, to);
 		}
 		return result;
-	}
-
-	String getSimpleManifestValue(String name) {
-		ParameterValue pv = getManifestHeader(name);
-		if (pv == null) {
-			return null;
-		}
-		return pv.getValue();
 	}
 
 	/**

@@ -25,7 +25,9 @@ public class PropertyConversionHelper {
 			return Boolean.parseBoolean(value);
 		} else if (Enum.class.isAssignableFrom(targetType)) {
 			try {
-				return targetType.getDeclaredMethod("valueOf", String.class).invoke(null, value);
+				@SuppressWarnings({ "rawtypes", "unchecked" })
+				Enum valueOf = Enum.valueOf((Class<Enum>) targetType, value);
+				return valueOf;
 			} catch (Exception e) {
 				throw new RuntimeException("Unsupported field type: " + targetType, e);
 			}

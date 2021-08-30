@@ -37,6 +37,17 @@ public class ZipExecPart {
 
 	private String jarKey;
 
+	public ZipExecPart() {
+		// public
+	}
+
+	/** copy constructor **/
+	ZipExecPart(ZipExecPart source) {
+		sourceDirectory = source.sourceDirectory;
+		relativePaths.addAll(source.relativePaths);
+		excludeGit = source.excludeGit;
+	}
+
 	/**
 	 * sort all elements and return the path of the first element
 	 */

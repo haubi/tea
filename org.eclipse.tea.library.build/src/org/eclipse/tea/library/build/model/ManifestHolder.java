@@ -122,7 +122,7 @@ final class ManifestHolder {
 		return Boolean.parseBoolean(getSimple(name));
 	}
 
-	private void putSimple(String name, String value) {
+	void putSimple(String name, String value) {
 		attributes.put(name, new ManifestAttribute(name, value));
 	}
 

@@ -19,6 +19,7 @@ import java.util.TreeSet;
 import org.eclipse.tea.library.build.jar.JarManager;
 import org.eclipse.tea.library.build.jar.ZipExec;
 import org.eclipse.tea.library.build.jar.ZipExecFactory;
+import org.eclipse.tea.library.build.jar.ZipExecInterceptor;
 import org.eclipse.tea.library.build.jar.ZipExecPart;
 import org.eclipse.tea.library.build.util.FileUtils;
 import org.w3c.dom.Document;
@@ -202,19 +203,21 @@ public class FeatureBuild extends BundleBuild<FeatureData> {
 		return pluginElement;
 	}
 
-	@Override
-	public File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, JarManager jarManager,
-			boolean withSources) throws Exception {
-		// ignore withSources
-		return execJarCommands(zip, distDirectory, buildVersion, jarManager);
-	}
-
 	/**
 	 * Creates the JAR file for this feature.
 	 */
 	@Override
 	public File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, JarManager jarManager)
 			throws Exception {
+		boolean withSources = false;
+		ZipExecInterceptor zipExecInterceptor = null;
+		return execJarCommands(zip, distDirectory, buildVersion, jarManager, withSources, zipExecInterceptor);
+	}
+
+	@Override
+	public File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, JarManager jarManager,
+			boolean withSources, ZipExecInterceptor zipExecInterceptor) throws Exception {
+
 		File jarFile = new File(distDirectory, getJarFileName(buildVersion));
 
 		// remove the jar file
@@ -227,6 +230,7 @@ public class FeatureBuild extends BundleBuild<FeatureData> {
 
 		// create JAR
 		ZipExec exec = zip.createZipExec();
+		exec.setZipExecInterceptor(zipExecInterceptor);
 		exec.setZipFile(jarFile);
 		exec.setJarMode(true);
 

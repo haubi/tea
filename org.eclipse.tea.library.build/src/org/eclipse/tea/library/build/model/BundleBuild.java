@@ -14,6 +14,7 @@ import java.io.File;
 
 import org.eclipse.tea.library.build.jar.JarManager;
 import org.eclipse.tea.library.build.jar.ZipExecFactory;
+import org.eclipse.tea.library.build.jar.ZipExecInterceptor;
 
 /**
  * Common operations of build elements.
@@ -40,7 +41,7 @@ public abstract class BundleBuild<T extends BundleData> {
 			JarManager jarManager) throws Exception;
 
 	public abstract File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion,
-			JarManager jarManager, boolean withSources) throws Exception;
+			JarManager jarManager, boolean withSources, ZipExecInterceptor zipExecInterceptor) throws Exception;
 
 	/**
 	 * Returns the JAR filename for the specified build version

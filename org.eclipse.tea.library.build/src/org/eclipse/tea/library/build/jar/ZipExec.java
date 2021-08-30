@@ -51,4 +51,7 @@ public interface ZipExec {
 	 */
 	public void unzip(File zip, File destDir) throws IOException;
 
+	public void setZipExecInterceptor(ZipExecInterceptor zipExecInterceptor);
+
+	public ZipExecInterceptor getZipExecInterceptor();
 }

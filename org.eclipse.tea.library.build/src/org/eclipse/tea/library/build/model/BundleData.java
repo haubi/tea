@@ -12,6 +12,7 @@ package org.eclipse.tea.library.build.model;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -204,6 +205,13 @@ public abstract class BundleData {
 	 */
 	public abstract void setBundleVersion(String value);
 
+	public static void copyManifestFromDirectory(File srcBundleDir, File destFile,
+			Map<String, String> additionalAttributes) throws IOException {
+		ManifestHolder mfh = readManifestFromDirectory(srcBundleDir);
+		additionalAttributes.forEach((name, value) -> mfh.putSimple(name, value));
+		mfh.write(destFile);
+	}
+
 	protected static ManifestHolder readManifestFromDirectory(File bundleDir) {
 		File manifestFile = new File(bundleDir, "META-INF/MANIFEST.MF");
 		if (!manifestFile.isFile()) {
@@ -386,7 +394,7 @@ public abstract class BundleData {
 		return manifest.getListAttribute(name);
 	}
 
-	String getSimpleManifestValue(String name) {
+	public String getSimpleManifestValue(String name) {
 		ParameterValue pv = getManifestHeader(name);
 		if (pv == null) {
 			return null;

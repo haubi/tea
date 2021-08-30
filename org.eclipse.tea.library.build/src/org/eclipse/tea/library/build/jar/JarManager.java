@@ -107,12 +107,14 @@ public final class JarManager {
 	 */
 	public File execJarCommands(BundleBuild<?> bundle, File destDirectory) throws Exception {
 		boolean withSource = false;
-		return execJarCommands(bundle, destDirectory, withSource);
+		ZipExecInterceptor zipExecInterceptor = null;
+		return execJarCommands(bundle, destDirectory, withSource, zipExecInterceptor);
 	}
 
-	public File execJarCommands(BundleBuild<?> bundle, File destDirectory, boolean withSource) throws Exception {
+	public File execJarCommands(BundleBuild<?> bundle, File destDirectory, boolean withSource,
+			ZipExecInterceptor zipExecInterceptor) throws Exception {
 		String version = createNewVersion(bundle.getData());
-		return bundle.execJarCommands(zipExecFactory, destDirectory, version, this, withSource);
+		return bundle.execJarCommands(zipExecFactory, destDirectory, version, this, withSource, zipExecInterceptor);
 	}
 
 }

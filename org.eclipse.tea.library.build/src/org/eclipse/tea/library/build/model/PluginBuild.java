@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.tea.library.build.jar.JarManager;
 import org.eclipse.tea.library.build.jar.ZipExec;
 import org.eclipse.tea.library.build.jar.ZipExecFactory;
+import org.eclipse.tea.library.build.jar.ZipExecInterceptor;
 import org.eclipse.tea.library.build.jar.ZipExecPart;
 import org.eclipse.tea.library.build.util.FileUtils;
 
@@ -196,8 +197,8 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 
 	@Override
 	public File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, JarManager jarManager,
-			boolean withSources) throws Exception {
-		return execJarCommands(zip, distDirectory, buildVersion, true, withSources);
+			boolean withSources, ZipExecInterceptor zipExecInterceptor) throws Exception {
+		return execJarCommands(zip, distDirectory, buildVersion, true, withSources, zipExecInterceptor);
 	}
 
 	/**
@@ -209,17 +210,18 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 	public File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, boolean withBinInc)
 			throws Exception {
 		boolean withSource = false;
-		return execJarCommands(zip, distDirectory, buildVersion, withBinInc, withSource);
+		ZipExecInterceptor zipExecInterceptor = null;
+		return execJarCommands(zip, distDirectory, buildVersion, withBinInc, withSource, zipExecInterceptor);
 	}
 
 	public File execJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, boolean withBinInc,
-			boolean withSource) throws Exception {
+			boolean withSource, ZipExecInterceptor zipExecInterceptor) throws Exception {
 
 		final String oldBundleVersion = data.getBundleVersion();
 		final File manifest = data.getManifestFile();
 		if (oldBundleVersion == null || manifest == null) {
 			// simply create the JAR
-			return doExecJarCommands(zip, distDirectory, buildVersion, withBinInc, withSource);
+			return doExecJarCommands(zip, distDirectory, buildVersion, withBinInc, withSource, zipExecInterceptor);
 		}
 
 		// backup the manifest file
@@ -249,7 +251,7 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 			}
 
 			// create the JAR
-			return doExecJarCommands(zip, distDirectory, buildVersion, withBinInc, withSource);
+			return doExecJarCommands(zip, distDirectory, buildVersion, withBinInc, withSource, zipExecInterceptor);
 		} finally {
 			// restore the old manifest
 			FileUtils.copyFile(backup, manifest);
@@ -265,7 +267,7 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 	}
 
 	private File doExecJarCommands(ZipExecFactory zip, File distDirectory, String buildVersion, boolean withBinInc,
-			boolean withSource) throws Exception {
+			boolean withSource, ZipExecInterceptor zipExecInterceptor) throws Exception {
 		final File jarFile = new File(distDirectory, getJarFileName(buildVersion));
 
 		// remove the jar file
@@ -276,6 +278,7 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 
 		// create the ZIP executor
 		final ZipExec exec = zip.createZipExec();
+		exec.setZipExecInterceptor(zipExecInterceptor);
 		exec.setZipFile(jarFile);
 		exec.setJarMode(true);
 

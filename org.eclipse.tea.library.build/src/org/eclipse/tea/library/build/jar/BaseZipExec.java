@@ -26,6 +26,7 @@ abstract class BaseZipExec implements ZipExec {
 	protected File zipFile;
 	protected final List<ZipExecPart> parts = new ArrayList<>();
 	protected boolean isJar;
+	private ZipExecInterceptor zipExecInterceptor;
 
 	@Override
 	public void setZipFile(File zipFile) {
@@ -39,7 +40,15 @@ abstract class BaseZipExec implements ZipExec {
 
 	@Override
 	public void addPart(ZipExecPart part) {
-		parts.add(part);
+		ZipExecInterceptor interceptor = getZipExecInterceptor();
+		if (interceptor != null) {
+			List<ZipExecPart> converted = interceptor.convert(part);
+			for (ZipExecPart convertedPart : converted) {
+				parts.add(convertedPart);
+			}
+		} else {
+			parts.add(part);
+		}
 	}
 
 	@Override
@@ -63,5 +72,15 @@ abstract class BaseZipExec implements ZipExec {
 	 * processes the ZipExecPart list
 	 */
 	protected abstract void doCreateZip();
+
+	@Override
+	public ZipExecInterceptor getZipExecInterceptor() {
+		return zipExecInterceptor;
+	}
+
+	@Override
+	public void setZipExecInterceptor(ZipExecInterceptor zipExecInterceptor) {
+		this.zipExecInterceptor = zipExecInterceptor;
+	}
 
 }

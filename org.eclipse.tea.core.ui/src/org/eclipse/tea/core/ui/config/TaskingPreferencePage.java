@@ -151,7 +151,10 @@ public class TaskingPreferencePage extends FieldEditorPreferencePage implements 
 					d.widthHint = 30; // prevent text fields with a lot of text
 										// from exploding the layout
 					add(editor, editorsPerSection);
+				} else if (f.getType().equals(Integer.class) || f.getType().equals(int.class)) {
+					add(new IntegerFieldEditor(propertyName, config.description(), c), editorsPerSection);
 				} else if (f.getType().equals(Long.class) || f.getType().equals(long.class)) {
+					// XXX IntegerFieldEditor does not support long
 					add(new IntegerFieldEditor(propertyName, config.description(), c), editorsPerSection);
 				} else if (f.getType().equals(Boolean.class) || f.getType().equals(boolean.class)) {
 					add(new BooleanFieldEditor(propertyName, config.description(), c), editorsPerSection);

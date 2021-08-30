@@ -19,6 +19,8 @@ public class PropertyConversionHelper {
 	public static Object convertValue(String value, Class<?> targetType) {
 		if (targetType == String.class) {
 			return value;
+		} else if (targetType == Integer.class || targetType == int.class) {
+			return Integer.parseInt(value);
 		} else if (targetType == Long.class || targetType == long.class) {
 			return Long.parseLong(value);
 		} else if (targetType == Boolean.class || targetType == boolean.class) {

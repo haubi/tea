@@ -44,16 +44,14 @@ public class TaskCleanWorkspace {
 	 * resources.
 	 */
 	public static void fullCleanAndRefresh(IProject project) throws CoreException {
-		if (WorkspaceData.isBinaryProject(project)) {
+		if (project == null || !project.exists() || !project.isOpen() || WorkspaceData.isBinaryProject(project)) {
 			return;
 		}
 
 		project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
 
-		if (project.exists() && project.isOpen()) {
-			project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
-			project.refreshLocal(IResource.DEPTH_INFINITE, null);
-		}
+		project.deleteMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+		project.refreshLocal(IResource.DEPTH_INFINITE, null);
 	}
 
 }

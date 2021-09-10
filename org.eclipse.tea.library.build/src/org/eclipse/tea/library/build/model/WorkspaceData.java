@@ -11,12 +11,10 @@
 package org.eclipse.tea.library.build.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -62,12 +60,6 @@ public class WorkspaceData {
 	 */
 	public WorkspaceData(IWorkspace workspace, TaskingLog console, TeaBuildVersionService bvService) {
 		final IWorkspaceRoot root = workspace.getRoot();
-		List<String> closedProjectNames = Arrays.stream(root.getProjects()).filter(p -> !p.isOpen())
-				.map(IProject::getName).sorted().collect(Collectors.toList());
-		if (closedProjectNames.size() > 0) {
-			console.info(closedProjectNames.size() + " projects are closed: "
-					+ closedProjectNames.stream().collect(Collectors.joining(", ")));
-		}
 		for (IProject project : root.getProjects()) {
 			try {
 				if (!project.exists()) {

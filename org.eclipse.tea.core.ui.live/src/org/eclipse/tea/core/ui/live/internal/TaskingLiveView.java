@@ -131,7 +131,8 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 		// on double click, check whether we can jump somewhere
 		tree.addDoubleClickListener(this::doubleClick);
 
-		// also on double click, check whether an item can and should be expanded...
+		// also on double click, check whether an item can and should be
+		// expanded...
 		tree.addDoubleClickListener(event -> {
 			ISelection selection = event.getSelection();
 			if (selection instanceof ITreeSelection) {
@@ -336,7 +337,11 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 
 	@Override
 	public void refresh() {
-		tree.getControl().getDisplay().asyncExec(() -> tree.refresh(true));
+		tree.getControl().getDisplay().asyncExec(() -> {
+			if (!tree.getControl().isDisposed()) {
+				tree.refresh(true);
+			}
+		});
 	}
 
 	@Focus

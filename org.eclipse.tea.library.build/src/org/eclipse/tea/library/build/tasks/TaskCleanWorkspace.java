@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.tea.core.services.TaskProgressTracker;
 import org.eclipse.tea.library.build.model.WorkspaceData;
@@ -32,6 +33,9 @@ public class TaskCleanWorkspace {
 	public void run(TaskProgressTracker tracker) throws Exception {
 		// refresh all projects
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+			if (tracker.isCanceled()) {
+				throw new OperationCanceledException();
+			}
 			tracker.setTaskName(project.getName());
 			fullCleanAndRefresh(project);
 

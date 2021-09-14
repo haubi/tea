@@ -23,10 +23,12 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.tea.core.services.TaskProgressTracker;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.core.ui.internal.listeners.AutoBuildDeactivator;
+import org.eclipse.tea.library.build.chain.TeaBuildChain;
 import org.eclipse.tea.library.build.chain.TeaBuildElement;
 import org.eclipse.tea.library.build.config.TeaBuildConfig;
 import org.eclipse.tea.library.build.internal.Activator;
 import org.eclipse.tea.library.build.services.TeaBuildVisitor;
+import org.eclipse.tea.library.build.services.TeaElementFailurePolicy.FailurePolicy;
 import org.eclipse.tea.library.build.util.TeaBuildUtil;
 import org.osgi.service.component.annotations.Component;
 
@@ -80,24 +82,29 @@ public class TeaBuildPluginVisitor implements TeaBuildVisitor {
 			}
 		} else {
 			// Step 1: compile all projects, each by itself
-			elements.stream().filter(TeaBuildPluginElement.class::isInstance).map(TeaBuildPluginElement.class::cast)
-					.forEach(p -> {
-						tracker.setTaskName(p.getName());
-						if (!p.isAllDependenciesBuilt()) {
-							results.put(p, Status.CANCEL_STATUS);
-							log.warn("skipping " + p.getName() + " due to errors in dependencies.");
-						} else {
-							IStatus s = TeaBuildUtil.tryCompile(log, tracker, p, config);
-							if (s.getSeverity() > IStatus.WARNING) {
-								p.error();
-								results.put(p, s);
-							} else {
-								p.done();
-								results.put(p, Status.OK_STATUS);
-								AutoBuildDeactivator.avoidBuild(p.getPlugin().getData().getProject());
+			for (TeaBuildElement e : elements) {
+				if (e instanceof TeaBuildPluginElement) {
+					TeaBuildPluginElement p = (TeaBuildPluginElement) e;
+					tracker.setTaskName(p.getName());
+					if (!p.isAllDependenciesBuilt()) {
+						results.put(p, Status.CANCEL_STATUS);
+						log.warn("skipping " + p.getName() + " due to errors in dependencies.");
+					} else {
+						IStatus s = TeaBuildUtil.tryCompile(log, tracker, p, config);
+						if (s.getSeverity() > IStatus.WARNING) {
+							p.error();
+							results.put(p, s);
+							if (TeaBuildChain.getFailurePolicyFor(p) == FailurePolicy.ABORT_IMMEDIATE) {
+								break; // fail fast
 							}
+						} else {
+							p.done();
+							results.put(p, Status.OK_STATUS);
+							AutoBuildDeactivator.avoidBuild(p.getPlugin().getData().getProject());
 						}
-					});
+					}
+				}
+			}
 		}
 
 		// Step 3: return all results

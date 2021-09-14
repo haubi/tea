@@ -24,10 +24,12 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.tea.core.services.TaskProgressTracker;
 import org.eclipse.tea.core.services.TaskingLog;
+import org.eclipse.tea.library.build.chain.TeaBuildChain;
 import org.eclipse.tea.library.build.chain.TeaBuildProjectElement;
 import org.eclipse.tea.library.build.config.TeaBuildConfig;
 import org.eclipse.tea.library.build.internal.Activator;
 import org.eclipse.tea.library.build.model.WorkspaceData;
+import org.eclipse.tea.library.build.services.TeaElementFailurePolicy.FailurePolicy;
 
 /**
  * Utility method collection for the build library.
@@ -145,6 +147,11 @@ public class TeaBuildUtil {
 				status = new MultiStatus(Activator.PLUGIN_ID, IStatus.ERROR,
 						"Exception during build of " + element.getName(), e);
 				log.info(logTxt + ": got exception: " + e.toString());
+			}
+			if (status.getSeverity() > IStatus.WARNING) {
+				if (TeaBuildChain.getFailurePolicyFor(element) == FailurePolicy.ABORT_IMMEDIATE) {
+					break; // fail fast
+				}
 			}
 		}
 

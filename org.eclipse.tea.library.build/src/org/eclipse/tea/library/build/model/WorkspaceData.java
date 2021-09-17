@@ -73,6 +73,10 @@ public class WorkspaceData {
 				final IProjectDescription desc;
 				try {
 					desc = project.getDescription();
+				} catch (org.eclipse.core.internal.resources.ResourceException ex) {
+					// Resource does not exist. - project is still opening
+					console.warn("Failed to check project " + project.getName() + "", ex);
+					continue;
 				} catch (CoreException ex) {
 					throw new IllegalStateException(ex);
 				}

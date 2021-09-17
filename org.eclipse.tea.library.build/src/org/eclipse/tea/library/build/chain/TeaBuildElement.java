@@ -82,8 +82,11 @@ public abstract class TeaBuildElement implements Comparable<TeaBuildElement> {
 			}
 
 			int depOrder = target.getBuildOrder();
-			if (depOrder >= result) {
-				result = depOrder + 1;
+			if (isBuilder()) {
+				depOrder++;
+			}
+			if (depOrder > result) {
+				result = depOrder;
 			}
 		}
 
@@ -126,6 +129,10 @@ public abstract class TeaBuildElement implements Comparable<TeaBuildElement> {
 	@Override
 	public int compareTo(TeaBuildElement o) {
 		return getName().compareTo(o.getName());
+	}
+
+	public boolean isBuilder() {
+		return true;
 	}
 
 }

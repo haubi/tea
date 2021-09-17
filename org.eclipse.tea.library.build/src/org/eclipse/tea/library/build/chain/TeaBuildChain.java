@@ -11,8 +11,10 @@
 package org.eclipse.tea.library.build.chain;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,6 +35,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Service;
+import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.tea.core.services.TaskProgressTracker;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.internal.Activator;
@@ -87,18 +90,29 @@ public class TeaBuildChain {
 		// access them
 		elementFactories.forEach(f -> ContextInjectionFactory.invoke(f, Execute.class, context, null));
 
+		Arrays.stream(PluginRegistry.getActiveModels(false)).filter(model -> !(model.getUnderlyingResource() != null
+				&& model.getUnderlyingResource().getProject().isOpen())).forEach(model -> {
+					TeaBuildElement e = new TeaClosedPluginElement(model);
+					// does not need to be build
+					// but is important for the build order;
+					namedElements.put(e.getName(), e);
+				});
 		for (IProject prj : projectsToBuild) {
-			List<TeaBuildElement> elements = elementFactories.stream().map(f -> f.createElements(this, prj))
-					.filter(Objects::nonNull).flatMap(l -> l.stream()).filter(Objects::nonNull)
-					.collect(Collectors.toList());
+			if (!prj.isOpen()) {
+				// does not need to be build
+			} else {
+				List<TeaBuildElement> elements = elementFactories.stream().map(f -> f.createElements(this, prj))
+						.filter(Objects::nonNull).flatMap(l -> l.stream()).filter(Objects::nonNull)
+						.collect(Collectors.toList());
 
-			if (elements.isEmpty()) {
-				// nobody knows how to handle this... create a dummy element to
-				// allow dependencies.
-				elements.add(new TeaUnhandledElement(prj.getName()));
+				if (elements.isEmpty()) {
+					// nobody knows how to handle this... create a dummy element
+					// to allow dependencies.
+					elements.add(new TeaUnhandledElement(prj.getName()));
+				}
+
+				elements.forEach(e -> namedElements.put(e.getName(), e));
 			}
-
-			elements.forEach(e -> namedElements.put(e.getName(), e));
 		}
 
 		// Step 2: calculate dependencies of each element
@@ -136,6 +150,15 @@ public class TeaBuildChain {
 				.flatMap(teaBuildElement -> teaBuildElement.stream().filter(e -> e instanceof TeaBuildProjectElement)
 						.map(e -> ((TeaBuildProjectElement) e).getProject().getName()))
 				.collect(Collectors.toList());
+	}
+
+	public List<List<String>> getBuildingGroupNames(String projecPrefixToSkip) {
+		return groupedElements.entrySet().stream().sorted(Comparator.comparing(e -> e.getKey()))
+				.map(e -> e.getValue().stream()
+						.filter(el -> !(el instanceof TeaClosedPluginElement | el instanceof TeaUnhandledElement))
+						.map(el -> el.getName().replaceFirst(java.util.regex.Pattern.quote(projecPrefixToSkip), "")).sorted()
+						.collect(Collectors.toList()))
+				.filter(l -> !l.isEmpty()).collect(Collectors.toList());
 	}
 
 	/**
@@ -205,7 +228,7 @@ public class TeaBuildChain {
 				for (TeaBuildElement e : entry.getValue()) {
 					if (getVisitPolicyFor(e) == VisitPolicy.ABORT_IF_PREVIOUS_ERROR) {
 						if (ms.getSeverity() > IStatus.WARNING) {
-						    // report the Error
+							// report the Error
 							ms.add(new Status(ms.getSeverity(), Activator.PLUGIN_ID,
 									"Abort prior to executing " + e.getName() + " due to previous error"));
 							return ms;

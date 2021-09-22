@@ -14,10 +14,13 @@ import org.eclipse.tea.library.build.chain.TeaBuildElement;
 import org.eclipse.tea.library.build.chain.TeaBuildProjectElement;
 import org.eclipse.tea.library.build.chain.TeaDependencyWire;
 import org.eclipse.tea.library.build.model.PluginBuild;
+import org.eclipse.tea.library.build.services.TeaElementFailurePolicy;
+import org.eclipse.tea.library.build.services.TeaElementFailurePolicy.FailurePolicy;
 
 /**
  * Represents a {@link TeaBuildElement} for plugins.
  */
+@TeaElementFailurePolicy(FailurePolicy.ABORT_IMMEDIATE)
 public class TeaBuildPluginElement extends TeaBuildProjectElement {
 
 	/** The state of a build element. */

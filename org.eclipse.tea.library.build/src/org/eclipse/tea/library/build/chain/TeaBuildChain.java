@@ -62,7 +62,6 @@ import org.eclipse.tea.library.build.services.TeaElementVisitPolicy.VisitPolicy;
  * <li>...
  * </ul>
  */
-@SuppressWarnings("restriction")
 public class TeaBuildChain {
 
 	private final Map<String, TeaBuildElement> namedElements = new TreeMap<>();
@@ -206,7 +205,8 @@ public class TeaBuildChain {
 				for (TeaBuildElement e : entry.getValue()) {
 					if (getVisitPolicyFor(e) == VisitPolicy.ABORT_IF_PREVIOUS_ERROR) {
 						if (ms.getSeverity() > IStatus.WARNING) {
-							ms.add(new Status(IStatus.CANCEL, Activator.PLUGIN_ID,
+						    // report the Error
+							ms.add(new Status(ms.getSeverity(), Activator.PLUGIN_ID,
 									"Abort prior to executing " + e.getName() + " due to previous error"));
 							return ms;
 						}
@@ -251,7 +251,7 @@ public class TeaBuildChain {
 	 *            the element to query
 	 * @return a {@link FailurePolicy} describing the action to take on failure.
 	 */
-	private FailurePolicy getFailurePolicyFor(TeaBuildElement element) {
+	public static FailurePolicy getFailurePolicyFor(TeaBuildElement element) {
 		TeaElementFailurePolicy a = element.getClass().getAnnotation(TeaElementFailurePolicy.class);
 		if (a == null) {
 			return FailurePolicy.USE_THRESHOLD;

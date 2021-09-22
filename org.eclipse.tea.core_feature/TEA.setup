@@ -125,7 +125,7 @@
       <repositoryList
           name="EASE">
         <repository
-            url="http://download.eclipse.org/ease/update/nightly"/>
+            url="http://download.eclipse.org/ease/release/latest"/>
         <repository
             url="https://bintray.com/artifact/download/pontesegger/ease-engines"/>
         <repository

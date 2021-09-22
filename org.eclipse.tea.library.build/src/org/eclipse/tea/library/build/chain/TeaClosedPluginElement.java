@@ -10,23 +10,17 @@
  *******************************************************************************/
 package org.eclipse.tea.library.build.chain;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.tea.library.build.services.TeaBuildElementFactory;
+import org.eclipse.pde.core.plugin.IPluginModelBase;
 
 /**
- * Represents a named element for which no handler could have been found.
- * <p>
- * The primary use is to create a {@link TeaUnhandledElement} for each
- * {@link IProject} in the workspace where no {@link TeaBuildElementFactory}
- * produced a valid {@link TeaBuildElement}. This can be the case if a certain
- * {@link IProject} type is not supported by any {@link TeaBuildElementFactory}.
+ * Represents a {@link TeaBuildElement} for plugins in the target platform.
  */
-public class TeaUnhandledElement extends TeaBuildElement {
+public class TeaClosedPluginElement extends TeaBuildElement {
 
 	private final String name;
 
-	public TeaUnhandledElement(String name) {
-		this.name = name;
+	public TeaClosedPluginElement(IPluginModelBase model) {
+		this.name = model.getPluginBase().getId();
 	}
 
 	@Override

@@ -15,19 +15,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.wagon.ConnectionException;
@@ -57,7 +53,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.internal.core.JavaModelManager;
@@ -66,6 +61,7 @@ import org.eclipse.tea.core.services.TaskProgressTracker;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.config.BuildDirectories;
 import org.eclipse.tea.library.build.config.TeaBuildConfig;
+import org.eclipse.tea.library.build.model.MavenExternalJarBuild;
 import org.eclipse.tea.library.build.model.PluginBuild;
 import org.eclipse.tea.library.build.model.WorkspaceBuild;
 import org.eclipse.tea.library.build.util.FileUtils;
@@ -84,8 +80,8 @@ public class SynchronizeMavenArtifact {
 			RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN);
 	private final static RepositoryPolicy SNAPSHOT_POLICY = new RepositoryPolicy(true,
 			RepositoryPolicy.UPDATE_POLICY_ALWAYS, RepositoryPolicy.CHECKSUM_POLICY_WARN);
-	private static AtomicReference<String> lastExceptionName;
-	private static ExecutorService es = Executors.newFixedThreadPool(8);
+	private static String lastExceptionName;
+	private MavenConfig properties;
 
 	@Override
 	public String toString() {
@@ -95,7 +91,7 @@ public class SynchronizeMavenArtifact {
 	@Execute
 	public void run(TaskingLog log, TaskProgressTracker tracker, TeaBuildConfig cfg, WorkspaceBuild wb)
 			throws Exception {
-		MavenConfig properties = getMavenConfig(log, cfg);
+		properties = getMavenConfig(log, cfg);
 		if (properties == null) {
 			return;
 		}
@@ -109,7 +105,7 @@ public class SynchronizeMavenArtifact {
 		// for finalization. But instead of sleeping, we do something else.
 		IndexManager indexManager = JavaModelManager.getIndexManager();
 		indexManager.disable();
-		lastExceptionName = new AtomicReference<>();
+		lastExceptionName = null;
 
 		try {
 			indexManager.discardJobs(null);
@@ -120,17 +116,18 @@ public class SynchronizeMavenArtifact {
 
 			ServiceLocator locator = createServiceLocator(log);
 			RepositorySystem system = locator.getService(RepositorySystem.class);
-			RepositorySystemSession session = createSession(log, system, properties);
-			List<RemoteRepository> remotes = createRemoteRepositories(properties);
+			RepositorySystemSession session = createSession(log, system);
+			List<RemoteRepository> remotes = createRemoteRepositories();
 
 			Collection<PluginBuild> pbs = wb.getSourcePlugIns();
 
 			// Try to close the Indexer's file handles now.
 			System.gc();
 			System.runFinalization();
+
 			for (PluginBuild pb : pbs) {
 				if (!pb.getMavenExternalJarDependencies().isEmpty() && !pb.getData().isBinary()) {
-					runSingle(log, tracker, pb, system, session, remotes, properties);
+					runSingle(log, tracker, pb, system, session, remotes);
 				}
 			}
 		} finally {
@@ -155,77 +152,56 @@ public class SynchronizeMavenArtifact {
 		return new MavenConfig(file);
 	}
 
-	private static void runSingle(TaskingLog log, TaskProgressTracker tracker, PluginBuild hostPlugin,
-			RepositorySystem system, RepositorySystemSession session, List<RemoteRepository> remotes,
-			MavenConfig properties) throws Exception {
+	private void runSingle(TaskingLog log, TaskProgressTracker tracker, PluginBuild hostPlugin, RepositorySystem system,
+			RepositorySystemSession session, List<RemoteRepository> remotes) throws Exception {
 		File target = new File(hostPlugin.getPluginDirectory(), "maven");
 
 		if (!target.exists()) {
 			FileUtils.mkdirs(target);
 			log.warn("creating " + target + "; make sure to add to the classpath of " + hostPlugin.getPluginName());
 		}
-		tracker.setTaskName(hostPlugin.getPluginName());
-		log.info("synchronizing " + hostPlugin.getPluginName());
 
-		Set<File> valid = ConcurrentHashMap.newKeySet();
-		List<FutureTask<Object>> tasks = hostPlugin.getMavenExternalJarDependencies().stream()
-				.map(artifact -> new FutureTask<>(() -> {
-					if (tracker.isCanceled()) {
-						throw new OperationCanceledException();
-					}
-					Coordinate coord = new Coordinate(artifact.getCoordinates());
+		Set<File> valid = new TreeSet<>(Comparator.comparing(File::getName));
+		for (MavenExternalJarBuild artifact : hostPlugin.getMavenExternalJarDependencies()) {
+			tracker.setTaskName(artifact.getCoordinates());
+			tracker.worked(1);
+			log.info("synchronize nexus coordinate " + artifact.getCoordinates() + " into "
+					+ hostPlugin.getPluginName());
 
-					// try to look it up in the local repository only!
-					Artifact mvn = new DefaultArtifact(coord.group, coord.artifact, coord.classifier, coord.extension,
-							coord.version);
-					ArtifactRequest localrq = new ArtifactRequest().setArtifact(mvn);
-					boolean remote = false;
-					try {
-						ArtifactResult local = system.resolveArtifact(session, localrq);
-						if (local.isMissing() || !local.isResolved() || local.getArtifact().isSnapshot()) {
-							remote = true;
-						}
-					} catch (Exception e) {
-						remote = true;
-					}
+			Coordinate coord = new Coordinate(artifact.getCoordinates());
 
-					// resolve binary bundle.
-					{
-						ArtifactRequest remoterq = new ArtifactRequest().setArtifact(mvn)
-								.setRepositories(remote ? remotes : null);
-						resolveArtifact(log, target, system, session, remoterq, valid, properties);
-					}
-
-					// resolve source bundle.
-					try {
-						Artifact srcmvn = new DefaultArtifact(coord.group, coord.artifact, "sources", coord.extension,
-								coord.version);
-						ArtifactRequest srcrq = new ArtifactRequest().setArtifact(srcmvn)
-								.setRepositories(remote ? remotes : null);
-
-						resolveArtifact(log, target, system, session, srcrq, valid, properties);
-					} catch (Exception e) {
-						log.warn("No sources available for " + artifact.getCoordinates());
-					}
-					tracker.setTaskName(artifact.getCoordinates());
-					tracker.worked(1);
-					log.info("synchronized nexus coordinate " + artifact.getCoordinates() + " into "
-							+ hostPlugin.getPluginName());
-					return null;
-				})).collect(Collectors.toList());
-		try {
-			tasks.forEach(es::submit);
-			for (FutureTask<Object> task : tasks) {
-				if (tracker.isCanceled()) {
-					throw new OperationCanceledException();
+			// try to look it up in the local repository only!
+			Artifact mvn = new DefaultArtifact(coord.group, coord.artifact, coord.classifier, coord.extension,
+					coord.version);
+			ArtifactRequest localrq = new ArtifactRequest().setArtifact(mvn);
+			boolean remote = false;
+			try {
+				ArtifactResult local = system.resolveArtifact(session, localrq);
+				if (local.isMissing() || !local.isResolved() || local.getArtifact().isSnapshot()) {
+					remote = true;
 				}
-				task.get();
+			} catch (Exception e) {
+				remote = true;
 			}
-		} finally {
-			// just in case that a thread had an exception
-			// do not interrupt to avoid follow up errors
-			// "Unbalanced enter/exit" in okio.AsyncTimeout.enter
-			tasks.forEach(t -> t.cancel(false));
+
+			// resolve binary bundle.
+			{
+				ArtifactRequest remoterq = new ArtifactRequest().setArtifact(mvn)
+						.setRepositories(remote ? remotes : null);
+				resolveArtifact(log, target, system, session, remoterq, valid);
+			}
+
+			// resolve source bundle.
+			try {
+				Artifact srcmvn = new DefaultArtifact(coord.group, coord.artifact, "sources", coord.extension,
+						coord.version);
+				ArtifactRequest srcrq = new ArtifactRequest().setArtifact(srcmvn)
+						.setRepositories(remote ? remotes : null);
+
+				resolveArtifact(log, target, system, session, srcrq, valid);
+			} catch (Exception e) {
+				log.warn("No sources available for " + artifact.getCoordinates());
+			}
 		}
 
 		// cleanup old files
@@ -234,7 +210,13 @@ public class SynchronizeMavenArtifact {
 				continue;
 			}
 
-			boolean isValid = valid.contains(file);
+			boolean isValid = false;
+			for (File validFile : valid) {
+				if (file.equals(validFile)) {
+					isValid = true;
+				}
+			}
+
 			if (!isValid) {
 				log.info("removing old maven artifact: " + file);
 				FileUtils.delete(file);
@@ -273,8 +255,8 @@ public class SynchronizeMavenArtifact {
 	 *            all resolved artifacts will be added to this list, even if no
 	 *            file has been changed on disk.
 	 */
-	private static void resolveArtifact(TaskingLog log, File target, RepositorySystem system,
-			RepositorySystemSession session, ArtifactRequest rq, Set<File> resolved, MavenConfig properties) {
+	private void resolveArtifact(TaskingLog log, File target, RepositorySystem system, RepositorySystemSession session,
+			ArtifactRequest rq, Set<File> resolved) {
 		Artifact mvn = rq.getArtifact();
 
 		try {
@@ -350,8 +332,8 @@ public class SynchronizeMavenArtifact {
 			} catch (IOException e) {
 				String exName = e.getClass().getName();
 				// don't spam missing rights for symlink creation
-				if (!exName
-						.equals(lastExceptionName.getAndUpdate(last -> Objects.equals(exName, last) ? last : exName))) {
+				if (!Objects.equals(exName, lastExceptionName)) {
+					lastExceptionName = exName;
 					// Windows 10:
 					// "$file: Dem Client fehlt ein erforderliches Recht.\r\n"
 					String msg = e.getMessage();
@@ -366,7 +348,7 @@ public class SynchronizeMavenArtifact {
 		}
 	}
 
-	private List<RemoteRepository> createRemoteRepositories(MavenConfig properties) {
+	private List<RemoteRepository> createRemoteRepositories() {
 		List<RemoteRepository> repos = new ArrayList<>();
 		for (Map.Entry<String, String> repo : properties.getMavenRepos().entrySet()) {
 			RemoteRepository.Builder builder = new RemoteRepository.Builder("nexus_" + repo.getKey(), "default",
@@ -383,8 +365,7 @@ public class SynchronizeMavenArtifact {
 		return repos;
 	}
 
-	private DefaultRepositorySystemSession createSession(TaskingLog log, RepositorySystem system,
-			MavenConfig properties) {
+	private DefaultRepositorySystemSession createSession(TaskingLog log, RepositorySystem system) {
 		DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 		LocalRepository repo = new LocalRepository(BuildDirectories.get().getMavenDirectory());
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, repo));

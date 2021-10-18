@@ -301,6 +301,7 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 							part.sourceDirectory = data.getBundleDir();
 							part.relativePaths.add(path);
 						} else {
+							// Place class files into its package directory:
 							part.sourceDirectory = binDir;
 							part.relativePaths.add(".");
 						}
@@ -334,11 +335,11 @@ public class PluginBuild extends BundleBuild<PluginData> implements Comparable<P
 			for (String path : srcFolders) {
 				// typically "src" or "src-gen" or "src/main/java"
 				ZipExecPart part = new ZipExecPart();
-				File binDir = new File(data.getBundleDir(), path);
-				if (binDir.isDirectory() && binDir.list().length > 0) {
-					// keep the "src" folder
-					part.sourceDirectory = data.getBundleDir();
-					part.relativePaths.add(path);
+				File srcDir = new File(data.getBundleDir(), path);
+				if (srcDir.isDirectory() && srcDir.list().length > 0) {
+					// Place source files into its package directory:
+					part.sourceDirectory = srcDir;
+					part.relativePaths.add(".");
 					part.excludeGit = true;
 					exec.addPart(part);
 				}

@@ -92,7 +92,10 @@ public class WorkspaceData {
 				}
 
 				if (desc.hasNature(JAVA_NATURE)) {
-					console.warn("skipping plain Java project: " + project.getName());
+					if (!org.eclipse.pde.internal.core.SearchablePluginsManager.PROXY_PROJECT_NAME
+							.equals(project.getName())) {
+						console.warn("skipping plain Java project: " + project.getName());
+					}
 				}
 				unknownProjects.add(project);
 

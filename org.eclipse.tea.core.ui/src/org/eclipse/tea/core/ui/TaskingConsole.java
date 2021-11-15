@@ -50,66 +50,62 @@ public class TaskingConsole extends TaskingLog {
 	public PrintStream outWrn;
 	public PrintStream outErr;
 
-	private MessageConsole myConsole;
-	private MessageConsoleStream sInfo, sStd, sWrn, sErr;
+	private volatile MessageConsole myConsole;
+	private volatile MessageConsoleStream sInfo, sStd, sWrn, sErr;
 
 	private CoreConfig cfg;
+	private volatile TaskingConsoleConfig config;
 
 	@TaskingLogInit
 	public void init(TaskingConsoleConfig config, TaskingDevelopmentConfig devConfig, CoreConfig coreCfg) {
 		this.cfg = coreCfg;
+		this.config = config;
 
 		setShowDebug(devConfig.showDebugLogs);
-
-		Display.getDefault().syncExec(() -> {
-			boolean update = myConsole != null;
-
+		if (myConsole == null) {
 			myConsole = findConsole(TASKING_CONSOLE);
+			sInfo = myConsole.newMessageStream();
+			sStd = myConsole.newMessageStream();
+			sWrn = myConsole.newMessageStream();
+			sErr = myConsole.newMessageStream();
 
-			if (cfg.useAccessibleMode) {
-				myConsole.setConsoleWidth(80);
+			outInfo = new PrintStream(sInfo);
+			outStd = new PrintStream(sStd);
+			outWrn = new PrintStream(sWrn);
+			outErr = new PrintStream(sErr);
+
+			myConsole.activate();
+		}
+		Display.getDefault().asyncExec(this::updateConfig);
+	}
+
+	void updateConfig() {
+		if (cfg.useAccessibleMode) {
+			myConsole.setConsoleWidth(80);
+		} else {
+			myConsole.setConsoleWidth(0);
+		}
+		if (config.useColors) {
+			boolean isDarkTheme = ((IThemeEngine) Display.getDefault().getData("org.eclipse.e4.ui.css.swt.theme"))
+					.getActiveTheme().getLabel().equals("Dark");
+
+			if (config.useDarkColors || isDarkTheme) {
+				sInfo.setColor(new Color(null, 164, 164, 164));
+				sStd.setColor(new Color(null, 255, 255, 255));
+				sWrn.setColor(new Color(null, 255, 190, 50));
+				sErr.setColor(new Color(null, 255, 100, 100));
 			} else {
-				myConsole.setConsoleWidth(0);
+				sInfo.setColor(new Color(null, 164, 164, 164));
+				sStd.setColor(new Color(null, 32, 32, 32));
+				sWrn.setColor(new Color(null, 255, 190, 0));
+				sErr.setColor(new Color(null, 255, 0, 0));
 			}
-
-			if (!update) {
-				// only on initial setup
-				sInfo = myConsole.newMessageStream();
-				sStd = myConsole.newMessageStream();
-				sWrn = myConsole.newMessageStream();
-				sErr = myConsole.newMessageStream();
-
-				outInfo = new PrintStream(sInfo);
-				outStd = new PrintStream(sStd);
-				outWrn = new PrintStream(sWrn);
-				outErr = new PrintStream(sErr);
-
-				myConsole.activate();
-			}
-
-			if (config.useColors) {
-
-				boolean isDarkTheme = ((IThemeEngine) Display.getDefault().getData("org.eclipse.e4.ui.css.swt.theme"))
-						.getActiveTheme().getLabel().equals("Dark");
-
-				if (config.useDarkColors || isDarkTheme) {
-					sInfo.setColor(new Color(null, 164, 164, 164));
-					sStd.setColor(new Color(null, 255, 255, 255));
-					sWrn.setColor(new Color(null, 255, 190, 50));
-					sErr.setColor(new Color(null, 255, 100, 100));
-				} else {
-					sInfo.setColor(new Color(null, 164, 164, 164));
-					sStd.setColor(new Color(null, 32, 32, 32));
-					sWrn.setColor(new Color(null, 255, 190, 0));
-					sErr.setColor(new Color(null, 255, 0, 0));
-				}
-			} else {
-				sInfo.setColor(null);
-				sStd.setColor(null);
-				sWrn.setColor(null);
-				sErr.setColor(null);
-			}
-		});
+		} else {
+			sInfo.setColor(null);
+			sStd.setColor(null);
+			sWrn.setColor(null);
+			sErr.setColor(null);
+		}
 	}
 
 	/**

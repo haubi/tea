@@ -225,7 +225,8 @@ public class TaskExecutionContext {
 				// setup dedicated progress monitor, based on previous work
 				// amount calculation
 				String taskName = TaskingModel.getTaskName(task);
-				SubMonitor taskMonitor = SubMonitor.convert(rootMonitor, taskName, amount);
+				SubMonitor taskMonitor = rootMonitor.split(amount).setWorkRemaining(amount);
+				taskMonitor.setTaskName(taskName);
 
 				TaskProgressTracker tracker = new TaskProgressTrackerImpl(task, taskMonitor);
 				taskCtx.set(TaskProgressExtendedTracker.class, (TaskProgressExtendedTracker) tracker);
@@ -276,11 +277,6 @@ public class TaskExecutionContext {
 					log.error("Task aborted with status " + taskStatus);
 					break;
 				}
-
-				// update the root monitor to reflect the child amount of work
-				// that is now consumed after the task finished for good or bad.
-				totalAmount -= amount;
-				rootMonitor.setWorkRemaining(totalAmount);
 			}
 		} catch (Throwable t) {
 			status.add(

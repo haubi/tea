@@ -187,4 +187,11 @@ public abstract class TaskingLog {
 		return "[TEA " + TimeHelper.getFormattedCurrentTime() + "] " + msg;
 	}
 
+	/**
+	 * If the Log is a Console Window the Window will be brought to front;
+	 */
+	public void bringToFront() {
+		//
+	}
+
 }

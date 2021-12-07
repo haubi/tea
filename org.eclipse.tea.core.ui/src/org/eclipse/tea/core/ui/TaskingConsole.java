@@ -79,6 +79,13 @@ public class TaskingConsole extends TaskingLog {
 		Display.getDefault().asyncExec(this::updateConfig);
 	}
 
+	@Override
+	public void bringToFront() {
+		if (myConsole != null) {
+			myConsole.activate();
+		}
+	}
+
 	void updateConfig() {
 		if (cfg.useAccessibleMode) {
 			myConsole.setConsoleWidth(80);

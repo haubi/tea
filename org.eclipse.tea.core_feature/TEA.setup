@@ -38,15 +38,13 @@
   <setupTask
       xsi:type="setup:VariableTask"
       name="eclipse.target.platform"
-      defaultValue="Oxygen"
+      defaultValue="2021-12"
       storageURI="scope://Workspace"
       label=""/>
   <setupTask
       xsi:type="setup.p2:P2Task">
     <requirement
         name="com.wamas.ide.launching.feature.feature.group"/>
-    <requirement
-        name="com.wamas.ide.launchview.feature.feature.group"/>
     <repository
         url="https://mduft.github.io/lcdsl-latest"/>
     <description>Install the tools needed in the IDE to work with the source code for ${scope.project.label}</description>
@@ -89,9 +87,9 @@
           rootFolder="${git.clone.tea.location}"
           locateNestedProjects="true"/>
       <repositoryList
-          name="Oxygen">
+          name="2021-12">
         <repository
-            url="http://download.eclipse.org/releases/oxygen"/>
+            url="http://download.eclipse.org/releases/2021-12"/>
         <repository
             url="http://download.eclipse.org/cbi/updates/license"/>
       </repositoryList>
@@ -101,8 +99,6 @@
         activeRepositoryList="LcDsl">
       <requirement
           name="com.wamas.ide.launching.feature.feature.group"/>
-      <requirement
-          name="com.wamas.ide.launchview.feature.feature.group"/>
       <requirement
           name="*"/>
       <repositoryList

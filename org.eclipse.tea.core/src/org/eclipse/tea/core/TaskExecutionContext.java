@@ -59,6 +59,7 @@ import org.eclipse.tea.core.services.TaskingLog;
  */
 public class TaskExecutionContext {
 
+	public static final String FATAL_FAILURE_WHILE_EXECUTING = "Fatal failure while executing ";
 	private final TaskChain chain;
 	private final IEclipseContext context;
 
@@ -325,7 +326,7 @@ public class TaskExecutionContext {
 						"Cancelled: " + TaskingModel.getTaskName(task), oce));
 			} else {
 				taskCtx.set(IStatus.class, new Status(IStatus.ERROR, TaskingEngineActivator.PLUGIN_ID,
-						"Fatal failure while executing " + TaskingModel.getTaskName(task), t));
+						FATAL_FAILURE_WHILE_EXECUTING + TaskingModel.getTaskName(task), t));
 			}
 		} finally {
 			// reset redirection

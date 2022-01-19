@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.tea.core.MarkerStatus;
 
 public class VisualizationStatusNode {
@@ -39,7 +40,17 @@ public class VisualizationStatusNode {
 	public String getLabel() {
 		String message = status.getMessage();
 		if (status.getException() != null) {
-			return message + " (" + status.getException() + ")";
+			Throwable unwrapped = status.getException();
+			// A RuntimException is typically wrapped in two
+			// InjectionException. unwrap them:
+			while (unwrapped instanceof InjectionException && unwrapped.getCause() != null) {
+				unwrapped = unwrapped.getCause();
+			}
+			if (message != null
+					&& message.startsWith(org.eclipse.tea.core.TaskExecutionContext.FATAL_FAILURE_WHILE_EXECUTING)) {
+				return "" + unwrapped;
+			}
+			return message + " (" + unwrapped + ")";
 		}
 		if (message == null || message.isEmpty()) {
 			return status.toString(); // aehm. prevent empty string (e.g.
@@ -55,9 +66,9 @@ public class VisualizationStatusNode {
 	public List<VisualizationStatusNode> getChildren() {
 		return children;
 	}
-	
+
 	public IMarker getMarker() {
-		if(status instanceof MarkerStatus) {
+		if (status instanceof MarkerStatus) {
 			return ((MarkerStatus) status).getMarker();
 		}
 		return null;

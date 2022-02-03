@@ -112,7 +112,8 @@ public class TaskBuildWorkspace {
 		IWorkspaceDescription description = workspace.getDescription();
 
 		description.setBuildOrder(buildOrder == null ? null : buildOrder.toArray(new String[buildOrder.size()]));
-		description.setMaxBuildIterations(3);
+		// Workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=577530:
+		description.setMaxBuildIterations(3 * buildOrder.size());
 
 		workspace.setDescription(description);
 	}

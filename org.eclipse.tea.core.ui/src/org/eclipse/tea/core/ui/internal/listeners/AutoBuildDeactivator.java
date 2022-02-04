@@ -66,7 +66,13 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 		if (nestCount.getAndIncrement() == 0) {
 			log.debug("Disabling automatic build...");
 			autoBuildOriginalState = setAutoBuild(log, false, false);
+			cancelAutoBuild();
 		}
+	}
+
+	private static void cancelAutoBuild() {
+		BuildManager mgr = ((Workspace) ResourcesPlugin.getWorkspace()).getBuildManager();
+		mgr.shutdown(null);
 	}
 
 	@FinishTaskChain
@@ -187,7 +193,7 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 			jobField.setAccessible(false);
 
 			// cancel the job
-			((Job) o).cancel();
+			cancelAutoBuild();
 
 			// reset force flag
 			Field force = o.getClass().getDeclaredField("forceBuild");

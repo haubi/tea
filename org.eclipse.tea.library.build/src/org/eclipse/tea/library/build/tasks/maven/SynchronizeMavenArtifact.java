@@ -49,10 +49,13 @@ import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.transport.wagon.WagonProvider;
 import org.eclipse.aether.transport.wagon.WagonTransporterFactory;
 import org.eclipse.core.internal.variables.StringVariableManager;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.internal.core.JavaModelManager;
@@ -95,6 +98,11 @@ public class SynchronizeMavenArtifact {
 		if (properties == null) {
 			return;
 		}
+		ResourcesPlugin.getWorkspace().run(m -> runOperation(log, tracker, cfg, wb), null);
+	}
+
+	private void runOperation(TaskingLog log, TaskProgressTracker tracker, TeaBuildConfig cfg, WorkspaceBuild wb)
+			throws CoreException {
 
 		// Close jar files potentially in use by the Indexer:
 		// The Indexer actually leaves closing real files to finalization,
@@ -153,13 +161,15 @@ public class SynchronizeMavenArtifact {
 	}
 
 	private void runSingle(TaskingLog log, TaskProgressTracker tracker, PluginBuild hostPlugin, RepositorySystem system,
-			RepositorySystemSession session, List<RemoteRepository> remotes) throws Exception {
-		File target = new File(hostPlugin.getPluginDirectory(), "maven");
-
-		if (!target.exists()) {
-			FileUtils.mkdirs(target);
-			log.warn("creating " + target + "; make sure to add to the classpath of " + hostPlugin.getPluginName());
+			RepositorySystemSession session, List<RemoteRepository> remotes) throws CoreException {
+		IProject prj = hostPlugin.getData().getProject();
+		IFolder folder = prj.getFolder("maven");
+		if (!folder.exists()) {
+			folder.create(false, true, null);
+			log.warn("creating " + folder.getName() + "; make sure to add to the classpath of "
+					+ hostPlugin.getPluginName());
 		}
+		File target = folder.getRawLocation().toFile();
 
 		Set<File> valid = new TreeSet<>(Comparator.comparing(File::getName));
 		for (MavenExternalJarBuild artifact : hostPlugin.getMavenExternalJarDependencies()) {
@@ -226,12 +236,14 @@ public class SynchronizeMavenArtifact {
 		// write .gitignore
 		File gitignore = new File(target, ".gitignore");
 		if (!gitignore.exists()) {
-			FileUtils.writeFileFromString(gitignore, Charsets.UTF_8, "*.jar");
+			try {
+				FileUtils.writeFileFromString(gitignore, Charsets.UTF_8, "*.jar");
+			} catch (IOException e) {
+				throw new CoreException(Status.error(e.getMessage(), e));
+			}
 		}
 
-		// refresh project
-		IProject prj = hostPlugin.getData().getProject();
-		prj.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+		folder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 	}
 
 	/**

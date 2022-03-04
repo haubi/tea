@@ -33,6 +33,7 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -63,6 +64,7 @@ public class TaskingPreferencePage extends FieldEditorPreferencePage implements 
 	private TaskingDevelopmentConfig config;
 
 	private final List<Composite> allFieldEditorParents = new ArrayList<>();
+	Image logoImage;
 
 	public TaskingPreferencePage() {
 		super(GRID);
@@ -75,6 +77,18 @@ public class TaskingPreferencePage extends FieldEditorPreferencePage implements 
 		setPreferenceStore(Activator.getInstance().getPreferenceStore());
 		ContextInjectionFactory.inject(this,
 				TaskingInjectionHelper.createConfiguredContext(new TaskingEclipsePreferenceStore()));
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+		disposeLogoImage();
+	}
+
+	private void disposeLogoImage() {
+		if (logoImage != null) {
+			logoImage.dispose();
+		}
 	}
 
 	@Override
@@ -92,8 +106,9 @@ public class TaskingPreferencePage extends FieldEditorPreferencePage implements 
 
 		Label logo = new Label(getFieldEditorParent(), SWT.NONE);
 		GridDataFactory.swtDefaults().align(SWT.FILL, SWT.TOP).applyTo(logo);
-		logo.setImage(
-				Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "resources/tea-full60r.png").createImage());
+		disposeLogoImage();
+		logoImage = Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "resources/tea-full60r.png").createImage();
+		logo.setImage(logoImage);
 
 		List<TaskingConfigurationExtension> sortedExtensions = new ArrayList<>(extensions);
 		sortedExtensions.sort((a, b) -> {

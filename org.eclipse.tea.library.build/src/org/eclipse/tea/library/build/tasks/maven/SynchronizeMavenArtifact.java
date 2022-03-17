@@ -14,8 +14,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,10 +56,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jdt.apt.core.util.AptConfig;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.tea.core.services.TaskProgressTracker;
@@ -66,6 +72,7 @@ import org.eclipse.tea.library.build.config.BuildDirectories;
 import org.eclipse.tea.library.build.config.TeaBuildConfig;
 import org.eclipse.tea.library.build.model.MavenExternalJarBuild;
 import org.eclipse.tea.library.build.model.PluginBuild;
+import org.eclipse.tea.library.build.model.PluginData;
 import org.eclipse.tea.library.build.model.WorkspaceBuild;
 import org.eclipse.tea.library.build.util.FileUtils;
 import org.eclipse.tea.library.build.util.StringHelper;
@@ -83,6 +90,7 @@ public class SynchronizeMavenArtifact {
 			RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN);
 	private final static RepositoryPolicy SNAPSHOT_POLICY = new RepositoryPolicy(true,
 			RepositoryPolicy.UPDATE_POLICY_ALWAYS, RepositoryPolicy.CHECKSUM_POLICY_WARN);
+	private final static String MAVEN_DIRNAME = "maven";
 	private static String lastExceptionName;
 	private MavenConfig properties;
 
@@ -115,6 +123,8 @@ public class SynchronizeMavenArtifact {
 		indexManager.disable();
 		lastExceptionName = null;
 
+		Map<PluginBuild, IClasspathEntry[]> pluginsWithClasspath = new HashMap<>();
+
 		try {
 			indexManager.discardJobs(null);
 
@@ -129,16 +139,44 @@ public class SynchronizeMavenArtifact {
 
 			Collection<PluginBuild> pbs = wb.getSourcePlugIns();
 
+			log.info("drop maven artifacts from classpath before synchronizing");
+			for (PluginBuild pb : pbs) {
+				if (!pb.getMavenExternalJarDependencies().isEmpty() && !pb.getData().isBinary()) {
+					IProject prj = pb.getData().getProject();
+					IJavaProject jp = JavaCore.create(prj);
+					IClasspathEntry[] classpath = jp.getRawClasspath();
+
+					pluginsWithClasspath.put(pb, classpath);
+
+					IClasspathEntry[] nonMavenCP = filterMavenArtifactsFromClasspath(prj, classpath);
+					jp.setRawClasspath(nonMavenCP, false, new NullProgressMonitor());
+				}
+			}
+			ResourcesPlugin.getWorkspace().checkpoint(false);
+
 			// Try to close the Indexer's file handles now.
 			System.gc();
 			System.runFinalization();
 
-			for (PluginBuild pb : pbs) {
-				if (!pb.getMavenExternalJarDependencies().isEmpty() && !pb.getData().isBinary()) {
-					runSingle(log, tracker, pb, system, session, remotes);
-				}
+			for (PluginBuild pb : pluginsWithClasspath.keySet()) {
+				runSingle(log, tracker, pb, system, session, remotes);
 			}
 		} finally {
+			ResourcesPlugin.getWorkspace().checkpoint(false);
+
+			log.info("restore classpaths after synchronizing maven artifacts");
+			for (Map.Entry<PluginBuild, IClasspathEntry[]> pluginWithCP : pluginsWithClasspath.entrySet()) {
+				try {
+					PluginData pd = pluginWithCP.getKey().getData();
+					IProject prj = pd.getProject();
+					IJavaProject jp = JavaCore.create(prj);
+					jp.setRawClasspath(pluginWithCP.getValue(), false, new NullProgressMonitor());
+				} catch (Exception e) {
+					log.error("error restoring classpath of " + pluginWithCP.getKey().getPluginName(), e);
+				}
+			}
+			ResourcesPlugin.getWorkspace().checkpoint(false);
+
 			indexManager.enable();
 		}
 	}
@@ -160,10 +198,23 @@ public class SynchronizeMavenArtifact {
 		return new MavenConfig(file);
 	}
 
+	private IClasspathEntry[] filterMavenArtifactsFromClasspath(IProject prj, IClasspathEntry[] classpath) {
+		IFolder mavenFolder = prj.getFolder(MAVEN_DIRNAME);
+		IPath mavenPath = mavenFolder.getFullPath();
+		IClasspathEntry[] nonMavenCP = Arrays.stream(classpath).filter((cp) -> {
+			switch (cp.getEntryKind()) {
+			case IClasspathEntry.CPE_LIBRARY:
+				return !mavenPath.isPrefixOf(cp.getPath());
+			}
+			return true;
+		}).toArray((s) -> new IClasspathEntry[s]);
+		return nonMavenCP;
+	}
+
 	private void runSingle(TaskingLog log, TaskProgressTracker tracker, PluginBuild hostPlugin, RepositorySystem system,
 			RepositorySystemSession session, List<RemoteRepository> remotes) throws CoreException {
 		IProject prj = hostPlugin.getData().getProject();
-		IFolder folder = prj.getFolder("maven");
+		IFolder folder = prj.getFolder(MAVEN_DIRNAME);
 		if (!folder.exists()) {
 			folder.create(false, true, null);
 			log.warn("creating " + folder.getName() + "; make sure to add to the classpath of "

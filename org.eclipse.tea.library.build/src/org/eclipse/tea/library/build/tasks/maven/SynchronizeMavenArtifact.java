@@ -14,8 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +62,7 @@ import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.tea.core.services.TaskProgressTracker;
@@ -72,7 +71,6 @@ import org.eclipse.tea.library.build.config.BuildDirectories;
 import org.eclipse.tea.library.build.config.TeaBuildConfig;
 import org.eclipse.tea.library.build.model.MavenExternalJarBuild;
 import org.eclipse.tea.library.build.model.PluginBuild;
-import org.eclipse.tea.library.build.model.PluginData;
 import org.eclipse.tea.library.build.model.WorkspaceBuild;
 import org.eclipse.tea.library.build.util.FileUtils;
 import org.eclipse.tea.library.build.util.StringHelper;
@@ -109,26 +107,71 @@ public class SynchronizeMavenArtifact {
 		ResourcesPlugin.getWorkspace().run(m -> runOperation(log, tracker, cfg, wb), null);
 	}
 
+	private static class MavenAwareClasspathManipulator {
+		private final String pluginName;
+		private final IJavaProject jp;
+		private final IClasspathEntry[] originalCP;
+		private final List<IClasspathEntry> mavenCP;
+		private final List<IClasspathEntry> nonMavenCP;
+
+		private MavenAwareClasspathManipulator(String pluginName, IJavaProject jp, IClasspathEntry[] originalCP) {
+			this.pluginName = pluginName;
+			this.jp = jp;
+			this.originalCP = originalCP;
+			this.mavenCP = new ArrayList<>();
+			this.nonMavenCP = new ArrayList<>();
+		}
+
+		static MavenAwareClasspathManipulator of(String pluginName, IJavaProject jp, IFolder mavenFolder)
+				throws JavaModelException {
+			IPath mavenPath = mavenFolder.getFullPath();
+			IClasspathEntry[] originalCP = jp.getRawClasspath();
+			MavenAwareClasspathManipulator ret = new MavenAwareClasspathManipulator(pluginName, jp, originalCP);
+			for (IClasspathEntry cp : originalCP) {
+				if (cp.getEntryKind() == IClasspathEntry.CPE_LIBRARY && mavenPath.isPrefixOf(cp.getPath())) {
+					ret.mavenCP.add(cp);
+				} else {
+					ret.nonMavenCP.add(cp);
+				}
+			}
+			return ret;
+		}
+
+		void discardMavenIndexerJobs(IndexManager indexManager) {
+			for (IClasspathEntry cp : mavenCP) {
+				indexManager.discardJobs(cp.getPath().toString());
+			}
+		}
+
+		void setNonMavenClasspath() throws JavaModelException {
+			jp.setRawClasspath(nonMavenCP.toArray(new IClasspathEntry[nonMavenCP.size()]), false,
+					new NullProgressMonitor());
+		}
+
+		void setOriginalClasspath() throws JavaModelException {
+			jp.setRawClasspath(originalCP, false, new NullProgressMonitor());
+		}
+
+		String getPluginName() {
+			return pluginName;
+		}
+	};
+
 	private void runOperation(TaskingLog log, TaskProgressTracker tracker, TeaBuildConfig cfg, WorkspaceBuild wb)
 			throws CoreException {
 
-		// Close jar files potentially in use by the Indexer:
-		// The Indexer actually leaves closing real files to finalization,
-		// see https://bugs.eclipse.org/567661
-		// and https://bugs.eclipse.org/406170
-		// Although discardJobs() does wait for the Indexer jobs to
-		// terminate, the resources may take a little longer to get ready
-		// for finalization. But instead of sleeping, we do something else.
+		// We have to close jar files potentially in use by Eclipse,
+		// to allow them for being replaced even on Windows, see
+		// https://bugs.eclipse.org/406170
+		// First, prevent the Indexer from reopening them.
 		IndexManager indexManager = JavaModelManager.getIndexManager();
 		indexManager.disable();
 		lastExceptionName = null;
 
-		Map<PluginBuild, IClasspathEntry[]> pluginsWithClasspath = new HashMap<>();
+		Map<PluginBuild, MavenAwareClasspathManipulator> classpathManipulatorOfPlugin = new HashMap<>();
 
 		try {
-			indexManager.discardJobs(null);
-
-			// close jar files providing Annotations, see
+			// Also close jar files providing Annotations, see
 			// https://bugs.eclipse.org/565436
 			AptConfig.setFactoryPath(null, AptConfig.getFactoryPath(null));
 
@@ -137,42 +180,52 @@ public class SynchronizeMavenArtifact {
 			RepositorySystemSession session = createSession(log, system);
 			List<RemoteRepository> remotes = createRemoteRepositories();
 
-			Collection<PluginBuild> pbs = wb.getSourcePlugIns();
-
-			log.info("drop maven artifacts from classpath before synchronizing");
-			for (PluginBuild pb : pbs) {
+			log.info("before synchronizing, inspect classpath for maven artifacts");
+			for (PluginBuild pb : wb.getSourcePlugIns()) {
 				if (!pb.getMavenExternalJarDependencies().isEmpty() && !pb.getData().isBinary()) {
 					IProject prj = pb.getData().getProject();
-					IJavaProject jp = JavaCore.create(prj);
-					IClasspathEntry[] classpath = jp.getRawClasspath();
+					IJavaProject javaProject = JavaCore.create(prj);
+					IFolder mavenFolder = prj.getFolder(MAVEN_DIRNAME);
 
-					pluginsWithClasspath.put(pb, classpath);
-
-					IClasspathEntry[] nonMavenCP = filterMavenArtifactsFromClasspath(prj, classpath);
-					jp.setRawClasspath(nonMavenCP, false, new NullProgressMonitor());
+					MavenAwareClasspathManipulator cpManip = MavenAwareClasspathManipulator.of(pb.getPluginName(),
+							javaProject, mavenFolder);
+					classpathManipulatorOfPlugin.put(pb, cpManip);
 				}
+			}
+
+			log.info("before synchronizing, stop indexer for maven artifacts");
+			for (MavenAwareClasspathManipulator cpManip : classpathManipulatorOfPlugin.values()) {
+				cpManip.discardMavenIndexerJobs(indexManager);
+			}
+			// Although discardJobs() does wait for the Indexer jobs to
+			// terminate, the resources may take a little longer to get ready
+			// for finalization. But instead of sleeping, we do something else.
+
+			log.info("before synchronizing, drop maven artifacts from classpath");
+			for (MavenAwareClasspathManipulator cpManip : classpathManipulatorOfPlugin.values()) {
+				cpManip.setNonMavenClasspath();
 			}
 			ResourcesPlugin.getWorkspace().checkpoint(false);
 
-			// Try to close the Indexer's file handles now.
+			// The Indexer leaves closing ZipFile handles to finalization, see
+			// https://bugs.eclipse.org/567661
 			System.gc();
 			System.runFinalization();
 
-			for (PluginBuild pb : pluginsWithClasspath.keySet()) {
+			for (PluginBuild pb : classpathManipulatorOfPlugin.keySet()) {
 				runSingle(log, tracker, pb, system, session, remotes);
 			}
+		} catch (Exception e) {
+			log.error("error synchronizing maven artifacts", e);
 		} finally {
 			ResourcesPlugin.getWorkspace().checkpoint(false);
 
-			log.info("restore classpaths after synchronizing maven artifacts");
-			for (Map.Entry<PluginBuild, IClasspathEntry[]> pluginWithCP : pluginsWithClasspath.entrySet()) {
+			log.info("after synchronizing, restore classpaths with maven artifacts");
+			for (MavenAwareClasspathManipulator cpManip : classpathManipulatorOfPlugin.values()) {
 				try {
-					PluginData pd = pluginWithCP.getKey().getData();
-					IProject prj = pd.getProject();
-					IJavaProject jp = JavaCore.create(prj);
-					jp.setRawClasspath(pluginWithCP.getValue(), false, new NullProgressMonitor());
+					cpManip.setOriginalClasspath();
 				} catch (Exception e) {
-					log.error("error restoring classpath of " + pluginWithCP.getKey().getPluginName(), e);
+					log.error("error restoring classpath of " + cpManip.getPluginName(), e);
 				}
 			}
 			ResourcesPlugin.getWorkspace().checkpoint(false);
@@ -196,19 +249,6 @@ public class SynchronizeMavenArtifact {
 			return null;
 		}
 		return new MavenConfig(file);
-	}
-
-	private IClasspathEntry[] filterMavenArtifactsFromClasspath(IProject prj, IClasspathEntry[] classpath) {
-		IFolder mavenFolder = prj.getFolder(MAVEN_DIRNAME);
-		IPath mavenPath = mavenFolder.getFullPath();
-		IClasspathEntry[] nonMavenCP = Arrays.stream(classpath).filter((cp) -> {
-			switch (cp.getEntryKind()) {
-			case IClasspathEntry.CPE_LIBRARY:
-				return !mavenPath.isPrefixOf(cp.getPath());
-			}
-			return true;
-		}).toArray((s) -> new IClasspathEntry[s]);
-		return nonMavenCP;
 	}
 
 	private void runSingle(TaskingLog log, TaskProgressTracker tracker, PluginBuild hostPlugin, RepositorySystem system,

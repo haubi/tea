@@ -205,25 +205,27 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 			if (!suppressedProjects.isEmpty()) {
 				for (Entry<IProject, ElementTree> entry : suppressedProjects.entrySet()) {
 					IProject project = entry.getKey();
-					IBuildConfiguration bc = project.getActiveBuildConfig();
-					ElementTree elementTree = suppressedProjects.get(project);
-					if (elementTree != null) {
-						ICommand[] commands;
-						// yay - now make sure the tree of all builders is the
-						// current tree of the project
-						if (project.isAccessible()) {
-							commands = ((Project) project).internalGetDescription().getBuildSpec(false);
-						} else {
-							continue;
-						}
+					if (project.isOpen()) {
+						IBuildConfiguration bc = project.getActiveBuildConfig();
+						ElementTree elementTree = suppressedProjects.get(project);
+						if (elementTree != null) {
+							ICommand[] commands;
+							// now make sure the tree of all builders is the
+							// current tree of the project
+							if (project.isAccessible()) {
+								commands = ((Project) project).internalGetDescription().getBuildSpec(false);
+							} else {
+								continue;
+							}
 
-						for (ICommand c : commands) {
-							IncrementalProjectBuilder b = ((BuildCommand) c).getBuilder(bc);
-							Method setTree = InternalBuilder.class.getDeclaredMethod("setLastBuiltTree",
-									ElementTree.class);
-							setTree.setAccessible(true);
-							setTree.invoke(b, elementTree);
-							setTree.setAccessible(false);
+							for (ICommand c : commands) {
+								IncrementalProjectBuilder b = ((BuildCommand) c).getBuilder(bc);
+								Method setTree = InternalBuilder.class.getDeclaredMethod("setLastBuiltTree",
+										ElementTree.class);
+								setTree.setAccessible(true);
+								setTree.invoke(b, elementTree);
+								setTree.setAccessible(false);
+							}
 						}
 					}
 				}

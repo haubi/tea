@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.tea.library.build.chain;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -121,7 +122,8 @@ public class TeaBuildChain {
 
 		// Step 3: sort elements by build order into groups. lazily triggers
 		// calculation of order groups (getBuildOrder()).
-		namedElements.values().forEach(e -> groupedElements.computeIfAbsent(e.getBuildOrder(), ArrayList::new).add(e));
+		namedElements.values().forEach(
+				e -> groupedElements.computeIfAbsent(e.getBuildOrder(new ArrayDeque<>()), ArrayList::new).add(e));
 	}
 
 	/**
@@ -156,8 +158,8 @@ public class TeaBuildChain {
 		return groupedElements.entrySet().stream().sorted(Comparator.comparing(e -> e.getKey()))
 				.map(e -> e.getValue().stream()
 						.filter(el -> !(el instanceof TeaClosedPluginElement | el instanceof TeaUnhandledElement))
-						.map(el -> el.getName().replaceFirst(java.util.regex.Pattern.quote(projecPrefixToSkip), "")).sorted()
-						.collect(Collectors.toList()))
+						.map(el -> el.getName().replaceFirst(java.util.regex.Pattern.quote(projecPrefixToSkip), ""))
+						.sorted().collect(Collectors.toList()))
 				.filter(l -> !l.isEmpty()).collect(Collectors.toList());
 	}
 

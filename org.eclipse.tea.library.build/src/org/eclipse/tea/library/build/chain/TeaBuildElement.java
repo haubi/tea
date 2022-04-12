@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.tea.library.build.chain;
 
+import java.util.Deque;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.tea.library.build.services.TeaElementFailurePolicy;
@@ -41,24 +43,32 @@ public abstract class TeaBuildElement implements Comparable<TeaBuildElement> {
 	/**
 	 * Returns the build order value for this element.
 	 *
+	 * @param dependencyChain
+	 *            Dependency graph reported for circular dependencies
 	 * @returns the build order; the builds must run in ascending order, cycles
 	 *          are forbidden
 	 */
-	protected final int getBuildOrder() {
+	protected final int getBuildOrder(Deque<TeaBuildElement> dependencyChain) {
 		if (buildOrder >= 0) {
 			return buildOrder;
 		}
 
-		if (buildOrder == -2) {
-			// already in calculation!
-			throw new IllegalStateException("circular dependency detected in " + this);
+		dependencyChain.push(this);
+		try {
+			if (buildOrder == -2) {
+				// already in calculation!
+				throw new IllegalStateException("circular dependency detected in "
+						+ dependencyChain.stream().map(TeaBuildElement::getName).collect(Collectors.joining(" -> ")));
+			}
+
+			// set to -2 to detect circular dependencies
+			buildOrder = -2;
+
+			// calculate the build order
+			buildOrder = calcBuildOrder(1, dependencyChain);
+		} finally {
+			dependencyChain.pop();
 		}
-
-		// set to -2 to detect circular dependencies
-		buildOrder = -2;
-
-		// calculate the build order
-		buildOrder = calcBuildOrder(1);
 
 		return buildOrder;
 	}
@@ -68,9 +78,11 @@ public abstract class TeaBuildElement implements Comparable<TeaBuildElement> {
 	 *
 	 * @param minValue
 	 *            minimal order value
+	 * @param dependencyChain
+	 *            Dependency graph reported for circular dependencies
 	 * @returns the build order (>=minValue)
 	 */
-	protected int calcBuildOrder(int minValue) {
+	protected int calcBuildOrder(int minValue, Deque<TeaBuildElement> dependencyChain) {
 		int result = minValue;
 
 		for (TeaDependencyWire wire : dependencyWires) {
@@ -80,8 +92,7 @@ public abstract class TeaBuildElement implements Comparable<TeaBuildElement> {
 				throw new RuntimeException("depenendecy from " + getName() + " to " + target.getName()
 						+ " not possible. Target unhandled.");
 			}
-
-			int depOrder = target.getBuildOrder();
+			int depOrder = target.getBuildOrder(dependencyChain);
 			if (isBuilder()) {
 				depOrder++;
 			}

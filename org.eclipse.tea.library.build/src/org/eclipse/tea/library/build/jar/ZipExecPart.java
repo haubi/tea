@@ -42,7 +42,7 @@ public class ZipExecPart {
 	}
 
 	/** copy constructor **/
-	ZipExecPart(ZipExecPart source) {
+	public ZipExecPart(ZipExecPart source) {
 		sourceDirectory = source.sourceDirectory;
 		relativePaths.addAll(source.relativePaths);
 		excludeGit = source.excludeGit;

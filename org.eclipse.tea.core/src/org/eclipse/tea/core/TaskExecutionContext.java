@@ -275,7 +275,12 @@ public class TaskExecutionContext {
 				// not throw an exception
 				IStatus taskStatus = taskCtx.get(IStatus.class);
 				if (taskStatus.getSeverity() >= IStatus.ERROR) {
-					log.error("Task aborted with status " + taskStatus);
+					if (taskStatus.getException() != null && taskStatus.getSeverity() != IStatus.CANCEL) {
+						// Already logged in
+						// org.eclipse.tea.core.internal.listeners.LifecycleAnnouncer#finishTask
+					} else {
+						log.error("Task aborted with status " + taskStatus);
+					}
 					break;
 				}
 			}

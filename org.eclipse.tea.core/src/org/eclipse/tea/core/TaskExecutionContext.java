@@ -168,6 +168,10 @@ public class TaskExecutionContext {
 	 *            contained in the {@link TaskChain}.
 	 */
 	public void addTask(Object o) {
+		if (o == null) {
+			return; // ignore
+		}
+
 		if (o instanceof TaskChain) {
 			ContextInjectionFactory.invoke(o, TaskChainContextInit.class, context);
 		} else if (o instanceof Class && TaskChain.class.isAssignableFrom((Class<?>) o)) {
@@ -179,6 +183,9 @@ public class TaskExecutionContext {
 	}
 
 	public void addTaskAt(int index, Object o) {
+		if (o == null) {
+			return; // ignore
+		}
 		tasks.add(index, o);
 	}
 

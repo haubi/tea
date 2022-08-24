@@ -33,7 +33,6 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * (or an output file) if running headless, or the "Tasking Log" view in the
  * IDE.
  */
-@SuppressWarnings("restriction")
 @Component(service = IContextFunction.class, property = {
 		"service.context.key=org.eclipse.tea.core.services.TaskingLog" })
 public class TaskingLogLookupContextFunction extends ContextFunction {

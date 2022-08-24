@@ -26,7 +26,6 @@ import com.google.common.base.Strings;
  * {@link ContextFunction} that looks up a task chain by the name stored in the
  * context.
  */
-@SuppressWarnings("restriction")
 @Component(service = IContextFunction.class, property = {
 		"service.context.key=org.eclipse.tea.core.services.TaskChain" })
 public class TaskChainLookupContextFunction extends ContextFunction {

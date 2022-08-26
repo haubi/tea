@@ -7,7 +7,6 @@ import java.util.Deque;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -73,7 +72,6 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 
 	private TreeViewer tree;
 	private final Deque<VisualizationRootNode> nodes = new ArrayDeque<>();
-	private Clipboard clipboard;
 
 	@PostConstruct
 	public void postConstruct(Composite parent, IEventBroker broker, MPart part, EMenuService menuService) {
@@ -110,8 +108,6 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 		progressText.getColumn().setText("Status");
 		progressText.getColumn().setWidth(75);
 		progressText.setLabelProvider(new TreeProgressRenderer(tree.getControl().getDisplay()));
-
-		clipboard = new Clipboard(tree.getControl().getDisplay());
 
 		// add toolbar entries
 		MDirectToolItem clear = MMenuFactory.INSTANCE.createDirectToolItem();
@@ -213,9 +209,13 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 						labels.add(((VisualizationStatusNode) element).getLabel());
 					}
 				}
-
-				clipboard.setContents(new Object[] { Joiner.on('\n').join(labels) },
-						new Transfer[] { TextTransfer.getInstance() });
+				Clipboard clipboard = new Clipboard(tree.getControl().getDisplay());
+				try {
+					clipboard.setContents(new Object[] { Joiner.on('\n').join(labels) },
+							new Transfer[] { TextTransfer.getInstance() });
+				} finally {
+					clipboard.dispose();
+				}
 			}
 		});
 
@@ -347,11 +347,6 @@ public class TaskingLiveView implements Refreshable, EventHandler {
 	@Focus
 	public void onFocus() {
 		tree.getControl().setFocus();
-	}
-
-	@PreDestroy
-	public void dispose() {
-		clipboard.dispose();
 	}
 
 }

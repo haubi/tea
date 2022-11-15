@@ -198,6 +198,7 @@ public class SynchronizeMavenArtifact {
 			}
 
 			log.info("before synchronizing, stop indexer for maven artifacts");
+			tracker.setTaskName("stoppig indexer");
 			for (MavenAwareClasspathManipulator cpManip : classpathManipulatorOfPlugin.values()) {
 				cpManip.discardMavenIndexerJobs(indexManager);
 			}
@@ -206,6 +207,7 @@ public class SynchronizeMavenArtifact {
 			// for finalization. But instead of sleeping, we do something else.
 
 			log.info("before synchronizing, drop maven artifacts from classpath");
+			tracker.setTaskName("removing artifacts from classpath");
 			for (MavenAwareClasspathManipulator cpManip : classpathManipulatorOfPlugin.values()) {
 				cpManip.setNonMavenClasspath();
 			}
@@ -229,6 +231,7 @@ public class SynchronizeMavenArtifact {
 			ResourcesPlugin.getWorkspace().checkpoint(false);
 
 			log.info("after synchronizing, restore classpaths with maven artifacts");
+			tracker.setTaskName("restoring classpath");
 			for (MavenAwareClasspathManipulator cpManip : classpathManipulatorOfPlugin.values()) {
 				try {
 					cpManip.setOriginalClasspath();
@@ -268,6 +271,7 @@ public class SynchronizeMavenArtifact {
 	private void synchronizePlugin(TaskingLog log, TaskProgressTracker tracker, PluginBuild hostPlugin,
 			RepositorySystem system, RepositorySystemSession session, List<RemoteRepository> remotes)
 			throws CoreException {
+		tracker.setTaskName(hostPlugin.getMavenExternalJarDependencies().size() + " for " + hostPlugin.getPluginName());
 		NullProgressMonitor monitor = new NullProgressMonitor();
 		IProject prj = hostPlugin.getData().getProject();
 		IFolder targetFolder = prj.getFolder(MAVEN_DIRNAME);
@@ -285,9 +289,6 @@ public class SynchronizeMavenArtifact {
 				+ hostPlugin.getMavenExternalJarDependencies().stream().map(artifact -> artifact.getCoordinates())
 						.collect(Collectors.joining(", ")));
 		for (MavenExternalJarBuild artifact : hostPlugin.getMavenExternalJarDependencies()) {
-			tracker.setTaskName(artifact.getCoordinates());
-			tracker.worked(1);
-
 			Coordinate coord = new Coordinate(artifact.getCoordinates());
 
 			// try to look it up in the local repository only!

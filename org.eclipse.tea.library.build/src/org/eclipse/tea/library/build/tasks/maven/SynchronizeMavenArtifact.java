@@ -60,6 +60,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -216,8 +217,12 @@ public class SynchronizeMavenArtifact {
 			System.runFinalization();
 
 			for (PluginBuild pb : classpathManipulatorOfPlugin.keySet()) {
+				checkCanceled(tracker);
 				synchronizePlugin(log, tracker, pb, system, session, remotes);
 			}
+		} catch (OperationCanceledException e) {
+			log.info("synchronizing maven artifacts was cancelled");
+			throw e;
 		} catch (Exception e) {
 			log.error("error synchronizing maven artifacts", e);
 		} finally {
@@ -234,6 +239,12 @@ public class SynchronizeMavenArtifact {
 			ResourcesPlugin.getWorkspace().checkpoint(false);
 
 			indexManager.enable();
+		}
+	}
+
+	private void checkCanceled(TaskProgressTracker tracker) {
+		if (tracker.isCanceled()) {
+			throw new OperationCanceledException();
 		}
 	}
 

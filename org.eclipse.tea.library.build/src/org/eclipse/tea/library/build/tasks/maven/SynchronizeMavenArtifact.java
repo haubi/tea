@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -58,15 +59,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jdt.apt.core.util.AptConfig;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.tea.core.services.TaskProgressTracker;
@@ -93,12 +89,17 @@ public class SynchronizeMavenArtifact {
 	private final static RepositoryPolicy SNAPSHOT_POLICY = new RepositoryPolicy(true,
 			RepositoryPolicy.UPDATE_POLICY_ALWAYS, RepositoryPolicy.CHECKSUM_POLICY_WARN);
 	private final static String MAVEN_DIRNAME = "maven";
-	private static String lastExceptionName;
+	private final static String CLASSIFIER_SOURCES = "sources";
+	private String lastExceptionName;
 	private MavenConfig properties;
 
 	@Override
 	public String toString() {
 		return "Synchronize Maven";
+	}
+
+	private void info(TaskingLog log, String msg) {
+		log.info(toString() + ": " + msg);
 	}
 
 	@Execute
@@ -111,141 +112,104 @@ public class SynchronizeMavenArtifact {
 		ResourcesPlugin.getWorkspace().run(m -> runOperation(log, tracker, cfg, wb), null);
 	}
 
-	private static class MavenAwareClasspathManipulator {
-		private final String pluginName;
-		private final IJavaProject jp;
-		private final IClasspathEntry[] originalCP;
-		private final List<IClasspathEntry> mavenCP;
-		private final List<IClasspathEntry> nonMavenCP;
-
-		private MavenAwareClasspathManipulator(String pluginName, IJavaProject jp, IClasspathEntry[] originalCP) {
-			this.pluginName = pluginName;
-			this.jp = jp;
-			this.originalCP = originalCP;
-			this.mavenCP = new ArrayList<>();
-			this.nonMavenCP = new ArrayList<>();
-		}
-
-		static MavenAwareClasspathManipulator of(String pluginName, IJavaProject jp, IFolder mavenFolder)
-				throws JavaModelException {
-			IPath mavenPath = mavenFolder.getFullPath();
-			IClasspathEntry[] originalCP = jp.getRawClasspath();
-			MavenAwareClasspathManipulator ret = new MavenAwareClasspathManipulator(pluginName, jp, originalCP);
-			for (IClasspathEntry cp : originalCP) {
-				if (cp.getEntryKind() == IClasspathEntry.CPE_LIBRARY && mavenPath.isPrefixOf(cp.getPath())) {
-					ret.mavenCP.add(cp);
-				} else {
-					ret.nonMavenCP.add(cp);
-				}
-			}
-			return ret;
-		}
-
-		void discardMavenIndexerJobs(IndexManager indexManager) {
-			for (IClasspathEntry cp : mavenCP) {
-				indexManager.discardJobs(cp.getPath().toString());
-			}
-		}
-
-		void setNonMavenClasspath() throws JavaModelException {
-			jp.setRawClasspath(nonMavenCP.toArray(new IClasspathEntry[nonMavenCP.size()]), false,
-					new NullProgressMonitor());
-		}
-
-		void setOriginalClasspath() throws JavaModelException {
-			jp.setRawClasspath(originalCP, false, new NullProgressMonitor());
-		}
-
-		String getPluginName() {
-			return pluginName;
-		}
-	};
-
 	private void runOperation(TaskingLog log, TaskProgressTracker tracker, TeaBuildConfig cfg, WorkspaceBuild wb)
 			throws CoreException {
 
-		// We have to close jar files potentially in use by Eclipse,
-		// to allow them for being replaced even on Windows, see
-		// https://bugs.eclipse.org/406170
-		// First, prevent the Indexer from reopening them.
 		IndexManager indexManager = JavaModelManager.getIndexManager();
-		indexManager.disable();
 		lastExceptionName = null;
 
-		Map<PluginBuild, MavenAwareClasspathManipulator> classpathManipulatorOfPlugin = new HashMap<>();
-
+		boolean needIndexerDisable = false;
 		try {
-			// Also close jar files providing Annotations, see
-			// https://bugs.eclipse.org/565436
-			AptConfig.setFactoryPath(null, AptConfig.getFactoryPath(null));
 
 			ServiceLocator locator = createServiceLocator(log);
 			RepositorySystem system = locator.getService(RepositorySystem.class);
 			RepositorySystemSession session = createSession(log, system);
 			List<RemoteRepository> remotes = createRemoteRepositories();
 
-			log.info("before synchronizing, inspect classpath for maven artifacts");
+			Set<BatchableMavenManipulator> mavenManips = new HashSet<>();
 			for (PluginBuild pb : wb.getSourcePlugIns()) {
 				if (!pb.getMavenExternalJarDependencies().isEmpty() && !pb.getData().isBinary()) {
-					IProject prj = pb.getData().getProject();
-					IJavaProject javaProject = JavaCore.create(prj);
-					IFolder mavenFolder = prj.getFolder(MAVEN_DIRNAME);
-
-					MavenAwareClasspathManipulator cpManip = MavenAwareClasspathManipulator.of(pb.getPluginName(),
-							javaProject, mavenFolder);
-					classpathManipulatorOfPlugin.put(pb, cpManip);
+					mavenManips.add(new BatchableMavenManipulator(log, tracker, system, session, remotes, pb));
 				}
 			}
 
-			log.info("before synchronizing, stop indexer for maven artifacts");
-			tracker.setTaskName("stoppig indexer");
-			for (MavenAwareClasspathManipulator cpManip : classpathManipulatorOfPlugin.values()) {
-				cpManip.discardMavenIndexerJobs(indexManager);
+			for (BatchableMavenManipulator mavenManip : mavenManips) {
+				mavenManip.identifyFilesToUpdate(); // throws
 			}
-			// Although discardJobs() does wait for the Indexer jobs to
-			// terminate, the resources may take a little longer to get ready
-			// for finalization. But instead of sleeping, we do something else.
 
-			log.info("before synchronizing, drop maven artifacts from classpath");
-			tracker.setTaskName("removing artifacts from classpath");
-			for (MavenAwareClasspathManipulator cpManip : classpathManipulatorOfPlugin.values()) {
-				cpManip.setNonMavenClasspath();
+			for (BatchableMavenManipulator mavenManip : mavenManips) {
+				if (!mavenManip.getFilesToClean().isEmpty()) {
+					needIndexerDisable = true;
+					break;
+				}
 			}
+
+			// process remaining old workspace change events
 			ResourcesPlugin.getWorkspace().checkpoint(false);
 
-			// The Indexer leaves closing ZipFile handles to finalization, see
-			// https://bugs.eclipse.org/567661
-			System.gc();
-			System.runFinalization();
+			if (needIndexerDisable) {
+				// We have to close jar files potentially in use by Eclipse,
+				// to allow them for being replaced even on Windows, see
+				// https://bugs.eclipse.org/406170
+				tracker.setTaskName("closing workspace files that are updated");
+				info(log, "closing workspace files that are updated");
 
-			for (PluginBuild pb : classpathManipulatorOfPlugin.keySet()) {
-				checkCanceled(tracker);
-				synchronizePlugin(log, tracker, pb, system, session, remotes);
+				// First, prevent the Indexer from reopening them.
+				indexManager.disable();
+
+				// Second, tell indexer to release the file handles.
+				mavenManips.forEach(
+						m -> m.getFilesToClean().forEach(f -> indexManager.discardJobs(f.getFullPath().toString())));
+
+				// The Indexer leaves closing ZipFile handles to finalization,
+				// see https://bugs.eclipse.org/567661
+				// Although discardJobs() does wait for the Indexer jobs to
+				// terminate, the resources may take a little longer to get
+				// ready for finalization.
+				// But instead of sleeping, we do something else.
+
+				// Close jar files providing Annotations, see
+				// https://bugs.eclipse.org/565436
+				AptConfig.setFactoryPath(null, AptConfig.getFactoryPath(null));
+
+				// Third, close the file handles.
+				System.gc();
+				System.runFinalization();
 			}
+
+			// change file system content, no workspace change events yet
+			mavenManips.forEach(BatchableMavenManipulator::synchronizeArtifacts);
+
+			tracker.setTaskName("finalizing");
+			info(log, "finalizing");
+
+			// in case the indexer listens to workspace change events
+			if (needIndexerDisable) {
+				needIndexerDisable = false;
+				indexManager.enable();
+			}
+
+			// create new workspace change events, may already process them
+			for (BatchableMavenManipulator mavenManip : mavenManips) {
+				mavenManip.refreshWorkspace(); // throws
+			}
+
 		} catch (OperationCanceledException e) {
-			log.info("synchronizing maven artifacts was cancelled");
+			info(log, "cancelled");
 			throw e;
 		} catch (Exception e) {
 			log.error("error synchronizing maven artifacts", e);
 		} finally {
-			ResourcesPlugin.getWorkspace().checkpoint(false);
-
-			log.info("after synchronizing, restore classpaths with maven artifacts");
-			tracker.setTaskName("restoring classpath");
-			for (MavenAwareClasspathManipulator cpManip : classpathManipulatorOfPlugin.values()) {
-				try {
-					cpManip.setOriginalClasspath();
-				} catch (Exception e) {
-					log.error("error restoring classpath of " + cpManip.getPluginName(), e);
-				}
+			if (needIndexerDisable) {
+				// never leave disabled, even not on exception
+				indexManager.enable();
 			}
+			// process remaining new workspace change events
 			ResourcesPlugin.getWorkspace().checkpoint(false);
-
-			indexManager.enable();
 		}
 	}
 
-	private void checkCanceled(TaskProgressTracker tracker) {
+	private static void checkCanceled(TaskProgressTracker tracker) {
 		if (tracker.isCanceled()) {
 			throw new OperationCanceledException();
 		}
@@ -268,97 +232,171 @@ public class SynchronizeMavenArtifact {
 		return new MavenConfig(file);
 	}
 
-	private void synchronizePlugin(TaskingLog log, TaskProgressTracker tracker, PluginBuild hostPlugin,
-			RepositorySystem system, RepositorySystemSession session, List<RemoteRepository> remotes)
-			throws CoreException {
-		tracker.setTaskName(hostPlugin.getMavenExternalJarDependencies().size() + " for " + hostPlugin.getPluginName());
-		NullProgressMonitor monitor = new NullProgressMonitor();
-		IProject prj = hostPlugin.getData().getProject();
-		IFolder targetFolder = prj.getFolder(MAVEN_DIRNAME);
-		if (!targetFolder.exists()) {
-			targetFolder.create(false, true, monitor);
-			log.warn("creating " + targetFolder.getName() + "; make sure to add to the classpath of "
-					+ hostPlugin.getPluginName());
+	private class BatchableMavenManipulator {
+		private final TaskingLog log;
+		private final TaskProgressTracker tracker;
+		private final RepositorySystem system;
+		private final RepositorySystemSession session;
+		private final List<RemoteRepository> remotes;
+		private final PluginBuild hostPlugin;
+		private final IFolder targetFolder;
+
+		private final Set<IFile> filesAlreadyUpToDate = new HashSet<>();
+		private final Set<IFile> filesToClean = new HashSet<>();
+		private final List<ArtifactRequest> artifactRequests = new ArrayList<>();
+		private final Map<IFile, Artifact> artifactOfFilesToCreate = new HashMap<>();
+		private final Set<IResource> artifactsToRefresh = new HashSet<>();
+
+		private BatchableMavenManipulator(TaskingLog log, TaskProgressTracker tracker, RepositorySystem system,
+				RepositorySystemSession session, List<RemoteRepository> remotes, PluginBuild hostPlugin)
+				throws CoreException {
+			this.log = log;
+			this.tracker = tracker;
+			this.system = system;
+			this.session = session;
+			this.remotes = remotes;
+			this.hostPlugin = hostPlugin;
+			IProject prj = hostPlugin.getData().getProject();
+			this.targetFolder = prj.getFolder(MAVEN_DIRNAME);
+
+			NullProgressMonitor monitor = new NullProgressMonitor();
+			if (!targetFolder.exists()) {
+				targetFolder.create(false, true, monitor);
+				log.warn("creating " + targetFolder.getName() + "; make sure to add to the classpath of "
+						+ hostPlugin.getPluginName());
+			}
 			// write .gitignore
 			IFile gitignore = targetFolder.getFile(".gitignore");
-			gitignore.create(new ByteArrayInputStream("*.jar".getBytes(Charsets.UTF_8)), false, null);
+			if (!gitignore.exists()) {
+				gitignore.create(new ByteArrayInputStream("*.jar".getBytes(Charsets.UTF_8)), false, null);
+			}
+			this.filesAlreadyUpToDate.add(gitignore);
 		}
 
-		List<ArtifactRequest> artifactRequests = new ArrayList<>();
-		log.info("synchronize maven artifacts for '" + hostPlugin.getPluginName() + "': "
-				+ hostPlugin.getMavenExternalJarDependencies().stream().map(artifact -> artifact.getCoordinates())
-						.collect(Collectors.joining(", ")));
-		for (MavenExternalJarBuild artifact : hostPlugin.getMavenExternalJarDependencies()) {
-			Coordinate coord = new Coordinate(artifact.getCoordinates());
+		void identifyFilesToUpdate() throws CoreException {
+			checkCanceled(tracker);
+			int count = hostPlugin.getMavenExternalJarDependencies().size();
+			tracker.setTaskName("checking artifacts (" + count + ") for " + hostPlugin.getPluginName());
+			info(log,
+					"check " + count + " artifacts for '" + hostPlugin.getPluginName() + "': "
+							+ hostPlugin.getMavenExternalJarDependencies().stream()
+									.map(artifact -> artifact.getCoordinates()).collect(Collectors.joining(", ")));
+			for (MavenExternalJarBuild artifact : hostPlugin.getMavenExternalJarDependencies()) {
+				Coordinate coord = new Coordinate(artifact.getCoordinates());
 
-			// try to look it up in the local repository only!
-			Artifact mvn = new DefaultArtifact(coord.group, coord.artifact, coord.classifier, coord.extension,
-					coord.version);
-			ArtifactRequest localrq = new ArtifactRequest().setArtifact(mvn);
-			boolean remote = false;
+				// resolve binary bundle.
+				checkCoordinateForUpdate(coord, coord.classifier);
+
+				if (!CLASSIFIER_SOURCES.equals(coord.classifier)) {
+					// resolve source bundle.
+					checkCoordinateForUpdate(coord, CLASSIFIER_SOURCES);
+				}
+			}
+
+			// Identify existing files that we don't know or have an update for.
+			for (IResource file : targetFolder.members()) {
+				if (file instanceof IFile && !filesAlreadyUpToDate.contains(file)) {
+					filesToClean.add((IFile) file);
+				}
+			}
+		}
+
+		private void checkCoordinateForUpdate(Coordinate coord, String classifier) {
+			Artifact mvn = new DefaultArtifact(coord.group, coord.artifact, classifier, coord.extension, coord.version);
+			boolean needDownload = false;
 			try {
-				ArtifactResult local = system.resolveArtifact(session, localrq);
-				if (local.isMissing() || !local.isResolved() || local.getArtifact().isSnapshot()) {
-					remote = true;
+				// try to look it up in the local repository only!
+				ArtifactRequest localrq = new ArtifactRequest().setArtifact(mvn);
+				ArtifactResult localResult = system.resolveArtifact(session, localrq);
+				Artifact localArtifact = localResult.getArtifact();
+				File localFile = localArtifact.getFile();
+				if (localResult.isMissing() || !localResult.isResolved() || localArtifact.isSnapshot()
+						|| localFile == null) {
+					needDownload = true;
+				} else {
+					// Any existing workspace file might be up to date if
+					// and only if we have locally resolved the artifact.
+					// We always replace the workspace file when downloading.
+					IFile targetFile = targetFolder.getFile(localFile.getName());
+					if (needUpdateFileInProjectsMavenFolder(targetFile, localArtifact)) {
+						artifactOfFilesToCreate.put(targetFile, localArtifact);
+					} else {
+						filesAlreadyUpToDate.add(targetFile);
+					}
 				}
 			} catch (Exception e) {
-				remote = true;
+				needDownload = true;
 			}
-
-			// resolve binary bundle.
-			{
-				ArtifactRequest remoterq = new ArtifactRequest().setArtifact(mvn)
-						.setRepositories(remote ? remotes : null);
+			if (needDownload) {
+				ArtifactRequest remoterq = new ArtifactRequest().setArtifact(mvn).setRepositories(remotes);
 				artifactRequests.add(remoterq);
 			}
-
-			// resolve source bundle.
-			Artifact srcmvn = new DefaultArtifact(coord.group, coord.artifact, "sources", coord.extension,
-					coord.version);
-			ArtifactRequest srcrq = new ArtifactRequest().setArtifact(srcmvn).setRepositories(remote ? remotes : null);
-			artifactRequests.add(srcrq);
 		}
 
-		List<ArtifactResult> results = resolveArtifacts(log, system, session, artifactRequests);
-		Set<IFile> resolvedFiles = new HashSet<>();
-		for (ArtifactResult result : results) {
-			ArtifactRequest rq = result.getRequest();
-			Artifact mvn = rq.getArtifact();
-			String c = mvn.getClassifier();
-			if (result.isMissing() || !result.isResolved() || !result.getExceptions().isEmpty()) {
-				if ("sources".equals(c)) {
-					log.warn("No sources available for " + mvn.getGroupId() + ":" + mvn.getArtifactId() + ":"
-							+ mvn.getVersion());
+		Collection<IFile> getFilesToClean() {
+			return filesToClean;
+		}
+
+		void synchronizeArtifacts() {
+			checkCanceled(tracker);
+			int local = artifactOfFilesToCreate.size();
+			int remote = artifactRequests.size();
+			int old = filesToClean.size();
+			int total = local + remote;
+			if (total > 0 || old > 0) {
+				String totalFileCnt = total == 1 ? "1 file" : total + " files";
+				tracker.setTaskName(
+						"update " + totalFileCnt + " (download " + remote + ") in " + hostPlugin.getPluginName());
+				info(log,
+						"update " + total + " files (download " + remote + ") in '" + hostPlugin.getPluginName() + "'");
+			}
+
+			// cleanup unknown or outdated files
+			for (IResource file : filesToClean) {
+				artifactsToRefresh.add(file);
+				info(log, "remove old or suspect file: " + file);
+				// Delete raw File, let refreshLocal() fire workspace events.
+				// Ignore delete errors here, we retry for files we update.
+				file.getRawLocation().toFile().delete();
+			}
+
+			List<ArtifactResult> results = resolveArtifacts(log, system, session, artifactRequests);
+			for (ArtifactResult result : results) {
+				ArtifactRequest rq = result.getRequest();
+				Artifact mvn = rq.getArtifact();
+				String c = mvn.getClassifier();
+				if (result.isMissing() || !result.isResolved() || !result.getExceptions().isEmpty()) {
+					if ("sources".equals(c)) {
+						log.warn("No sources available for " + mvn.getGroupId() + ":" + mvn.getArtifactId() + ":"
+								+ mvn.getVersion());
+					} else {
+						String classifier = c == null || c.isEmpty() ? "" : (":" + c);
+						log.error("cannot resolve " + mvn.getGroupId() + ":" + mvn.getArtifactId() + classifier + ":"
+								+ mvn.getVersion());
+					}
 				} else {
-					String classifier = c == null || c.isEmpty() ? "" : (":" + c);
-					log.error("cannot resolve " + mvn.getGroupId() + ":" + mvn.getArtifactId() + classifier + ":"
-							+ mvn.getVersion());
+					// copy file to maven directory
+					Artifact artifact = result.getArtifact();
+					File resolvedFile = artifact.getFile();
+					IFile targetFile = targetFolder.getFile(resolvedFile.getName());
+					artifactOfFilesToCreate.put(targetFile, artifact);
 				}
-			} else {
-				// copy file to maven directory
-				File resolvedFile = result.getArtifact().getFile();
-				IFile targetFile = targetFolder.getFile(resolvedFile.getName());
-				resolvedFiles.add(targetFile);
-
-				Artifact artifact = result.getArtifact();
-				if (needUpdateFileInProjectsMavenFolder(log, targetFile, artifact)) {
-					updateFileInProjectsMavenFolder(log, targetFile, artifact);
-				}
+			}
+			for (Entry<IFile, Artifact> artifactOfFile : artifactOfFilesToCreate.entrySet()) {
+				IFile targetResource = artifactOfFile.getKey();
+				artifactsToRefresh.add(targetResource);
+				// Update raw File, let refreshLocal() fire workspace events.
+				File targetFile = targetResource.getRawLocation().toFile();
+				File resolvedFile = artifactOfFile.getValue().getFile();
+				updateFileInProjectsMavenFolder(log, targetFile, resolvedFile);
 			}
 		}
 
-		// cleanup old files
-		for (IResource file : targetFolder.members()) {
-			if (file.getName().equals(".gitignore")) {
-				continue;
-			}
-
-			if (!resolvedFiles.contains(file)) {
-				log.info("removing old maven artifact: " + file);
-				file.delete(true, null);
+		void refreshWorkspace() throws CoreException {
+			for (IResource r : artifactsToRefresh) {
+				r.refreshLocal(IResource.DEPTH_ZERO, null); // throws
 			}
 		}
-		return;
 	}
 
 	/**
@@ -379,7 +417,7 @@ public class SynchronizeMavenArtifact {
 	 *            resolve
 	 * @returns list of {@link ArtifactResult}
 	 */
-	private List<ArtifactResult> resolveArtifacts(TaskingLog log, RepositorySystem system,
+	private static List<ArtifactResult> resolveArtifacts(TaskingLog log, RepositorySystem system,
 			RepositorySystemSession session, Collection<ArtifactRequest> requests) {
 		List<ArtifactResult> results;
 		try {
@@ -390,20 +428,17 @@ public class SynchronizeMavenArtifact {
 		return results;
 	}
 
-	private static boolean needUpdateFileInProjectsMavenFolder(TaskingLog log, IFile targetResource,
-			Artifact artifact) {
+	private static boolean needUpdateFileInProjectsMavenFolder(IFile targetResource, Artifact artifact) {
 		File targetFile = targetResource.getRawLocation().toFile();
 		File resolvedFile = artifact.getFile();
 		// no need to update if files are equal:
 		return !FileUtils.equals(targetFile, resolvedFile);
 	}
 
-	private static void updateFileInProjectsMavenFolder(TaskingLog log, IFile targetResource, Artifact artifact)
-			throws CoreException {
-		File targetFile = targetResource.getRawLocation().toFile();
-		File resolvedFile = artifact.getFile();
+	private void updateFileInProjectsMavenFolder(TaskingLog log, File targetFile, File resolvedFile) {
 		// update = delete existing + copy or link new file:
 		if (targetFile.exists()) {
+			// we have ignored failure of previous delete attempt
 			if (!targetFile.delete()) {
 				log.error("cannot update " + targetFile + ". Please make sure file is not locked");
 				return;
@@ -433,7 +468,6 @@ public class SynchronizeMavenArtifact {
 				return;
 			}
 		}
-		targetResource.refreshLocal(IResource.DEPTH_ZERO, null);
 		return;
 	}
 

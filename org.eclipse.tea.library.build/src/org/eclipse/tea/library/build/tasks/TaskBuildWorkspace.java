@@ -76,7 +76,9 @@ public class TaskBuildWorkspace {
 		}
 
 		for (IStatus child : status.getChildren()) {
-			builder.append('\n').append(formatStatus(child, indent + "  "));
+			if (child.getSeverity() > IStatus.WARNING) {
+				builder.append('\n').append(formatStatus(child, indent + "  "));
+			}
 		}
 
 		return builder.toString();

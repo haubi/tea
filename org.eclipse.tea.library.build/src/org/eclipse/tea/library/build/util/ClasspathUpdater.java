@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.ClasspathComputer;
@@ -72,7 +73,7 @@ public class ClasspathUpdater {
 			final String bundleName = pd.getBundleName();
 			try {
 				IProject project = pd.getProject();
-				if (project == null) {
+				if (project == null || !JavaProject.hasJavaNature(project)) {
 					console.warn("skipping " + bundleName);
 					continue;
 				}

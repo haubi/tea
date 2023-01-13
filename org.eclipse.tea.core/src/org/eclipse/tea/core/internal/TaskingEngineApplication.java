@@ -39,8 +39,8 @@ import com.google.common.base.Strings;
  */
 public class TaskingEngineApplication implements IApplication {
 
-	public static final Integer EXIT_FAILED = new Integer(1);
-	public static final Integer EXIT_EXCEPTION = new Integer(2);
+	public static final Integer EXIT_FAILED = Integer.valueOf(1);
+	public static final Integer EXIT_EXCEPTION = Integer.valueOf(2);
 
 	@Override
 	public Object start(IApplicationContext context) throws Exception {

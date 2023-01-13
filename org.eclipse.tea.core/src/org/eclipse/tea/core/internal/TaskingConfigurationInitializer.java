@@ -39,7 +39,7 @@ public class TaskingConfigurationInitializer {
 			// create a fresh instance of the configuration just for this engine
 			// This would be better to do it with PROTOTYPE policy on the
 			// service, but this is not available in DS 1.2
-			config = config.getClass().newInstance();
+			config = config.getClass().getDeclaredConstructor().newInstance();
 
 			// register configuration for injection into task chain and task
 			context.set(config.getClass().getName(), config);

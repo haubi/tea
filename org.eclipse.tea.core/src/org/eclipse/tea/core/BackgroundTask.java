@@ -33,7 +33,7 @@ public class BackgroundTask {
 		Object actualTask;
 		if (task instanceof Class) {
 			try {
-				actualTask = ((Class<?>) task).newInstance();
+				actualTask = ((Class<?>) task).getDeclaredConstructor().newInstance();
 			} catch (Exception e) {
 				throw new IllegalStateException("Cannot create task " + task);
 			}

@@ -75,7 +75,7 @@ public class TaskExecutionContext {
 		// create fresh instances of all listeners - later use PROTOTYPE in DS
 		// 1.3
 		for (TaskingLifeCycleListener listener : listeners) {
-			TaskingLifeCycleListener l = listener.getClass().newInstance();
+			TaskingLifeCycleListener l = listener.getClass().getDeclaredConstructor().newInstance();
 			this.listeners.add(l);
 
 			// register listener for internal direct access

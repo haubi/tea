@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<!-- Created with Inkscape (https://www.inkscape.org/) -->
 
 <svg
    width="210mm"
@@ -12,14 +12,14 @@
    inkscape:export-filename="D:\TEA\workspace\tea\org.eclipse.tea.core.ui\resources\tea.png"
    inkscape:export-xdpi="13.552381"
    inkscape:export-ydpi="13.552381"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:dc="http://purl.org/dc/elements/1.1/">
+   xmlns:inkscape="https://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="https://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="https://www.w3.org/1999/xlink"
+   xmlns="https://www.w3.org/2000/svg"
+   xmlns:svg="https://www.w3.org/2000/svg"
+   xmlns:rdf="https://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="https://creativecommons.org/ns#"
+   xmlns:dc="https://purl.org/dc/elements/1.1/">
   <defs
      id="defs4">
     <linearGradient
@@ -301,7 +301,7 @@
          rdf:about="">
         <dc:format>image/svg+xml</dc:format>
         <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+           rdf:resource="https://purl.org/dc/dcmitype/StillImage" />
       </cc:Work>
     </rdf:RDF>
   </metadata>

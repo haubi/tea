@@ -16,6 +16,7 @@ import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.project.PDEProject;
 import org.eclipse.pde.internal.ui.util.ModelModification;
 import org.eclipse.pde.internal.ui.util.PDEModelUtility;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.model.PluginData;
 import org.eclipse.tea.library.build.model.WorkspaceData;
@@ -63,18 +64,21 @@ public class DefaultCharsetUpdater {
 		if (!isMissingJavacDefaultEncoding(project)) {
 			return;
 		}
-		PDEModelUtility.modifyModel(new ModelModification(PDEProject.getBuildProperties(project)) {
+		// PDEModelUtility.modifyModel works with open editors:
+		// have seen deadlocks with main (=UI) thread
+		Display.getDefault().syncExec(
+				() -> PDEModelUtility.modifyModel(new ModelModification(PDEProject.getBuildProperties(project)) {
 
-			@Override
-			protected void modifyModel(IBaseModel model, IProgressMonitor monitor) throws CoreException {
-				IBuildModel buildModel = model.getAdapter(IBuildModel.class);
-				if (!isMissingJavacDefaultEncoding(buildModel)) {
-					return;
-				}
-				IBuildEntry buildProp = buildModel.getFactory().createEntry(propJavacDefaultEncodingForPlugin);
-				buildProp.addToken(pluginCharset);
-			}
-		}, nullMonitor);
+					@Override
+					protected void modifyModel(IBaseModel model, IProgressMonitor monitor) throws CoreException {
+						IBuildModel buildModel = model.getAdapter(IBuildModel.class);
+						if (!isMissingJavacDefaultEncoding(buildModel)) {
+							return;
+						}
+						IBuildEntry buildProp = buildModel.getFactory().createEntry(propJavacDefaultEncodingForPlugin);
+						buildProp.addToken(pluginCharset);
+					}
+				}, nullMonitor));
 	}
 
 	private boolean isMissingJavacDefaultEncoding(IProject project) {

@@ -11,15 +11,20 @@
 package org.eclipse.tea.library.build.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
@@ -37,7 +42,7 @@ public class ClasspathUpdater {
 
 	private final WorkspaceData wsData;
 	private Predicate<IProject> predicate;
-	private Map<String, IPath> sourcePaths;
+	private Map<String, IPath> sourcePaths = new HashMap<>();
 
 	/**
 	 * Creates the updater on top of a {@link WorkspaceData} instance.
@@ -58,7 +63,7 @@ public class ClasspathUpdater {
 	 *            a map from plugin name to source path.
 	 */
 	public void setSourcePaths(Map<String, IPath> sourcePaths) {
-		this.sourcePaths = sourcePaths;
+		this.sourcePaths = sourcePaths != null ? sourcePaths : new HashMap<>();
 	}
 
 	public void update(TaskingLog console, IProgressMonitor monitor) {
@@ -89,26 +94,52 @@ public class ClasspathUpdater {
 					continue;
 				}
 
-				IClasspathEntry[] entries = ClasspathComputer.getClasspath(project, model, null, true, true);
+				// PDE may fail to update the classpath based on the original,
+				// see https://github.com/eclipse-pde/eclipse.pde/pull/497
+				// But calculating from scratch drops existing attributes.
+				// Workaround here merges fresh classpath with the original one.
+				IClasspathEntry[] original = JavaCore.create(project).getRawClasspath();
+				Map<IPath, IClasspathEntry> origCPofPath = Arrays.stream(original)
+						.collect(Collectors.toMap(e -> e.getPath(), e -> e));
 
-				// add source attachments where possible. PDE cannot do it,
-				// because of reasons... :(
-				List<IClasspathEntry> processed = new ArrayList<>();
-				for (IClasspathEntry e : entries) {
-					if (sourcePaths != null && !sourcePaths.isEmpty()) {
-						if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY && e.getSourceAttachmentPath() == null
-								&& sourcePaths.containsKey(e.getPath().lastSegment())) {
-							processed.add(
-									JavaCore.newLibraryEntry(e.getPath(), sourcePaths.get(e.getPath().lastSegment()),
-											null, e.getAccessRules(), e.getExtraAttributes(), e.isExported()));
-							continue;
+				IClasspathEntry[] freshCP = ClasspathComputer.getClasspath(project, model, null, true, true);
+				List<IClasspathEntry> mergedCP = new ArrayList<>();
+				for (IClasspathEntry fresh : freshCP) {
+					if (fresh.getEntryKind() == IClasspathEntry.CPE_LIBRARY
+							&& fresh.getContentKind() == IPackageFragmentRoot.K_BINARY) {
+						Optional<IClasspathEntry> orig = Optional.ofNullable(origCPofPath.get(fresh.getPath()));
+						IClasspathEntry merged = orig.orElse(fresh);
+						IPath source = sourcePaths.get(fresh.getPath().lastSegment());
+						if (source == null) {
+							// no override, use existing
+							source = orig.isPresent() ? orig.get().getSourceAttachmentPath() : null;
 						}
+						if (source == null) {
+							// no override, no existing, use newly discovered
+							source = fresh.getSourceAttachmentPath();
+						}
+						if (source != null && !source.equals(fresh.getSourceAttachmentPath())) {
+							merged = JavaCore.newLibraryEntry(fresh.getPath(), source, null, merged.getAccessRules(),
+									merged.getExtraAttributes(), merged.isExported());
+						}
+						mergedCP.add(merged);
+						continue;
 					}
-					processed.add(e);
+					if (fresh.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+						Optional<IClasspathEntry> orig = Optional.ofNullable(origCPofPath.get(fresh.getPath()));
+						IClasspathEntry merged = orig.orElse(fresh);
+						if (!fresh.equals(merged)) {
+							merged = JavaCore.newSourceEntry(fresh.getPath(), merged.getInclusionPatterns(),
+									merged.getExclusionPatterns(), merged.getOutputLocation(),
+									merged.getExtraAttributes());
+						}
+						mergedCP.add(merged);
+						continue;
+					}
+					mergedCP.add(fresh);
 				}
 
-				JavaCore.create(project).setRawClasspath(processed.toArray(new IClasspathEntry[processed.size()]),
-						null);
+				JavaCore.create(project).setRawClasspath(mergedCP.toArray(new IClasspathEntry[mergedCP.size()]), null);
 				refreshList.add(pd);
 			} catch (Exception ex) {
 				console.error("cannot update " + bundleName + ": " + ex);

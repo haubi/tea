@@ -68,6 +68,7 @@ public class ClasspathUpdater {
 		updMon.beginTask("Update classpaths...", wsData.getPlugins().size());
 		List<PluginData> refreshList = new ArrayList<>();
 		for (PluginData pd : wsData.getPlugins()) {
+			updMon.checkCanceled();
 			updMon.worked(1);
 
 			final String bundleName = pd.getBundleName();

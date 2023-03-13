@@ -105,6 +105,9 @@ public class VisualizationTaskNode implements VisualizationNode, ProgressListene
 			return; // inhibit events.
 		}
 
+		if ((currentProgress - this.currentProgress) * 100L < maxProgress) {
+			return; // less then 1% progress - not significant: don't draw
+		}
 		this.currentProgress = currentProgress;
 		this.refreshable.refresh();
 	}

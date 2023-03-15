@@ -142,7 +142,7 @@ public class ClasspathUpdater {
 				JavaCore.create(project).setRawClasspath(mergedCP.toArray(new IClasspathEntry[mergedCP.size()]), null);
 				refreshList.add(pd);
 			} catch (Exception ex) {
-				console.error("cannot update " + bundleName + ": " + ex);
+				console.error("skipped classpath update for " + bundleName + " because of: " + ex);
 				ex.printStackTrace(console.warn());
 			}
 		}

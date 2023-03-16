@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -30,6 +30,7 @@ import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.ClasspathComputer;
+import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.model.PluginData;
 import org.eclipse.tea.library.build.model.WorkspaceData;
@@ -96,45 +97,73 @@ public class ClasspathUpdater {
 
 				// PDE may fail to update the classpath based on the original,
 				// see https://github.com/eclipse-pde/eclipse.pde/pull/497
-				// But calculating from scratch drops existing attributes.
+				// But calculating from scratch drops existing attributes and
+				// destroys the existing order.
 				// Workaround here merges fresh classpath with the original one.
-				IClasspathEntry[] original = JavaCore.create(project).getRawClasspath();
-				Map<IPath, IClasspathEntry> origCPofPath = Arrays.stream(original)
-						.collect(Collectors.toMap(e -> e.getPath(), e -> e));
-
+				IClasspathEntry[] origCP = JavaCore.create(project).getRawClasspath();
 				IClasspathEntry[] freshCP = ClasspathComputer.getClasspath(project, model, null, true, true);
+				Map<IPath, IClasspathEntry> freshCPofPath = Arrays.stream(freshCP)
+						.collect(Collectors.toMap(e -> keyOf(e), e -> e));
+
 				List<IClasspathEntry> mergedCP = new ArrayList<>();
+				for (final IClasspathEntry orig : origCP) {
+					final IClasspathEntry fresh = freshCPofPath.remove(keyOf(orig));
+					if (fresh == null) {
+						continue; // obsolete or redundant: drop
+					}
+					IClasspathEntry merged = fresh;
+					switch (fresh.getEntryKind()) {
+					case IClasspathEntry.CPE_LIBRARY:
+						if (fresh.getContentKind() == IPackageFragmentRoot.K_BINARY) {
+							IPath source = sourcePaths.get(fresh.getPath().lastSegment()); // override
+							source = source != null ? source : orig.getSourceAttachmentPath(); // current
+							source = source != null ? source : fresh.getSourceAttachmentPath(); // default
+							if (!fresh.equals(orig) || !Objects.equals(fresh.getSourceAttachmentPath(), source)) {
+								merged = JavaCore.newLibraryEntry(orig.getPath(), source, null, orig.getAccessRules(),
+										orig.getExtraAttributes(), orig.isExported());
+							}
+						}
+						break;
+					case IClasspathEntry.CPE_SOURCE:
+						if (!fresh.equals(orig)) {
+							merged = JavaCore.newSourceEntry(fresh.getPath(), orig.getInclusionPatterns(),
+									orig.getExclusionPatterns(), orig.getOutputLocation(), orig.getExtraAttributes());
+						}
+						break;
+					case IClasspathEntry.CPE_CONTAINER:
+						if (!fresh.equals(orig)) {
+							merged = JavaCore.newContainerEntry(fresh.getPath(), orig.getAccessRules(),
+									orig.getExtraAttributes(), orig.isExported());
+						}
+						break;
+					case IClasspathEntry.CPE_PROJECT:
+						if (!fresh.equals(orig)) {
+							merged = JavaCore.newProjectEntry(fresh.getPath(), orig.getAccessRules(),
+									orig.combineAccessRules(), orig.getExtraAttributes(), orig.isExported());
+						}
+						break;
+					case IClasspathEntry.CPE_VARIABLE:
+						if (!fresh.equals(orig)) {
+							merged = JavaCore.newVariableEntry(fresh.getPath(), fresh.getSourceAttachmentPath(),
+									fresh.getSourceAttachmentRootPath(), fresh.getAccessRules(),
+									fresh.getExtraAttributes(), fresh.isExported());
+						}
+						break;
+					}
+					mergedCP.add(merged);
+				}
+
 				for (IClasspathEntry fresh : freshCP) {
+					if (!freshCPofPath.containsKey(keyOf(fresh))) {
+						continue; // existing one, already added
+					}
 					if (fresh.getEntryKind() == IClasspathEntry.CPE_LIBRARY
 							&& fresh.getContentKind() == IPackageFragmentRoot.K_BINARY) {
-						Optional<IClasspathEntry> orig = Optional.ofNullable(origCPofPath.get(fresh.getPath()));
-						IClasspathEntry merged = orig.orElse(fresh);
 						IPath source = sourcePaths.get(fresh.getPath().lastSegment());
-						if (source == null) {
-							// no override, use existing
-							source = orig.isPresent() ? orig.get().getSourceAttachmentPath() : null;
-						}
-						if (source == null) {
-							// no override, no existing, use newly discovered
-							source = fresh.getSourceAttachmentPath();
-						}
 						if (source != null && !source.equals(fresh.getSourceAttachmentPath())) {
-							merged = JavaCore.newLibraryEntry(fresh.getPath(), source, null, merged.getAccessRules(),
-									merged.getExtraAttributes(), merged.isExported());
+							fresh = JavaCore.newLibraryEntry(fresh.getPath(), source, null, fresh.getAccessRules(),
+									fresh.getExtraAttributes(), fresh.isExported());
 						}
-						mergedCP.add(merged);
-						continue;
-					}
-					if (fresh.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-						Optional<IClasspathEntry> orig = Optional.ofNullable(origCPofPath.get(fresh.getPath()));
-						IClasspathEntry merged = orig.orElse(fresh);
-						if (!fresh.equals(merged)) {
-							merged = JavaCore.newSourceEntry(fresh.getPath(), merged.getInclusionPatterns(),
-									merged.getExclusionPatterns(), merged.getOutputLocation(),
-									merged.getExtraAttributes());
-						}
-						mergedCP.add(merged);
-						continue;
 					}
 					mergedCP.add(fresh);
 				}
@@ -157,6 +186,13 @@ public class ClasspathUpdater {
 		if (monitor != null) {
 			monitor.done();
 		}
+	}
+
+	private static IPath keyOf(IClasspathEntry entry) {
+		if (PDECore.JRE_CONTAINER_PATH.isPrefixOf(entry.getPath())) {
+			return PDECore.JRE_CONTAINER_PATH; // entry path contains properties
+		}
+		return entry.getPath();
 	}
 
 }

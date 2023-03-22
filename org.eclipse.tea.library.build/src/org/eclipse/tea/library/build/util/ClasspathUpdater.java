@@ -11,13 +11,13 @@
 package org.eclipse.tea.library.build.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -102,60 +102,53 @@ public class ClasspathUpdater {
 				// Workaround here merges fresh classpath with the original one.
 				IClasspathEntry[] origCP = JavaCore.create(project).getRawClasspath();
 				IClasspathEntry[] freshCP = ClasspathComputer.getClasspath(project, model, null, true, true);
-				Map<IPath, IClasspathEntry> freshCPofPath = Arrays.stream(freshCP)
-						.collect(Collectors.toMap(e -> keyOf(e), e -> e));
+				Map<IPath, IClasspathEntry> collectedCPofPath = Stream.concat(Stream.of(freshCP), Stream.of(origCP))
+						.collect(Collectors.toMap(e -> keyOf(e), e -> e, (first, dupe) -> first));
 
 				List<IClasspathEntry> mergedCP = new ArrayList<>();
 				for (final IClasspathEntry orig : origCP) {
-					final IClasspathEntry fresh = freshCPofPath.remove(keyOf(orig));
-					if (fresh == null) {
-						continue; // obsolete or redundant: drop
+					final IClasspathEntry collect = collectedCPofPath.remove(keyOf(orig));
+					if (collect == null) {
+						continue; // dupe in the original already
 					}
-					IClasspathEntry merged = fresh;
-					switch (fresh.getEntryKind()) {
+					IClasspathEntry merged = collect;
+					switch (collect.getEntryKind()) {
 					case IClasspathEntry.CPE_LIBRARY:
-						if (fresh.getContentKind() == IPackageFragmentRoot.K_BINARY) {
-							IPath source = sourcePaths.get(fresh.getPath().lastSegment()); // override
+						if (collect.getContentKind() == IPackageFragmentRoot.K_BINARY) {
+							IPath source = sourcePaths.get(collect.getPath().lastSegment()); // override
 							source = source != null ? source : orig.getSourceAttachmentPath(); // current
-							source = source != null ? source : fresh.getSourceAttachmentPath(); // default
-							if (!fresh.equals(orig) || !Objects.equals(fresh.getSourceAttachmentPath(), source)) {
-								merged = JavaCore.newLibraryEntry(orig.getPath(), source, null, orig.getAccessRules(),
-										orig.getExtraAttributes(), orig.isExported());
+							source = source != null ? source : collect.getSourceAttachmentPath(); // default
+							if (!collect.equals(orig) || !Objects.equals(collect.getSourceAttachmentPath(), source)) {
+								merged = JavaCore.newLibraryEntry(collect.getPath(), source, null,
+										orig.getAccessRules(), orig.getExtraAttributes(), orig.isExported());
 							}
 						}
 						break;
 					case IClasspathEntry.CPE_SOURCE:
-						if (!fresh.equals(orig)) {
-							merged = JavaCore.newSourceEntry(fresh.getPath(), orig.getInclusionPatterns(),
-									orig.getExclusionPatterns(), orig.getOutputLocation(), orig.getExtraAttributes());
-						}
+						merged = orig;
 						break;
 					case IClasspathEntry.CPE_CONTAINER:
-						if (!fresh.equals(orig)) {
-							merged = JavaCore.newContainerEntry(fresh.getPath(), orig.getAccessRules(),
+						if (!collect.equals(orig)) {
+							merged = JavaCore.newContainerEntry(collect.getPath(), orig.getAccessRules(),
 									orig.getExtraAttributes(), orig.isExported());
 						}
 						break;
 					case IClasspathEntry.CPE_PROJECT:
-						if (!fresh.equals(orig)) {
-							merged = JavaCore.newProjectEntry(fresh.getPath(), orig.getAccessRules(),
+						if (!collect.equals(orig)) {
+							merged = JavaCore.newProjectEntry(collect.getPath(), orig.getAccessRules(),
 									orig.combineAccessRules(), orig.getExtraAttributes(), orig.isExported());
 						}
 						break;
 					case IClasspathEntry.CPE_VARIABLE:
-						if (!fresh.equals(orig)) {
-							merged = JavaCore.newVariableEntry(fresh.getPath(), fresh.getSourceAttachmentPath(),
-									fresh.getSourceAttachmentRootPath(), fresh.getAccessRules(),
-									fresh.getExtraAttributes(), fresh.isExported());
-						}
+						merged = orig;
 						break;
 					}
 					mergedCP.add(merged);
 				}
 
 				for (IClasspathEntry fresh : freshCP) {
-					if (!freshCPofPath.containsKey(keyOf(fresh))) {
-						continue; // existing one, already added
+					if (collectedCPofPath.remove(keyOf(fresh)) == null) {
+						continue; // not a new one
 					}
 					if (fresh.getEntryKind() == IClasspathEntry.CPE_LIBRARY
 							&& fresh.getContentKind() == IPackageFragmentRoot.K_BINARY) {

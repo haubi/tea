@@ -43,9 +43,13 @@ public class DynamicTaskingMenu {
 	public void aboutToShow(List<MMenuElement> items) {
 		IEclipseContext configuredContext = TaskingInjectionHelper
 				.createConfiguredContext(new TaskingEclipsePreferenceStore());
-		TaskingDevelopmentConfig cfg = configuredContext.get(TaskingDevelopmentConfig.class);
+		try {
+			TaskingDevelopmentConfig cfg = configuredContext.get(TaskingDevelopmentConfig.class);
 
-		createMenu(cfg, items, model.getRootGroup());
+			createMenu(cfg, items, model.getRootGroup());
+		} finally {
+			configuredContext.dispose();
+		}
 	}
 
 	private void createMenu(TaskingDevelopmentConfig cfg, List<MMenuElement> target, TaskingContainer group) {

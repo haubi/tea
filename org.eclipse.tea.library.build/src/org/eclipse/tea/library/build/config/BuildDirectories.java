@@ -13,6 +13,7 @@ package org.eclipse.tea.library.build.config;
 import java.io.File;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.tea.core.TaskingInjectionHelper;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension;
 import org.eclipse.tea.core.services.TaskingConfigurationExtension.TaskingConfig;
@@ -104,8 +105,12 @@ public class BuildDirectories implements TaskingConfigurationExtension {
 	 * information.
 	 */
 	public static BuildDirectories get() {
-		return TaskingInjectionHelper.createConfiguredContext(new TaskingEclipsePreferenceStore())
-				.get(BuildDirectories.class);
+		IEclipseContext ctx = TaskingInjectionHelper.createConfiguredContext(new TaskingEclipsePreferenceStore());
+		try {
+			return ctx.get(BuildDirectories.class);
+		} finally {
+			ctx.dispose();
+		}
 	}
 
 }

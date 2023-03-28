@@ -43,6 +43,9 @@ import org.eclipse.tea.core.annotations.lifecycle.FinishTaskChain;
 import org.eclipse.tea.core.services.TaskingLifeCycleListener;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.ui.PlatformUI;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -55,7 +58,35 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 
 	private boolean autoBuildOriginalState = false;
 	private static AtomicInteger nestCount = new AtomicInteger(0);
+
+	// Suppressing the Auto Build with brute force after the Full Build is
+	// necessary for larger applications, to avoid Auto Build iterations for
+	// minutes right after we know everything was built from scratch.
+	// But since Eclipse 2022-12, suppressing the Auto Build does more harm than
+	// good. In particular, it may lead to this error when closing Eclipse:
+	// "Unable to save workspace - Trees in ambiguous order (Bug 352867)"
+	// https://bugs.eclipse.org/bugs/show_bug.cgi?id=352867
+	// Fortunately, it turns out that the Auto Build does not run for minutes
+	// any more, when enabled right after the Full Build. On the other hand,
+	// suppressing the Auto Build is not known to fail up to Eclipse 2022-06,
+	// and also was not reported to fail so far with Eclipse 2022-09.
+	// Being conservative, we continue to suppress the Auto Build before
+	// Eclipse 2022-12, based on the OSGi version of org.eclipse.core.resources:
+	// Eclipse 2022-06: org.eclipse.core.resources:3.17.0
+	// Eclipse 2022-09: org.eclipse.core.resources:3.18.0
+	// Eclipse 2022-12: org.eclipse.core.resources:3.18.100
+	private static final boolean haveGoodAutoBuild = getHaveGoodAutoBuild(new Version(3, 18, 100));
 	private static final Map<IProject, ElementTree> suppressedProjects = new HashMap<>();
+
+	private static boolean getHaveGoodAutoBuild(Version worksSince) {
+		Bundle bundle = FrameworkUtil.getBundle(ResourcesPlugin.class);
+		if (bundle != null && "org.eclipse.core.resources".equals(bundle.getSymbolicName())) {
+			return bundle.getVersion().compareTo(worksSince) >= 0;
+		}
+		// Something completely wrong, or bundle has been renamed:
+		// Assume this was done after suppressing Auto Build became obsolete.
+		return true;
+	}
 
 	public Workspace getWorkspace() {
 		return ((Workspace) ResourcesPlugin.getWorkspace());
@@ -112,6 +143,9 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 	 *            the project to assume to be cleanly built.
 	 */
 	public static void avoidBuild(IProject project) {
+		if (haveGoodAutoBuild) {
+			return;
+		}
 		synchronized (suppressedProjects) {
 			ElementTree currentTree = null;
 			try {

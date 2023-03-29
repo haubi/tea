@@ -35,12 +35,16 @@ class TaskLazyChainWrapper {
 	@Execute
 	public IStatus execute(TaskingLog log) {
 		IEclipseContext ec = parent.getContext().createChild(toString());
-		TaskingEngine engine = ContextInjectionFactory.make(TaskingEngine.class, ec);
-		TaskExecutionContext ctx = TaskingInjectionHelper.createNewChainContext(
-				ec.createChild(TaskingModel.getTaskChainName(child)), child,
-				parent.getContext().get(IProgressMonitor.class));
+		try {
+			TaskingEngine engine = ContextInjectionFactory.make(TaskingEngine.class, ec);
+			TaskExecutionContext ctx = TaskingInjectionHelper.createNewChainContext(
+					ec.createChild(TaskingModel.getTaskChainName(child)), child,
+					parent.getContext().get(IProgressMonitor.class));
 
-		return engine.runTaskChain(ctx);
+			return engine.runTaskChain(ctx);
+		} finally {
+			ec.dispose();
+		}
 	}
 
 	@Override

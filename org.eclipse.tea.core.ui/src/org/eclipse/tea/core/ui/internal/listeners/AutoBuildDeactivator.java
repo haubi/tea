@@ -33,6 +33,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -102,8 +103,12 @@ public class AutoBuildDeactivator implements TaskingLifeCycleListener {
 	}
 
 	private static void cancelAutoBuild() {
-		BuildManager mgr = ((Workspace) ResourcesPlugin.getWorkspace()).getBuildManager();
-		mgr.shutdown(null);
+		Job.getJobManager().cancel(ResourcesPlugin.FAMILY_AUTO_BUILD);
+		try {
+			Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, null);
+		} catch (OperationCanceledException | InterruptedException e) {
+			// ignored
+		}
 	}
 
 	@FinishTaskChain

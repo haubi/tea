@@ -102,6 +102,17 @@ public class ClasspathUpdater {
 				// Workaround here merges fresh classpath with the original one.
 				IClasspathEntry[] origCP = JavaCore.create(project).getRawClasspath();
 				IClasspathEntry[] freshCP = ClasspathComputer.getClasspath(project, model, null, true, true);
+
+				// remove trailing slash from source path if any:
+				for (int i = 0; i < freshCP.length; i++) {
+					IClasspathEntry old = freshCP[i];
+					if (old.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+						IPath path = old.getPath().removeTrailingSeparator();
+						freshCP[i] = JavaCore.newSourceEntry(path, old.getInclusionPatterns(),
+								old.getExclusionPatterns(), old.getOutputLocation(), old.getExtraAttributes());
+					}
+				}
+
 				Map<IPath, IClasspathEntry> collectedCPofPath = Stream.concat(Stream.of(freshCP), Stream.of(origCP))
 						.collect(Collectors.toMap(e -> keyOf(e), e -> e, (first, dupe) -> first));
 

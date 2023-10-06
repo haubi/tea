@@ -117,9 +117,9 @@ public class TaskGenFeatureFromLcDsl {
 		if (!propFile.exists()) {
 			throw new RuntimeException(propFile + " doesn't exist.");
 		}
-		FileInputStream inStream = new FileInputStream(propFile);
-		props.load(inStream);
-		inStream.close();
+		try (FileInputStream inStream = new FileInputStream(propFile)) {
+			props.load(inStream);
+		}
 
 		// read properties
 		final String dependencies = props.getProperty("dependencies");

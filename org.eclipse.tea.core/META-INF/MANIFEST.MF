@@ -5,7 +5,7 @@ Bundle-Name: %pluginName
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tea.core;singleton:=true
-Bundle-Version: 1.5.0.qualifier
+Bundle-Version: 1.6.0.qualifier
 Bundle-Activator: org.eclipse.tea.core.internal.TaskingEngineActivator
 Require-Bundle: org.eclipse.osgi.services;resolution:=optional,
  org.eclipse.core.runtime,

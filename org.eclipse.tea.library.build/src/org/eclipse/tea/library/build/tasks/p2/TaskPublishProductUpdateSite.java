@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.equinox.internal.p2.artifact.repository.ArtifactRepositoryManager;
@@ -44,7 +45,10 @@ import org.eclipse.equinox.p2.repository.artifact.IArtifactRepository;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetLocation;
+import org.eclipse.pde.core.target.TargetBundle;
+import org.eclipse.pde.core.target.TargetFeature;
 import org.eclipse.pde.internal.build.Utils;
+import org.eclipse.pde.internal.core.target.P2TargetUtils;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.config.BuildDirectories;
 import org.eclipse.tea.library.build.internal.Activator;
@@ -115,7 +119,7 @@ public class TaskPublishProductUpdateSite {
 
 	@Execute
 	public void run(TaskingLog log, UpdateSiteManager um, WorkspaceBuild wb, JarManager jarManager,
-			BuildDirectories dirs) throws Exception {
+			BuildDirectories dirs, IProgressMonitor mon) throws Exception {
 		final File featureDir = new File(dirs.getOutputDirectory(),
 				TaskRunFeaturePluginJarExport.getFeatureJarDirectory());
 		final File pluginDir = new File(dirs.getOutputDirectory(),
@@ -140,7 +144,7 @@ public class TaskPublishProductUpdateSite {
 
 		final Set<File> featureLocations = new LinkedHashSet<>();
 		final Set<File> pluginLocations = new LinkedHashSet<>();
-		File deltaPack = null;
+		final Set<File> deltaPacks = new LinkedHashSet<>();
 
 		featureLocations.add(featureDir);
 		pluginLocations.add(pluginDir);
@@ -149,38 +153,48 @@ public class TaskPublishProductUpdateSite {
 
 		int fSize = featureLocations.size();
 		for (ITargetLocation loc : targetDefinition.getTargetLocations()) {
-			String location = loc.getLocation(true);
-			File features = new File(location, "features");
-			File plugins = new File(location, "plugins");
-
-			if (!features.exists() || !plugins.exists()) {
-				log.error(location + " does not seem to be valid. skipping.");
-				continue;
-			}
-
-			// TODO: this is a SERIOUS problem, as the target platform might
-			// contain much more
-			// plugins in different versions which cause conflicts at the end.
-			// This might happen if
-			// there are updates to the target platform. Only completely
-			// removing the directory on
-			// disc and resetting the platform will solve this as long as this
-			// code is not more
-			// intelligent somehow.
-			featureLocations.add(features);
-			pluginLocations.add(plugins);
-
-			if (looksLikeDeltaFeatures(features)) {
-				deltaPack = features.getParentFile();
+			if (!isOK(loc.getStatus())) {
+				// trigger the updates
+				loc.resolve(targetDefinition, mon);
 			}
 		}
 
-		if (deltaPack == null && !hasBin) {
+		// work around ITargetLocation.resolve() implementations not properly
+		// waiting for the particular resolver jobs to finish
+		P2TargetUtils.getIUs(targetDefinition, mon);
+
+		for (ITargetLocation loc : targetDefinition.getTargetLocations()) {
+			if (!isOK(loc.getStatus())) {
+				throw new RuntimeException(
+						"Failed to resolve " + loc.getType() + "-type content for target definition '"
+								+ targetDefinition.getName() + "': " + getMessage(loc.getStatus()));
+			}
+		}
+
+		for (ITargetLocation loc : targetDefinition.getTargetLocations()) {
+			TargetFeature[] targetFeatures = loc.getFeatures();
+			if (targetFeatures != null) {
+				for (TargetFeature targetFeature : targetFeatures) {
+					File targetLocation = new File(targetFeature.getLocation());
+					if (featureLocations.add(targetLocation) && looksLikeDeltaFeature(targetLocation)) {
+						deltaPacks.add(targetLocation);
+					}
+				}
+			}
+			TargetBundle[] targetBundles = loc.getBundles();
+			if (targetBundles != null) {
+				for (TargetBundle targetBundle : targetBundles) {
+					pluginLocations.add(new File(targetBundle.getBundleInfo().getLocation()));
+				}
+			}
+		}
+
+		if (deltaPacks.isEmpty() && !hasBin) {
 			throw new IllegalStateException(
 					"Cannot find delta-pack. Do you have the correct Target Platform activated?");
 		}
 
-		log.info("found " + (featureLocations.size() - fSize) + " locations from target platform");
+		log.info("found " + (featureLocations.size() - fSize) + " features from target platform");
 
 		// ensure that the product file is existing
 		final File productFile = new File(feature.getData().getBundleDir(), productFileName);
@@ -212,7 +226,7 @@ public class TaskPublishProductUpdateSite {
 		actions.add(new FeaturesAction(featureLocations.toArray(new File[featureLocations.size()])));
 		actions.add(new BundlesAction(pluginLocations.toArray(new File[pluginLocations.size()])));
 
-		actions.add(new TeaProductAction(productDescriptor, getExecutablesDir(deltaPack),
+		actions.add(new TeaProductAction(productDescriptor, getExecutablesDir(deltaPacks),
 				hasBin ? new File(feature.getData().getBundleDir(), customBin) : null));
 		actions.add(new RootIUAction(feature.getFeatureName(), Version.parseVersion(featureVersion),
 				feature.getFeatureName()));
@@ -244,21 +258,20 @@ public class TaskPublishProductUpdateSite {
 		}
 	}
 
+	private static boolean isOK(IStatus status) {
+		return status == null ? false : status.isOK();
+	}
+
+	private String getMessage(IStatus status) {
+		return status == null ? "no status" : status.getMessage();
+	}
+
 	/**
 	 * Checks whether a given feature location looks like a delta-pack. A delta
-	 * pack has only a single feature starting with
-	 * "org.eclipse.equinox.executable".
+	 * pack's feature name starts with "org.eclipse.equinox.executable".
 	 */
-	private boolean looksLikeDeltaFeatures(File features) {
-		File[] files = features.listFiles();
-
-		for (File f : files) {
-			if (f.getName().startsWith(EXECUTABLE)) {
-				return true;
-			}
-		}
-
-		return false;
+	private boolean looksLikeDeltaFeature(File feature) {
+		return feature.getName().startsWith(EXECUTABLE);
 	}
 
 	/**
@@ -307,12 +320,12 @@ public class TaskPublishProductUpdateSite {
 
 	/**
 	 * Computes and returns the location of the feature containing the
-	 * executables
+	 * newest version of executables
 	 */
-	protected File getExecutablesDir(File deltaPack) {
-		File featuresDir = new File(deltaPack, "features");
+	protected File getExecutablesDir(Set<File> deltaPacks) {
 		File feature = null;
-		for (File candidate : featuresDir.listFiles()) {
+		Version featureVersion = null;
+		for (File candidate : deltaPacks) {
 			final String name = candidate.getName();
 			if (!name.startsWith(EXECUTABLE)) {
 				continue;
@@ -320,18 +333,19 @@ public class TaskPublishProductUpdateSite {
 			// remember the feature and go on
 			if (feature == null) {
 				feature = candidate;
+				featureVersion = Version.create(feature.getName().substring(name.indexOf("_") + 1));
 				continue;
 			}
 			// take the feature with the highest version
-			Version featureVersion = Version.create(feature.getName().substring(name.indexOf("_") + 1));
-			Version candiateVersion = Version.create(name.substring(name.indexOf("_") + 1));
-			if (featureVersion.compareTo(candiateVersion) < 1) {
+			Version candidateVersion = Version.create(name.substring(name.indexOf("_") + 1));
+			if (featureVersion.compareTo(candidateVersion) < 1) {
 				feature = candidate;
+				featureVersion = candidateVersion;
 			}
 		}
 		if (feature == null) {
 			throw new IllegalArgumentException(
-					"Unable to locate executable feature '" + EXECUTABLE + "' in '" + deltaPack + "'");
+					"Unable to locate executable feature '" + EXECUTABLE + "'");
 		}
 		return feature;
 	}

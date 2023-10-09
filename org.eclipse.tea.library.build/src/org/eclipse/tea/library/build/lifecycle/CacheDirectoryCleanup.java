@@ -16,6 +16,7 @@ import org.eclipse.tea.core.annotations.lifecycle.BeginTaskChain;
 import org.eclipse.tea.core.services.TaskingLifeCycleListener;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.config.BuildDirectories;
+import org.eclipse.tea.library.build.tasks.jar.TaskRunJarExport;
 import org.eclipse.tea.library.build.util.FileUtils;
 import org.osgi.service.component.annotations.Component;
 
@@ -34,6 +35,7 @@ public class CacheDirectoryCleanup implements TaskingLifeCycleListener {
 		} catch (Exception e) {
 			log.warn("cannot remove: " + directory);
 		}
+		TaskRunJarExport.cleanCache(log);
 	}
 
 }

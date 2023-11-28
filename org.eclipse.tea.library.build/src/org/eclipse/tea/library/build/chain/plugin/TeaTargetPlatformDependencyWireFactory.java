@@ -44,7 +44,8 @@ public class TeaTargetPlatformDependencyWireFactory implements TeaDependencyWire
 					for (BundleSpecification requiredBundleSpec : requiredBundles) {
 						String requiredBundleName = requiredBundleSpec.getName();
 						TeaBuildElement requiredPlugin = chain.getElementFor(requiredBundleName);
-						if (requiredPlugin != null && !(requiredPlugin instanceof TeaUnhandledElement)) {
+						if (requiredPlugin != null && requiredPlugin != plugin
+								&& !(requiredPlugin instanceof TeaUnhandledElement)) {
 							plugin.addDependencyWire(requiredPlugin.createWire());
 						}
 					}

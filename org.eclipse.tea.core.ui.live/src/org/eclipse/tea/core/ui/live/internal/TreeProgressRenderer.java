@@ -22,12 +22,10 @@ public class TreeProgressRenderer extends OwnerDrawLabelProvider {
 			.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "resources/waiting.png").createImage();
 	private final Color gradColorTop;
 	private final Color gradColorBottom;
-	private final Color textColor;
 
 	public TreeProgressRenderer(Display display) {
-		gradColorTop = display.getSystemColor(SWT.COLOR_DARK_BLUE);
-		gradColorBottom = display.getSystemColor(SWT.COLOR_BLUE);
-		textColor = display.getSystemColor(SWT.COLOR_LIST_FOREGROUND);
+		gradColorBottom = display.getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT);
+		gradColorTop = display.getSystemColor(SWT.COLOR_TITLE_BACKGROUND);	
 	}
 
 	@Override
@@ -56,7 +54,7 @@ public class TreeProgressRenderer extends OwnerDrawLabelProvider {
 				drawImage(event, bounds, IMG_WAIT);
 			} else {
 				drawProgress(event, percentage, gc, bounds, 100);
-				drawPercentageText(event, percentage, gc, bounds);
+				drawPercentageText(event, percentage, gc, bounds, foreground);
 			}
 		} else if (!(node instanceof VisualizationTaskNode && ((VisualizationTaskNode) node).isSkipped())) {
 			drawProgress(event, percentage, gc, bounds, 20);
@@ -92,13 +90,13 @@ public class TreeProgressRenderer extends OwnerDrawLabelProvider {
 		gc.setAlpha(255);
 	}
 
-	private void drawPercentageText(Event event, int percentage, GC gc, Rectangle bounds) {
+	private void drawPercentageText(Event event, int percentage, GC gc, Rectangle bounds, Color foreground) {
 		String text = percentage + "%";
 		Point size = event.gc.textExtent(text);
 		int offset = Math.max(0, (bounds.height - size.y) / 2);
 		int center = Math.max(0, (bounds.width - size.x) / 2);
 
-		gc.setForeground(textColor);
+		gc.setForeground(foreground);
 		gc.drawText(text, event.x + center, event.y + offset, true);
 	}
 

@@ -1,0 +1,45 @@
+target "Eclipse 2021-12"
+
+with source allEnvironments
+
+location "https://download.eclipse.org/releases/2021-12/" {
+	org.eclipse.sdk.ide
+	org.eclipse.platform.sdk
+	org.eclipse.equinox.sdk.feature.group
+	com.google.guava
+	com.google.gson
+	javaewah
+	org.eclipse.emf.feature.group
+	org.eclipse.ecf
+	org.eclipse.ecf.identity
+	org.eclipse.ecf.filetransfer
+	org.eclipse.jgit.feature.group
+	org.eclipse.jgit.gpg.bc.feature.group
+	org.eclipse.jgit.http.apache.feature.group
+	org.eclipse.jgit.lfs.feature.group
+	org.eclipse.jgit.ssh.apache.feature.group
+	org.eclipse.egit.feature.group
+	org.eclipse.jgit.pgm.feature.group
+	org.eclipse.jgit.ssh.jsch.feature.group
+	org.apache.httpcomponents.httpcore
+	org.apache.httpcomponents.httpclient
+	org.apache.commons.codec
+	net.i2p.crypto.eddsa
+	org.apache.sshd.sftp
+	org.eclipse.m2e.maven.runtime
+	org.eclipse.m2e.maven.runtime.slf4j.simple
+	
+	org.eclipse.xtext.sdk.feature.group
+	com.google.inject
+	org.objectweb.asm [9.1.0,9.2.0)
+	io.github.classgraph
+}
+
+location "https://download.eclipse.org/ease/release/0.9.0/" {
+	org.eclipse.ease.feature.feature.group
+	org.eclipse.ease.ui.feature.feature.group
+}
+
+location "https://mduft.github.io/lcdsl-latest/" {
+	com.wamas.ide.launching.feature.feature.group
+}

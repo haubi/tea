@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
    <feature id="org.eclipse.tea.core_feature"> <category name="tea.core.id"/> </feature>
+   <!--
    <feature id="org.eclipse.tea.core_feature.source"> <category name="tea.dev.id"/> </feature>
+   -->
    <feature id="org.eclipse.tea.ui_feature"> <category name="tea.core.id"/> </feature>
+   <!--
    <feature id="org.eclipse.tea.ui_feature.source"> <category name="tea.dev.id"/> </feature>
+   -->
    <feature id="org.eclipse.tea.scripting_feature"> <category name="tea.ease.id"/> </feature>
+   <!--
    <feature id="org.eclipse.tea.scripting_feature.source"> <category name="tea.dev.id"/> </feature>
+   -->
    <feature id="org.eclipse.tea.library_feature"> <category name="tea.library.id"/> </feature>
+   <!--
    <feature id="org.eclipse.tea.library_feature.source"> <category name="tea.dev.id"/> </feature>
+   -->
    <feature id="org.eclipse.tea.lcdsl.library_feature"> <category name="tea.lcdsl.id"/> </feature>
+   <!--
    <feature id="org.eclipse.tea.lcdsl.library_feature.source"> <category name="tea.dev.id"/> </feature>
+   -->
    <category-def name="tea.core.id" label="TEA Core (incubation)">
       <description>
          TEA Core Libraries

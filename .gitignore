@@ -1,9 +1,11 @@
 # generic rules only. for specific rules, put them into the plugins!
 
-*/target/
-*/bin/
+**/target/
+**/bin/
 *.tm.epoch
 */tm.out*
+.polyglot*
+pom.tycho
 *.xml.html
 *.xml_xmi12.xml
 *.zip_xmi12.xml

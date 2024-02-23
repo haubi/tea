@@ -555,7 +555,9 @@ public class SynchronizeMavenArtifact {
 			if (clazz != null) {
 				return clazz.newInstance();
 			}
-			throw new ClassNotFoundException("one of " + String.join(", ", classnames));
+			ClassNotFoundException e = new ClassNotFoundException("one of " + String.join(", ", classnames));
+			e.printStackTrace();
+			throw e;
 		}
 
 		@Override

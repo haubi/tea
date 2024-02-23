@@ -77,9 +77,6 @@ import org.eclipse.tea.library.build.util.StringHelper;
 
 import com.google.common.base.Charsets;
 
-import io.takari.aether.wagon.OkHttpWagon;
-import io.takari.aether.wagon.OkHttpsWagon;
-
 @SuppressWarnings("restriction")
 public class SynchronizeMavenArtifact {
 
@@ -525,12 +522,36 @@ public class SynchronizeMavenArtifact {
 			case "file":
 				return new FileWagon();
 			case "http":
-				return new OkHttpWagon();
+				return newOfFirstWagonAvailable(
+						"org.apache.maven.wagon.providers.http.HttpWagon.HttpWagon", // since Eclipse 2023-12
+						"io.takari.aether.wagon.OkHttpWagon.OkHttpWagon");
 			case "https":
-				return new OkHttpsWagon();
+				return newOfFirstWagonAvailable(
+						"org.apache.maven.wagon.providers.http.HttpWagon.HttpWagon", // since Eclipse 2023-12
+						"io.takari.aether.wagon.OkHttpWagon.OkHttpsWagon");
 			default:
 				return null;
 			}
+		}
+		
+		@SuppressWarnings("unchecked")
+		private static Wagon newOfFirstWagonAvailable(String...classnames)
+				throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+			Class<? extends Wagon> clazz = null;
+			for(String name: classnames) {
+				try {
+					Class<?> candidate = Class.forName(name);
+					if (Wagon.class.isAssignableFrom(candidate)) {
+						clazz = (Class<? extends Wagon>) candidate;
+						break;
+					}
+				} catch (ClassNotFoundException e) {
+				}
+			}
+			if (clazz != null) {
+				return clazz.newInstance();
+			}
+			throw new ClassNotFoundException("one of " + String.join(", ", classnames));
 		}
 
 		@Override

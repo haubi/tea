@@ -52,17 +52,17 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore,
  org.eclipse.e4.core.di.extensions
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Service-Component: OSGI-INF/org.eclipse.tea.core.ui.config.TaskingConsoleConfig.xml,
- OSGI-INF/org.eclipse.tea.core.ui.internal.PrintTaskChains.xml,
- OSGI-INF/org.eclipse.tea.core.ui.internal.listeners.AutoBuildDeactivator.xml,
- OSGI-INF/org.eclipse.tea.core.ui.internal.run.RunTaskChain.xml,
- OSGI-INF/org.eclipse.tea.core.ui.internal.context.E4WorkbenchContextFunction.xml,
- OSGI-INF/org.eclipse.tea.core.ui.internal.headless.WorkbenchStarter.xml,
- OSGI-INF/org.eclipse.tea.core.ui.DevelopmentMenuDecoration.xml,
- OSGI-INF/org.eclipse.tea.core.ui.TaskingConsole.xml,
- OSGI-INF/org.eclipse.tea.core.ui.internal.TaskProgressEstimationImpl.xml,
- OSGI-INF/org.eclipse.tea.core.ui.internal.listeners.EventBrokerBridge.xml
 Bundle-ActivationPolicy: lazy
 Import-Package: javax.annotation,
  org.eclipse.e4.ui.css.swt.theme,
  javax.inject;version="1.0.0"
+Service-Component: OSGI-INF/org.eclipse.tea.core.ui.DevelopmentMenuDecoration.xml,
+ OSGI-INF/org.eclipse.tea.core.ui.TaskingConsole.xml,
+ OSGI-INF/org.eclipse.tea.core.ui.config.TaskingConsoleConfig.xml,
+ OSGI-INF/org.eclipse.tea.core.ui.internal.PrintTaskChains.xml,
+ OSGI-INF/org.eclipse.tea.core.ui.internal.TaskProgressEstimationImpl.xml,
+ OSGI-INF/org.eclipse.tea.core.ui.internal.context.E4WorkbenchContextFunction.xml,
+ OSGI-INF/org.eclipse.tea.core.ui.internal.headless.WorkbenchStarter.xml,
+ OSGI-INF/org.eclipse.tea.core.ui.internal.listeners.AutoBuildDeactivator.xml,
+ OSGI-INF/org.eclipse.tea.core.ui.internal.listeners.EventBrokerBridge.xml,
+ OSGI-INF/org.eclipse.tea.core.ui.internal.run.RunTaskChain.xml

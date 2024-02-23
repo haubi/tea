@@ -523,22 +523,26 @@ public class SynchronizeMavenArtifact {
 				return new FileWagon();
 			case "http":
 				return newOfFirstWagonAvailable(
-						"org.apache.maven.wagon.providers.http.HttpWagon.HttpWagon", // since Eclipse 2023-12
-						"io.takari.aether.wagon.OkHttpWagon.OkHttpWagon");
+						// since Eclipse 2023-12
+						"org.apache.maven.wagon.providers.http.HttpWagon",
+						// up to Eclipse 2023-09
+						"io.takari.aether.wagon.OkHttpWagon");
 			case "https":
 				return newOfFirstWagonAvailable(
-						"org.apache.maven.wagon.providers.http.HttpWagon.HttpWagon", // since Eclipse 2023-12
-						"io.takari.aether.wagon.OkHttpWagon.OkHttpsWagon");
+						// since Eclipse 2023-12
+						"org.apache.maven.wagon.providers.http.HttpWagon",
+						// up to Eclipse 2023-09
+						"io.takari.aether.wagon.OkHttpsWagon");
 			default:
 				return null;
 			}
 		}
-		
+
 		@SuppressWarnings("unchecked")
-		private static Wagon newOfFirstWagonAvailable(String...classnames)
+		private static Wagon newOfFirstWagonAvailable(String... classnames)
 				throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 			Class<? extends Wagon> clazz = null;
-			for(String name: classnames) {
+			for (String name : classnames) {
 				try {
 					Class<?> candidate = Class.forName(name);
 					if (Wagon.class.isAssignableFrom(candidate)) {

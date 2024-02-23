@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
-<target name="Eclipse 2023-12" sequenceNumber="1708700141">
+<target name="Eclipse 2023-12" sequenceNumber="1708701430">
   <locations>
     <location includeMode="slicer" includeAllPlatforms="true" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="com.google.gson" version="2.10.1.v20230109-0753"/>
@@ -21,7 +21,7 @@
     </location>
     <location includeMode="slicer" includeAllPlatforms="true" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="com.wamas.ide.launching.feature.feature.group" version="0.5.0.N202402221544"/>
-      <repository location="https://github.com/ssi-schaefer/lcdsl/releases/download/0.5.0/"/>
+      <repository location="jar:https://github.com/ssi-schaefer/lcdsl/releases/download/0.5.0/lcdsl_site-0.5.0.N202402221544.zip!/"/>
     </location>
     <location includeDependencyDepth="infinite" includeDependencyScopes="compile,test" includeSource="true" missingManifest="generate" type="Maven" label="javax">
     <dependencies>

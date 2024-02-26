@@ -18,12 +18,11 @@ import org.eclipse.ease.service.ScriptType;
 import org.eclipse.ease.ui.scripts.repository.IRepositoryService;
 import org.eclipse.ease.ui.scripts.repository.IScript;
 import org.eclipse.tea.core.services.TaskingLog;
-import org.eclipse.tea.ease.internal.ListEaseScripts;
 import org.eclipse.ui.PlatformUI;
 
 /**
  * Task that runs an arbitrary EASE script from any of the registered script
- * locations. Use the {@link ListEaseScripts} to find the names that are to be
+ * locations. Use the {@link TaskListEaseScripts} to find the names that are to be
  * used (relative path from the script location).
  */
 public class EaseScriptTask {

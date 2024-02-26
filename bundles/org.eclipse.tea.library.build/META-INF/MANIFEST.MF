@@ -75,6 +75,6 @@ Service-Component: OSGI-INF/org.eclipse.tea.library.build.chain.plugin.TeaBuildP
  OSGI-INF/org.eclipse.tea.library.build.lifecycle.CacheDirectoryCleanup.xml,
  OSGI-INF/org.eclipse.tea.library.build.menu.BuildLibraryMenu.xml,
  OSGI-INF/org.eclipse.tea.library.build.tasks.chains.CleanBuildAllProjects.xml,
- OSGI-INF/org.eclipse.tea.library.build.tasks.chains.CleanProjectsWithErrors.xml,
  OSGI-INF/org.eclipse.tea.library.build.tasks.chains.CmdSyncMavenArtifacts.xml,
- OSGI-INF/org.eclipse.tea.library.build.tasks.chains.ExportAllJars.xml
+ OSGI-INF/org.eclipse.tea.library.build.tasks.chains.ExportAllJars.xml,
+ OSGI-INF/org.eclipse.tea.library.build.tasks.chains.TaskChainCleanProjectsWithErrors.xml

@@ -21,5 +21,5 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.tea.ease
 Service-Component: OSGI-INF/org.eclipse.tea.ease.chains.TaskChainRunEaseScript.xml,
  OSGI-INF/org.eclipse.tea.ease.config.EaseScriptConfig.xml,
- OSGI-INF/org.eclipse.tea.ease.internal.ListEaseScripts.xml,
+ OSGI-INF/org.eclipse.tea.ease.internal.TaskChainListEaseScripts.xml,
  OSGI-INF/org.eclipse.tea.ease.internal.menu.EaseScriptProvider.xml

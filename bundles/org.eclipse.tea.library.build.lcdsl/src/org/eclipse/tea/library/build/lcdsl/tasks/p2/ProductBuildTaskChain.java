@@ -101,19 +101,22 @@ public class ProductBuildTaskChain implements TaskChain {
 			for (final String product : productList) {
 				AbstractProductBuild productBuild = registry.findProductBuild(product);
 				if (productBuild != null) {
-					productBuild.addUpdateSiteTasks(c, new String[] { DUMMY_SITE });
-					productBuild.addProductTasks(c, DUMMY_SITE);
+					addProductBuildTasks(c, log, productBuild);
 				} else {
 					log.error("Cannot build product:" + product + " . Product not found.");
 				}
 			}
 		} else {
 			for (AbstractProductBuild build : builds) {
-				build.addUpdateSiteTasks(c, new String[] { DUMMY_SITE });
-				build.addProductTasks(c, DUMMY_SITE);
+				addProductBuildTasks(c, log, build);
 			}
 		}
 		c.addTask(cache.getCleanup());
+	}
+
+	private void addProductBuildTasks(TaskExecutionContext c, TaskingLog log, AbstractProductBuild productBuild) {
+		productBuild.addUpdateSiteTasks(c, new String[] { DUMMY_SITE });
+		productBuild.addProductTasks(c, DUMMY_SITE);
 	}
 
 	public static final class ProductSelectionDialog extends TitleAreaDialog {

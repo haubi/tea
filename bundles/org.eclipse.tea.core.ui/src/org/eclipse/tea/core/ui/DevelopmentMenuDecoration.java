@@ -10,17 +10,16 @@
  *******************************************************************************/
 package org.eclipse.tea.core.ui;
 
-import org.eclipse.tea.core.TaskingCoreGroupingIds;
+import org.eclipse.tea.core.TeaMenuTopLevelGrouping;
 import org.eclipse.tea.core.services.TaskingMenuDecoration;
 import org.osgi.service.component.annotations.Component;
 
 @Component
 public class DevelopmentMenuDecoration implements TaskingMenuDecoration {
 
-	@TaskingMenuGroupingId(menuPath = "Development", beforeGroupingId = NO_GROUPING)
-	public static final String DEV_GROUP_LISTS = "tea.core.dev.lists";
+	public static final String MENU_DEVELOPMENT = "Development";
 
-	@TaskingMenuPathDecoration(menuPath = "Development", groupingId = TaskingCoreGroupingIds.GID_DEVELOPMENT)
+	@TaskingMenuPathDecoration(menuPath = MENU_DEVELOPMENT, groupingId = TeaMenuTopLevelGrouping.GRP_DEVELOPMENT)
 	public static final String ICON_DEV = "resources/tea.png";
 
 }

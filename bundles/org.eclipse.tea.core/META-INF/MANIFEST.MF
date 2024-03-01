@@ -35,7 +35,7 @@ Export-Package: org.eclipse.tea.core;
  org.eclipse.tea.core.internal.tasks;x-friends:="org.eclipse.tea.core.ui",
  org.eclipse.tea.core.services
 Import-Package: javax.inject;version="1.0.0"
-Service-Component: OSGI-INF/org.eclipse.tea.core.TaskingCoreGroupingIds.xml,
+Service-Component: OSGI-INF/org.eclipse.tea.core.TeaMenuTopLevelGrouping.xml,
  OSGI-INF/org.eclipse.tea.core.internal.DefaultTaskingLog.xml,
  OSGI-INF/org.eclipse.tea.core.internal.config.CoreConfig.xml,
  OSGI-INF/org.eclipse.tea.core.internal.config.TaskingDevelopmentConfig.xml,

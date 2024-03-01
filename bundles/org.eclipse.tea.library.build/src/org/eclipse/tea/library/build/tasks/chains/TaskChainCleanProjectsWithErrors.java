@@ -15,12 +15,13 @@ import org.eclipse.tea.core.annotations.TaskChainContextInit;
 import org.eclipse.tea.core.annotations.TaskChainMenuEntry;
 import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskChain.TaskChainId;
-import org.eclipse.tea.library.build.menu.BuildLibraryMenu;
+import org.eclipse.tea.library.build.menu.BuildLibraryMenuDecoration;
+import org.eclipse.tea.library.build.menu.OtherMenuDecoration;
 import org.eclipse.tea.library.build.tasks.TaskCleanProjectsWithErrors;
 import org.osgi.service.component.annotations.Component;
 
-@TaskChainId(description = "Clean Projects with Errors")
-@TaskChainMenuEntry(path = BuildLibraryMenu.MENU_BUILD, icon = BuildLibraryMenu.ICON_BUILD, groupingId = BuildLibraryMenu.GROUP_MISC)
+@TaskChainMenuEntry(path = { OtherMenuDecoration.MENU_OTHER,
+		BuildLibraryMenuDecoration.MENU_BUILD }, groupingId = BuildLibraryMenuDecoration.GROUP_MISC, icon = BuildLibraryMenuDecoration.ICON_BUILD)
 @Component
 public class TaskChainCleanProjectsWithErrors implements TaskChain {
 

@@ -43,7 +43,8 @@ import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.core.ui.annotations.TaskChainUiInit;
 import org.eclipse.tea.library.build.config.BuildDirectories;
 import org.eclipse.tea.library.build.config.TeaBuildConfig;
-import org.eclipse.tea.library.build.menu.BuildLibraryMenu;
+import org.eclipse.tea.library.build.menu.BuildLibraryMenuDecoration;
+import org.eclipse.tea.library.build.menu.OtherMenuDecoration;
 import org.eclipse.tea.library.build.model.PlatformTriple;
 import org.eclipse.tea.library.build.tasks.jar.TaskInitJarCache;
 import org.osgi.service.component.annotations.Component;
@@ -55,7 +56,8 @@ import com.google.common.base.Splitter;
  * entry in the IDE.
  */
 @TaskChainId(description = "Export Products...", alias = "ProductBuildTaskChain")
-@TaskChainMenuEntry(icon = "icons/product_xml_obj.png", path = BuildLibraryMenu.MENU_BUILD, groupingId = BuildLibraryMenu.GROUP_MISC)
+@TaskChainMenuEntry(path = { OtherMenuDecoration.MENU_OTHER,
+		BuildLibraryMenuDecoration.MENU_BUILD }, groupingId = BuildLibraryMenuDecoration.GROUP_MISC, icon = "icons/product_xml_obj.png")
 @Component
 public class ProductBuildTaskChain implements TaskChain {
 

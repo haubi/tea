@@ -17,12 +17,13 @@ import org.eclipse.tea.core.annotations.TaskChainContextInit;
 import org.eclipse.tea.core.annotations.TaskChainMenuEntry;
 import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskChain.TaskChainId;
+import org.eclipse.tea.core.ui.DevelopmentMenuDecoration;
 import org.eclipse.tea.core.ui.SelectTaskChainDialog;
 import org.eclipse.tea.core.ui.annotations.TaskChainUiInit;
 import org.osgi.service.component.annotations.Component;
 
 @TaskChainId(description = "Run any TaskChain...", alias = "RunAny")
-@TaskChainMenuEntry(development = true, path = "Development")
+@TaskChainMenuEntry(development = true, path = DevelopmentMenuDecoration.MENU_DEVELOPMENT)
 @Component
 public class RunTaskChain implements TaskChain {
 

@@ -11,17 +11,17 @@
 package org.eclipse.tea.library.build.tasks.chains;
 
 import org.eclipse.tea.core.TaskExecutionContext;
+import org.eclipse.tea.core.TeaMenuTopLevelGrouping;
 import org.eclipse.tea.core.annotations.TaskChainContextInit;
 import org.eclipse.tea.core.annotations.TaskChainMenuEntry;
 import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskChain.TaskChainId;
-import org.eclipse.tea.library.build.menu.BuildLibraryMenu;
 import org.eclipse.tea.library.build.model.WorkspaceBuild;
 import org.eclipse.tea.library.build.tasks.maven.SynchronizeMavenArtifact;
 import org.osgi.service.component.annotations.Component;
 
 @TaskChainId(description = "Synchronize Maven Artifacts")
-@TaskChainMenuEntry(path = BuildLibraryMenu.MENU_BUILD, icon = "icons/jar_l_obj.png", groupingId = BuildLibraryMenu.GROUP_BUILD)
+@TaskChainMenuEntry(groupingId = TeaMenuTopLevelGrouping.GRP_OFTEN_USED, icon = "icons/jar_l_obj.png")
 @Component
 public class CmdSyncMavenArtifacts implements TaskChain {
 

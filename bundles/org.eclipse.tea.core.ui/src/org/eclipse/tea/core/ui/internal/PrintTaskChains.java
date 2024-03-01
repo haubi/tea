@@ -20,7 +20,7 @@ import org.eclipse.tea.core.ui.DevelopmentMenuDecoration;
 import org.osgi.service.component.annotations.Component;
 
 @TaskChainId(description = "Print all registered TaskChains")
-@TaskChainMenuEntry(development = true, path = "Development", icon = "resources/tea.png", groupingId = DevelopmentMenuDecoration.DEV_GROUP_LISTS)
+@TaskChainMenuEntry(development = true, path = DevelopmentMenuDecoration.MENU_DEVELOPMENT, icon = "resources/tea.png")
 @Component
 public class PrintTaskChains implements TaskChain {
 

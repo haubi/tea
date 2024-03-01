@@ -35,7 +35,8 @@ import org.eclipse.tea.core.services.TaskChain.TaskChainId;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.core.ui.annotations.TaskChainUiInit;
 import org.eclipse.tea.library.build.lcdsl.tasks.p2.TaskGenFeatureFromLcDsl;
-import org.eclipse.tea.library.build.menu.BuildLibraryMenu;
+import org.eclipse.tea.library.build.menu.BuildLibraryMenuDecoration;
+import org.eclipse.tea.library.build.menu.OtherMenuDecoration;
 import org.eclipse.tea.library.build.model.FeatureBuild;
 import org.eclipse.tea.library.build.model.WorkspaceBuild;
 import org.eclipse.tea.library.build.model.WorkspaceData;
@@ -45,8 +46,9 @@ import org.eclipse.tea.library.build.tasks.p2.TaskUpdateStrictFeatureVersions;
 import org.eclipse.tea.library.build.ui.SelectProjectDialog;
 import org.osgi.service.component.annotations.Component;
 
-@TaskChainMenuEntry(icon = "icons/site_obj.png", path = BuildLibraryMenu.MENU_BUILD, groupingId = BuildLibraryMenu.GROUP_MISC)
 @TaskChainId(description = "Create Update Site from Feature...")
+@TaskChainMenuEntry(path = { OtherMenuDecoration.MENU_OTHER,
+		BuildLibraryMenuDecoration.MENU_BUILD }, groupingId = BuildLibraryMenuDecoration.GROUP_MISC, icon = "icons/site_obj.png")
 @Component
 public class TaskChainBuildAnyFeatureSite implements TaskChain {
 

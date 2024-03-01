@@ -23,7 +23,7 @@ import org.osgi.service.component.annotations.Component;
  * Very simple task that shows a list of all registered EASE scripts.
  */
 @TaskChainId(description = "List available EASE Scripts")
-@TaskChainMenuEntry(path = "Development", development = true, icon = "platform:/plugin/org.eclipse.ease.ui/icons/eobj16/script.png", groupingId = DevelopmentMenuDecoration.DEV_GROUP_LISTS)
+@TaskChainMenuEntry(development = true, groupingId = DevelopmentMenuDecoration.MENU_DEVELOPMENT, icon = "platform:/plugin/org.eclipse.ease.ui/icons/eobj16/script.png")
 @Component
 public class TaskChainListEaseScripts implements TaskChain {
 

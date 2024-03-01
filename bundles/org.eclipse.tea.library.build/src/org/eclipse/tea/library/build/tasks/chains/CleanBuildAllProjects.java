@@ -15,7 +15,8 @@ import org.eclipse.tea.core.annotations.TaskChainContextInit;
 import org.eclipse.tea.core.annotations.TaskChainMenuEntry;
 import org.eclipse.tea.core.services.TaskChain;
 import org.eclipse.tea.core.services.TaskChain.TaskChainId;
-import org.eclipse.tea.library.build.menu.BuildLibraryMenu;
+import org.eclipse.tea.library.build.menu.BuildLibraryMenuDecoration;
+import org.eclipse.tea.library.build.menu.OtherMenuDecoration;
 import org.eclipse.tea.library.build.tasks.TaskBuildWorkspace;
 import org.eclipse.tea.library.build.tasks.TaskCleanWorkspace;
 import org.osgi.service.component.annotations.Component;
@@ -23,7 +24,8 @@ import org.osgi.service.component.annotations.Component;
 /**
  * Simple {@link TaskChain} to clean and build all projects in the workspace.
  */
-@TaskChainMenuEntry(path = BuildLibraryMenu.MENU_BUILD, icon = BuildLibraryMenu.ICON_BUILD, groupingId = BuildLibraryMenu.GROUP_BUILD)
+@TaskChainMenuEntry(path = { OtherMenuDecoration.MENU_OTHER,
+		BuildLibraryMenuDecoration.MENU_BUILD }, groupingId = BuildLibraryMenuDecoration.GROUP_BUILD, icon = BuildLibraryMenuDecoration.ICON_BUILD)
 @TaskChainId(description = "Clean and Build all Projects", alias = "CleanBuildAllProjects")
 @Component
 public class CleanBuildAllProjects implements TaskChain {

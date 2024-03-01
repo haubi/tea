@@ -14,17 +14,27 @@ import org.eclipse.tea.core.services.TaskingMenuDecoration;
 import org.osgi.service.component.annotations.Component;
 
 /**
- * Defines constants for TEA's own menu grouping IDs.
+ * Defines constants for TEA's menu grouping IDs.
  * <p>
  * Grouping ID's are used to keep items that belong together sorted in the Menu.
  * Also after each grouping region, a separator is inserted into the menu.
  */
 @Component
-public class TaskingCoreGroupingIds implements TaskingMenuDecoration {
+public class TeaMenuTopLevelGrouping implements TaskingMenuDecoration {
 
 	@TaskingMenuGroupingId(beforeGroupingId = NO_GROUPING)
-	public static final String GID_DEVELOPMENT = "tea.core.dev";
+	public static final String GRP_DEVELOPMENT = "tea.core.dev";
 
-	@TaskingMenuGroupingId(afterGroupingId = NO_GROUPING)
-	public static final String GID_ABOUT = "tea.core.about";
+	@TaskingMenuGroupingId(afterGroupingId = GRP_DEVELOPMENT)
+	public static final String GRP_ORGANIZE = "tea.organize";
+
+	@TaskingMenuGroupingId(afterGroupingId = GRP_ORGANIZE)
+	public static final String GRP_OFTEN_USED = "tea.often_used";
+
+	@TaskingMenuGroupingId(afterGroupingId = GRP_OFTEN_USED)
+	public static final String GRP_ADVANCED = "tea.advanced";
+
+	@TaskingMenuGroupingId(afterGroupingId = GRP_ADVANCED)
+	public static final String GRP_GENERATORS = "tea.generators";
+
 }

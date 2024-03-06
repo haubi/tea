@@ -41,7 +41,7 @@ public class TaskingModelTreePanel extends Composite {
 				}
 				return wordMatches(labelText);
 			}
-		}, true);
+		}, true, false);
 		tree.getViewer().setContentProvider(new TaskingModelContentProvider());
 		tree.getViewer().setLabelProvider(new DelegatingStyledCellLabelProvider(new TaskingModelLabelProvider()));
 		tree.getViewer().setInput(model);

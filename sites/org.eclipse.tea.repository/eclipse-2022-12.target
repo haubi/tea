@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde?>
+<!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
+<target name="Eclipse 2022-12" sequenceNumber="1709736902">
+  <locations>
+    <location includeMode="slicer" includeAllPlatforms="true" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="com.google.gson" version="2.9.1.v20220915-1632"/>
+      <unit id="com.google.guava" version="31.1.0.jre"/>
+      <unit id="com.google.guava.failureaccess" version="1.0.1"/>
+      <unit id="org.eclipse.egit.feature.group" version="6.4.0.202211300538-r"/>
+      <unit id="org.eclipse.emf.feature.group" version="2.32.0.v20221121-1400"/>
+      <unit id="org.eclipse.jgit.feature.group" version="6.4.0.202211300538-r"/>
+      <unit id="org.eclipse.m2e.feature.feature.group" version="2.1.2.20221130-2239"/>
+      <unit id="org.eclipse.sdk.feature.group" version="4.26.0.v20221123-2302"/>
+      <unit id="org.eclipse.xtext.sdk.feature.group" version="2.29.0.v20221121-1054"/>
+      <repository location="https://download.eclipse.org/releases/2022-12/"/>
+    </location>
+    <location includeMode="slicer" includeAllPlatforms="true" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.eclipse.ease.feature.feature.group" version="0.9.0.I202206140954"/>
+      <unit id="org.eclipse.ease.ui.feature.feature.group" version="0.9.0.I202207260937"/>
+      <unit id="org.eclipse.ease.python.jython.feature.feature.group" version="0.9.0.I202206141122"/>
+      <repository location="https://download.eclipse.org/ease/release/0.9.0/"/>
+    </location>
+    <location includeMode="slicer" includeAllPlatforms="true" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="com.wamas.ide.launching.feature.feature.group" version="0.5.0.N202402221544"/>
+      <repository location="https://github.com/ssi-schaefer/lcdsl/releases/download/0.5.0/"/>
+    </location>
+  </locations>
+</target>

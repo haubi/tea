@@ -14,6 +14,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -541,19 +543,25 @@ public class SynchronizeMavenArtifact {
 		@SuppressWarnings("unchecked")
 		private static Wagon newOfFirstWagonAvailable(String... classnames)
 				throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-			Class<? extends Wagon> clazz = null;
+			String classname = null;
+			Constructor<? extends Wagon> constructor = null;
 			for (String name : classnames) {
 				try {
 					Class<?> candidate = Class.forName(name);
 					if (Wagon.class.isAssignableFrom(candidate)) {
-						clazz = (Class<? extends Wagon>) candidate;
+						classname = name;
+						constructor = ((Class<? extends Wagon>) candidate).getConstructor();
 						break;
 					}
-				} catch (ClassNotFoundException e) {
+				} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
 				}
 			}
-			if (clazz != null) {
-				return clazz.newInstance();
+			if (constructor != null) {
+				try {
+					return constructor.newInstance();
+				} catch (InvocationTargetException e) {
+					throw new RuntimeException("constructing " + classname, e.getTargetException());
+				}
 			}
 			ClassNotFoundException e = new ClassNotFoundException("one of " + String.join(", ", classnames));
 			e.printStackTrace();

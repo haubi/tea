@@ -1,27 +1,61 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
-<target name="Eclipse 2022-12" sequenceNumber="1709736902">
+<target name="Eclipse 2022-12" sequenceNumber="1709826318">
   <locations>
-    <location includeMode="slicer" includeAllPlatforms="true" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+    <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="com.google.gson" version="2.9.1.v20220915-1632"/>
-      <unit id="com.google.guava" version="31.1.0.jre"/>
-      <unit id="com.google.guava.failureaccess" version="1.0.1"/>
+      <unit id="com.google.guava" version="30.1.0.v20221112-0806"/>
+      <unit id="com.google.inject" version="5.0.1.v20221112-0806"/>
+      <unit id="io.github.classgraph" version="4.8.149.v20220915-0556"/>
+      <unit id="javaewah" version="1.1.13.v20211029-0839"/>
+      <unit id="net.i2p.crypto.eddsa" version="0.3.0.v20220506-1020"/>
+      <unit id="org.aopalliance" version="1.0.0.v20220404-1927"/>
+      <unit id="org.apache.commons.codec" version="1.14.0.v20221112-0806"/>
+      <unit id="org.apache.commons.io" version="2.8.0.v20210415-0900"/>
+      <unit id="org.apache.commons.logging" version="1.2.0.v20180409-1502"/>
+      <unit id="org.apache.httpcomponents.httpclient" version="4.5.13.v20221112-0806"/>
+      <unit id="org.apache.httpcomponents.httpcore" version="4.4.15.v20220209-2345"/>
+      <unit id="org.apache.log4j" version="1.2.19.v20220208-1728"/>
+      <unit id="org.apache.sshd.osgi" version="2.9.2.v20221117-1942"/>
+      <unit id="org.apache.sshd.sftp" version="2.9.2.v20221117-1942"/>
+      <unit id="org.eclipse.draw2d.feature.group" version="3.15.0.202211301913"/>
+      <unit id="org.eclipse.e4.ui.progress" version="0.3.600.v20221024-2137"/>
+      <unit id="org.eclipse.e4.tools.emf.ui" version="4.7.400.v20220915-1041"/>
+      <unit id="org.eclipse.e4.tools.services" version="4.9.0.v20210427-1802"/>
+      <unit id="org.eclipse.ecf" version="3.10.0.v20210925-0032"/>
+      <unit id="org.eclipse.ecf.identity" version="3.9.402.v20210409-2301"/>
+      <unit id="org.eclipse.ecf.filetransfer" version="5.1.102.v20210409-2301"/>
       <unit id="org.eclipse.egit.feature.group" version="6.4.0.202211300538-r"/>
       <unit id="org.eclipse.emf.feature.group" version="2.32.0.v20221121-1400"/>
       <unit id="org.eclipse.jgit.feature.group" version="6.4.0.202211300538-r"/>
+      <unit id="org.eclipse.jgit.gpg.bc.feature.group" version="6.4.0.202211300538-r"/>
+      <unit id="org.eclipse.jgit.http.apache.feature.group" version="6.4.0.202211300538-r"/>
+      <unit id="org.eclipse.jgit.lfs.feature.group" version="6.4.0.202211300538-r"/>
+      <unit id="org.eclipse.jgit.ssh.apache.feature.group" version="6.4.0.202211300538-r"/>
       <unit id="org.eclipse.m2e.feature.feature.group" version="2.1.2.20221130-2239"/>
       <unit id="org.eclipse.sdk.feature.group" version="4.26.0.v20221123-2302"/>
       <unit id="org.eclipse.xtext.sdk.feature.group" version="2.29.0.v20221121-1054"/>
+      <unit id="org.objectweb.asm" version="9.4.0.v20221107-1714"/>
+      <unit id="org.objectweb.asm.tree" version="9.4.0"/>
+      <unit id="org.sat4j.core" version="2.3.6.v20201214"/>
+      <unit id="org.sat4j.pb" version="2.3.6.v20201214"/>
+      <unit id="slf4j.api" version="1.7.36"/>
+      <unit id="slf4j.nop" version="1.7.36"/>
       <repository location="https://download.eclipse.org/releases/2022-12/"/>
     </location>
-    <location includeMode="slicer" includeAllPlatforms="true" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.ease.feature.feature.group" version="0.9.0.I202206140954"/>
-      <unit id="org.eclipse.ease.ui.feature.feature.group" version="0.9.0.I202207260937"/>
-      <unit id="org.eclipse.ease.python.jython.feature.feature.group" version="0.9.0.I202206141122"/>
-      <repository location="https://download.eclipse.org/ease/release/0.9.0/"/>
+    <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.eclipse.ease.feature.feature.group" version="0.8.0.I202105061131"/>
+      <unit id="org.eclipse.ease.lang.python.feature.feature.group" version="0.8.0.I202104091425"/>
+      <unit id="org.eclipse.ease.ui.feature.feature.group" version="0.8.0.I202105111204"/>
+      <unit id="org.eclipse.ease.python.jython.feature.feature.group" version="0.8.0.I202104061519"/>
+      <repository location="https://download.eclipse.org/ease/release/0.8.0/"/>
     </location>
-    <location includeMode="slicer" includeAllPlatforms="true" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+    <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.jython" version="2.7.0.I202104151016"/>
+      <repository location="https://download.eclipse.org/tracecompass.incubator/2021-06/master/rcp-repository"/>
+    </location>
+    <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="com.wamas.ide.launching.feature.feature.group" version="0.5.0.N202402221544"/>
       <repository location="https://github.com/ssi-schaefer/lcdsl/releases/download/0.5.0/"/>
     </location>

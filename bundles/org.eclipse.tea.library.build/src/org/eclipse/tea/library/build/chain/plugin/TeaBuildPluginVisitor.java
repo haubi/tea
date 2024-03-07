@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.tea.core.services.TaskProgressTracker;
 import org.eclipse.tea.core.services.TaskingLog;
-import org.eclipse.tea.core.ui.internal.listeners.AutoBuildDeactivator;
 import org.eclipse.tea.library.build.chain.TeaBuildChain;
 import org.eclipse.tea.library.build.chain.TeaBuildElement;
 import org.eclipse.tea.library.build.config.TeaBuildConfig;
@@ -74,7 +73,6 @@ public class TeaBuildPluginVisitor implements TeaBuildVisitor {
 				TeaBuildUtil.tryCompile(projects.keySet());
 				projects.values().stream().forEach(e -> {
 					results.put(e, Status.OK_STATUS);
-					AutoBuildDeactivator.avoidBuild(e.getPlugin().getData().getProject());
 				});
 			} catch (Exception ex) {
 				projects.values().stream().forEach(e -> results.put(e,
@@ -100,7 +98,6 @@ public class TeaBuildPluginVisitor implements TeaBuildVisitor {
 						} else {
 							p.done();
 							results.put(p, Status.OK_STATUS);
-							AutoBuildDeactivator.avoidBuild(p.getPlugin().getData().getProject());
 						}
 					}
 				}

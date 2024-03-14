@@ -192,6 +192,8 @@ public class InternalZipExec extends BaseZipExec {
 			while (entries.hasMoreElements()) {
 				ZipEntry entry = entries.nextElement();
 				File realFile = new File(destDir, entry.getName());
+				if (!realFile.toPath().normalize().startsWith(destDir.toPath()))
+			        throw new IOException("Bad zip entry");
 				if (entry.isDirectory()) {
 					FileUtils.mkdirs(realFile);
 					continue;

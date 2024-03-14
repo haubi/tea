@@ -16,17 +16,22 @@ import java.net.URI;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.query.IQueryResult;
 import org.eclipse.pde.core.target.ITargetDefinition;
 import org.eclipse.pde.core.target.ITargetHandle;
 import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.core.target.ITargetPlatformService;
 import org.eclipse.pde.core.target.LoadTargetDefinitionJob;
+import org.eclipse.pde.internal.core.target.P2TargetUtils;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.internal.Activator;
 
@@ -45,7 +50,21 @@ public class TargetPlatformHelper {
 		}
 
 		log.debug("loading target definition");
-		final LoadTargetDefinitionJob job = new LoadTargetDefinitionJob(definition);
+		final LoadTargetDefinitionJob job = new LoadTargetDefinitionJob(definition) {
+
+			@Override
+			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+				IStatus result = super.runInWorkspace(monitor);
+				if (result == Status.OK_STATUS) {
+					try {
+						resolveTargetDefinition(getCurrentTargetDefinition(), monitor);
+					} catch (OperationCanceledException e) {
+						return Status.CANCEL_STATUS;
+					}
+				}
+				return result;
+			}
+		};
 		job.setUser(user);
 		job.addJobChangeListener(new JobChangeAdapter() {
 
@@ -121,4 +140,36 @@ public class TargetPlatformHelper {
 				ITargetPlatformService.class.getName());
 	}
 
+	public static void resolveTargetDefinition(ITargetDefinition targetDefinition, IProgressMonitor mon)
+			throws CoreException {
+		for (ITargetLocation loc : targetDefinition.getTargetLocations()) {
+			if (!isOK(loc.getStatus())) {
+				// trigger the updates
+				loc.resolve(targetDefinition, mon);
+			}
+		}
+
+		// work around ITargetLocation.resolve() implementations not properly
+		// waiting for the particular resolver jobs to finish
+		IQueryResult<IInstallableUnit> ius = P2TargetUtils.getIUs(targetDefinition, mon);
+		int count[] = { 0 };
+		ius.forEach(i -> count[0]++);
+
+		for (ITargetLocation loc : targetDefinition.getTargetLocations()) {
+			if (!isOK(loc.getStatus())) {
+				throw new RuntimeException(
+						"Failed to resolve " + loc.getType() + "-type content for target definition '"
+								+ targetDefinition.getName() + "': " + getMessage(loc.getStatus()));
+			}
+		}
+
+	}
+
+	private static boolean isOK(IStatus status) {
+		return status == null ? false : status.isOK();
+	}
+
+	private static String getMessage(IStatus status) {
+		return status == null ? "no status" : status.getMessage();
+	}
 }

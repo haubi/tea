@@ -48,7 +48,6 @@ import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.core.target.TargetBundle;
 import org.eclipse.pde.core.target.TargetFeature;
 import org.eclipse.pde.internal.build.Utils;
-import org.eclipse.pde.internal.core.target.P2TargetUtils;
 import org.eclipse.tea.core.services.TaskingLog;
 import org.eclipse.tea.library.build.config.BuildDirectories;
 import org.eclipse.tea.library.build.internal.Activator;
@@ -151,26 +150,9 @@ public class TaskPublishProductUpdateSite {
 
 		ITargetDefinition targetDefinition = TargetPlatformHelper.getCurrentTargetDefinition();
 
+		TargetPlatformHelper.resolveTargetDefinition(targetDefinition, mon);
+
 		int fSize = featureLocations.size();
-		for (ITargetLocation loc : targetDefinition.getTargetLocations()) {
-			if (!isOK(loc.getStatus())) {
-				// trigger the updates
-				loc.resolve(targetDefinition, mon);
-			}
-		}
-
-		// work around ITargetLocation.resolve() implementations not properly
-		// waiting for the particular resolver jobs to finish
-		P2TargetUtils.getIUs(targetDefinition, mon);
-
-		for (ITargetLocation loc : targetDefinition.getTargetLocations()) {
-			if (!isOK(loc.getStatus())) {
-				throw new RuntimeException(
-						"Failed to resolve " + loc.getType() + "-type content for target definition '"
-								+ targetDefinition.getName() + "': " + getMessage(loc.getStatus()));
-			}
-		}
-
 		for (ITargetLocation loc : targetDefinition.getTargetLocations()) {
 			TargetFeature[] targetFeatures = loc.getFeatures();
 			if (targetFeatures != null) {
@@ -258,14 +240,6 @@ public class TaskPublishProductUpdateSite {
 		}
 	}
 
-	private static boolean isOK(IStatus status) {
-		return status == null ? false : status.isOK();
-	}
-
-	private String getMessage(IStatus status) {
-		return status == null ? "no status" : status.getMessage();
-	}
-
 	/**
 	 * Checks whether a given feature location looks like a delta-pack. A delta
 	 * pack's feature name starts with "org.eclipse.equinox.executable".
@@ -319,8 +293,8 @@ public class TaskPublishProductUpdateSite {
 	}
 
 	/**
-	 * Computes and returns the location of the feature containing the
-	 * newest version of executables
+	 * Computes and returns the location of the feature containing the newest
+	 * version of executables
 	 */
 	protected File getExecutablesDir(Set<File> deltaPacks) {
 		File feature = null;
@@ -344,8 +318,7 @@ public class TaskPublishProductUpdateSite {
 			}
 		}
 		if (feature == null) {
-			throw new IllegalArgumentException(
-					"Unable to locate executable feature '" + EXECUTABLE + "'");
+			throw new IllegalArgumentException("Unable to locate executable feature '" + EXECUTABLE + "'");
 		}
 		return feature;
 	}

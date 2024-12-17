@@ -6,7 +6,7 @@ pipeline {
     }
     agent any
     tools {
-        maven 'apache-maven-latest'
+        maven 'apache-maven-3.9.9'
         jdk 'temurin-jdk17-latest'
     }
     stages {

@@ -12,13 +12,25 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh """
-                set -xe
-                mvn clean verify
+                sh '''
+                set -xeu
+                withOfficialSuffix=
+                if [[ ${TAG_NAME-} == v* ]] \
+                && [[ ${JOB_NAME-} == "continuous/${TAG_NAME-}" ]] \
+                && [[ $(git rev-parse refs/tags/${TAG_NAME-}) == "$(git rev-parse HEAD)" ]] \
+                ; then
+                    withOfficialSuffix='-DunofficialSuffix='
+                elif [[ ${BRANCH_NAME-} == master ]] \
+                && [[ ${JOB_NAME-} == "continuous/${BRANCH_NAME-}" ]] \
+                && [[ $(git rev-parse refs/remotes/origin/${BRANCH_NAME-}) == "$(git rev-parse HEAD)" ]] \
+                ; then
+                    withOfficialSuffix='-DunofficialSuffix='
+                fi
+                mvn clean verify ${withOfficialSuffix}
                 ! test -r ./p2
                 mv sites/org.eclipse.tea.repository/target/repository p2
                 test -r ./p2/.
-                """
+                '''
             }
             post {
                 success {

@@ -26,7 +26,7 @@ pipeline {
                 ; then
                     withOfficialSuffix='-DunofficialSuffix='
                 fi
-                mvn clean verify ${withOfficialSuffix}
+                mvn -B clean verify ${withOfficialSuffix}
                 ! test -r ./p2
                 mv sites/org.eclipse.tea.repository/target/repository p2
                 test -r ./p2/.

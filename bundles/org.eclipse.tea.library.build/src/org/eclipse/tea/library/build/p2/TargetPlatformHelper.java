@@ -49,6 +49,14 @@ public class TargetPlatformHelper {
 			throw new IllegalStateException("cannot resolve target definition");
 		}
 
+		return setTargetPlatform(log, definition, user);
+	}
+
+	public static Job setTargetPlatform(TaskingLog log, ITargetDefinition definition, boolean user) {
+		if (definition == null) {
+			throw new IllegalStateException("target definition is null");
+		}
+
 		log.debug("loading target definition");
 		final LoadTargetDefinitionJob job = new LoadTargetDefinitionJob(definition) {
 

@@ -126,7 +126,6 @@
       label="Master">
     <setupTask
         xsi:type="setup:EclipseIniTask"
-        disabled="true"
         option="-Doomph.redirection.tea"
         value="=https://raw.githubusercontent.com/eclipse-tea/tea/master/oomph/EclipseTEA.setup->${git.clone.tea.location|uri}/oomph/EclipseTEA.setup"
         vm="true">
@@ -140,7 +139,6 @@
       label="Playground">
     <setupTask
         xsi:type="setup:EclipseIniTask"
-        disabled="true"
         option="-Doomph.redirection.tea"
         value="=https://raw.githubusercontent.com/eclipse-tea/tea/playground/oomph/EclipseTEA.setup->${git.clone.tea.location|uri}/oomph/EclipseTEA.setup"
         vm="true">

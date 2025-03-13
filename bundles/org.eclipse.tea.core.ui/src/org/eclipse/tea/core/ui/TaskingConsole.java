@@ -125,7 +125,7 @@ public class TaskingConsole extends TaskingLog {
 		outErr.flush();
 	}
 
-	@Override
+	@Deprecated
 	protected void finalize() throws Throwable {
 		close(sInfo);
 		close(sStd);

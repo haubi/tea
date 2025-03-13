@@ -93,6 +93,12 @@
       <requirement
           name="org.eclipse.sdk.feature.group"/>
       <requirement
+          name="com.wamas.ide.launching.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.ease.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.ease.python.jython.feature.feature.group"/>
+      <requirement
           name="*"/>
       <sourceLocator
           rootFolder="${git.clone.tea.location}"
@@ -104,6 +110,8 @@
             url="https://download.eclipse.org/cbi/updates/license"/>
         <repository
             url="https://download.eclipse.org/ease/integration/nightly"/>
+        <repository
+            url="https://download.eclipse.org/tracecompass.incubator/master/rcp-repository"/>
         <repository
             url="https://github.com/ssi-schaefer/lcdsl/releases/latest/download/"/>
       </repositoryList>

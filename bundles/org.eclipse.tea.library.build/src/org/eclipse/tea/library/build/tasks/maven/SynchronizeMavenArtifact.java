@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -76,8 +77,6 @@ import org.eclipse.tea.library.build.model.PluginBuild;
 import org.eclipse.tea.library.build.model.WorkspaceBuild;
 import org.eclipse.tea.library.build.util.FileUtils;
 import org.eclipse.tea.library.build.util.StringHelper;
-
-import com.google.common.base.Charsets;
 
 @SuppressWarnings("restriction")
 public class SynchronizeMavenArtifact {
@@ -267,7 +266,7 @@ public class SynchronizeMavenArtifact {
 			// write .gitignore
 			IFile gitignore = targetFolder.getFile(".gitignore");
 			if (!gitignore.exists()) {
-				gitignore.create(new ByteArrayInputStream("*.jar".getBytes(Charsets.UTF_8)), false, null);
+				gitignore.create(new ByteArrayInputStream("*.jar".getBytes(Charset.defaultCharset())), false, null);
 			}
 			this.filesAlreadyUpToDate.add(gitignore);
 		}

@@ -5,7 +5,7 @@ Bundle-Name: %pluginName
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-SymbolicName: org.eclipse.tea.core.ui;singleton:=true
-Bundle-Version: 2.1.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: org.eclipse.tea.core.ui.Activator
 Export-Package: org.eclipse.tea.core.ui;
   uses:="org.eclipse.tea.core,
@@ -53,7 +53,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.e4.ui.workbench,
  org.eclipse.emf.ecore,
  org.eclipse.e4.core.di.extensions
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Import-Package: javax.annotation,
  org.eclipse.e4.ui.css.swt.theme,

@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -168,7 +169,7 @@ public final class FileUtils {
 	 *            the target to place the file to.
 	 */
 	public static void download(String uri, File target) throws Exception {
-		URL url = new URL(uri);
+		URL url = new URI(uri).toURL();
 		try (InputStream is = url.openStream(); FileOutputStream out = new FileOutputStream(target)) {
 			ReadableByteChannel rbc = Channels.newChannel(is);
 			out.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);

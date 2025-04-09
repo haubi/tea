@@ -17,7 +17,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -185,7 +185,7 @@ public class TaskingStatListener implements TaskingLifeCycleListener {
 		HttpURLConnection connection = null;
 		try {
 			String charset = Charset.defaultCharset().name();
-			connection = (HttpURLConnection) new URL(config.statServer).openConnection();
+			connection = (HttpURLConnection) new URI(config.statServer).toURL().openConnection();
 			connection.setDoOutput(true);
 			connection.setRequestProperty("Accept-Charset", charset);
 			connection.setRequestProperty("Content-Type", "application/json");

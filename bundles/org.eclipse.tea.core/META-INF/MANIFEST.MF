@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.osgi.services;resolution:=optional,
  com.google.guava,
  com.google.gson,
  org.eclipse.e4.core.di.extensions
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.tea.core;
   uses:="org.eclipse.core.runtime,

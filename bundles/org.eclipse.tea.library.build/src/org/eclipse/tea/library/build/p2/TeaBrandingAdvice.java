@@ -12,6 +12,8 @@ package org.eclipse.tea.library.build.p2;
 
 import java.io.File;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -20,6 +22,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.internal.p2.publisher.eclipse.IProductDescriptor;
 import org.eclipse.equinox.p2.metadata.Version;
 import org.eclipse.equinox.p2.publisher.eclipse.IBrandingAdvice;
+import org.eclipse.equinox.p2.publisher.eclipse.IMacOsBundleUrlType;
 import org.eclipse.equinox.p2.publisher.eclipse.ProductFileAdvice;
 
 /**
@@ -47,6 +50,11 @@ public class TeaBrandingAdvice implements IBrandingAdvice {
 	@Override
 	public String getExecutableName() {
 		return advice.getExecutableName();
+	}
+
+	@Override
+	public List<IMacOsBundleUrlType> getMacOsBundleUrlTypes() {
+		return advice.getMacOsBundleUrlTypes();
 	}
 
 	@Override

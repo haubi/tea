@@ -114,7 +114,7 @@
         <version>${tycho-version}</version>
         <configuration>
           <target>
-            <file>../../sites/org.eclipse.tea.repository/eclipse-2022-12.target</file>
+            <file>../../sites/org.eclipse.tea.repository/eclipse-2024-09.target</file>
           </target>
         </configuration>
       </plugin>
@@ -141,6 +141,50 @@
             <phase>none</phase>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-eclipse-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <inherited>false</inherited>
+        <executions>
+          <execution>
+            <goals>
+              <goal>eclipse-run</goal>
+            </goals>
+            <phase>generate-resources</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <addDefaultDependencies>true</addDefaultDependencies>
+          <repositories>
+            <repository>
+              <id>eclipse</id>
+              <layout>p2</layout>
+              <url>https://download.eclipse.org/releases/2024-09/202409111000/</url>
+            </repository>
+            <repository>
+              <id>cbi-targetplatform-dsl-mirror</id>
+              <layout>p2</layout>
+              <url>https://download.eclipse.org/cbi/updates/tpd/release/3.0.0/</url>
+            </repository>
+          </repositories>
+          <dependencies>
+            <dependency>
+              <artifactId>org.eclipse.cbi.targetplatform.feature</artifactId>
+              <type>eclipse-feature</type>
+            </dependency>
+            <dependency>
+              <artifactId>org.eclipse.equinox.p2.core.feature</artifactId>
+              <type>eclipse-feature</type>
+            </dependency>
+          </dependencies>
+          <applicationArgs>
+            <applicationArg>-application</applicationArg>
+            <applicationArg>org.eclipse.cbi.targetplatform.tpd.converter</applicationArg>
+            <applicationArg>sites/org.eclipse.tea.repository/eclipse-2024-09.tpd</applicationArg>
+          </applicationArgs>
+        </configuration>
       </plugin>
     </plugins>
   </build>

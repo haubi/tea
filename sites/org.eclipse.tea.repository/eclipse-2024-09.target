@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde?>
+<!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
+<target name="Eclipse 2024-09" sequenceNumber="1744190602">
+  <locations>
+    <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="com.google.gson" version="2.11.0"/>
+      <unit id="com.google.guava" version="33.3.0.jre"/>
+      <unit id="com.google.inject" version="7.0.0"/>
+      <unit id="io.github.classgraph.classgraph" version="4.8.174"/>
+      <unit id="com.googlecode.javaewah.JavaEWAH" version="1.2.3"/>
+      <unit id="net.i2p.crypto.eddsa" version="0.3.0"/>
+      <unit id="org.aopalliance" version="1.0.0.v20230720-0728"/>
+      <unit id="org.apache.commons.codec" version="1.14.0.v20221112-0806"/>
+      <unit id="org.apache.commons.io" version="2.8.0.v20210415-0900"/>
+      <unit id="org.apache.commons.logging" version="1.2.0"/>
+      <unit id="org.apache.httpcomponents.httpclient" version="4.5.14"/>
+      <unit id="org.apache.httpcomponents.httpcore" version="4.4.16"/>
+      <unit id="org.apache.log4j" version="1.2.25"/>
+      <unit id="org.apache.sshd.osgi" version="2.13.2"/>
+      <unit id="org.apache.sshd.sftp" version="2.13.2"/>
+      <unit id="org.eclipse.draw2d.feature.group" version="3.21.0.202409021815"/>
+      <unit id="org.eclipse.e4.ui.progress" version="0.4.600.v20240606-1020"/>
+      <unit id="org.eclipse.e4.tools.emf.ui" version="4.8.500.v20240801-2123"/>
+      <unit id="org.eclipse.e4.tools.services" version="4.10.600.v20240801-2123"/>
+      <unit id="org.eclipse.ecf" version="3.11.0.v20240812-1535"/>
+      <unit id="org.eclipse.ecf.identity" version="3.10.0.v20240812-1535"/>
+      <unit id="org.eclipse.ecf.filetransfer" version="5.1.103.v20230705-0614"/>
+      <unit id="org.eclipse.egit.feature.group" version="7.0.0.202409031743-r"/>
+      <unit id="org.eclipse.emf.feature.group" version="2.39.0.v20240731-0952"/>
+      <unit id="org.eclipse.jgit.feature.group" version="7.0.0.202409031743-r"/>
+      <unit id="org.eclipse.jgit.gpg.bc.feature.group" version="7.0.0.202409031743-r"/>
+      <unit id="org.eclipse.jgit.http.apache.feature.group" version="7.0.0.202409031743-r"/>
+      <unit id="org.eclipse.jgit.lfs.feature.group" version="7.0.0.202409031743-r"/>
+      <unit id="org.eclipse.jgit.ssh.apache.feature.group" version="7.0.0.202409031743-r"/>
+      <unit id="org.eclipse.m2e.feature.feature.group" version="2.6.2.20240828-1954"/>
+      <unit id="org.eclipse.sdk.feature.group" version="4.33.0.v20240903-0618"/>
+      <unit id="org.eclipse.xtext.sdk.feature.group" version="2.36.0.v20240825-0714"/>
+      <unit id="org.objectweb.asm" version="9.7.0"/>
+      <unit id="org.objectweb.asm.tree" version="9.7.0"/>
+      <unit id="org.sat4j.core" version="2.3.6.v20201214"/>
+      <unit id="org.sat4j.pb" version="2.3.6.v20201214"/>
+      <unit id="slf4j.api" version="2.0.16"/>
+      <unit id="slf4j.nop" version="2.0.16"/>
+      <repository location="https://download.eclipse.org/releases/2024-09/"/>
+    </location>
+    <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.eclipse.ease.feature.feature.group" version="0.8.0.I202105061131"/>
+      <unit id="org.eclipse.ease.lang.python.feature.feature.group" version="0.8.0.I202104091425"/>
+      <unit id="org.eclipse.ease.ui.feature.feature.group" version="0.8.0.I202105111204"/>
+      <unit id="org.eclipse.ease.python.jython.feature.feature.group" version="0.8.0.I202104061519"/>
+      <repository location="https://download.eclipse.org/ease/release/0.8.0/"/>
+    </location>
+    <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="org.jython" version="2.7.0.I202104151016"/>
+      <repository location="https://download.eclipse.org/tracecompass.incubator/2021-06/master/rcp-repository"/>
+    </location>
+    <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
+      <unit id="com.wamas.ide.launching.feature.feature.group" version="0.5.0.N202402221544"/>
+      <repository location="https://github.com/ssi-schaefer/lcdsl/releases/download/0.5.0/"/>
+    </location>
+  </locations>
+  <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-21"/>
+</target>

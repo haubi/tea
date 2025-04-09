@@ -53,7 +53,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.e4.ui.workbench,
  org.eclipse.emf.ecore,
  org.eclipse.e4.core.di.extensions
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Import-Package: javax.annotation,
  org.eclipse.e4.ui.css.swt.theme,

@@ -1,0 +1,67 @@
+target "Eclipse 2024-09"
+
+with source requirements
+environment JavaSE-21
+
+location "https://download.eclipse.org/releases/2024-09/202409111000/" {
+	com.google.gson
+	com.google.guava [33,34)
+	com.google.inject
+
+	io.github.classgraph.classgraph
+	com.googlecode.javaewah.JavaEWAH
+	net.i2p.crypto.eddsa
+
+	org.aopalliance
+
+	org.apache.commons.codec
+	org.apache.commons.io
+	org.apache.commons.logging
+	org.apache.httpcomponents.httpclient
+	org.apache.httpcomponents.httpcore
+	org.apache.log4j
+	org.apache.sshd.osgi
+	org.apache.sshd.sftp
+
+	org.eclipse.draw2d.feature.group
+	org.eclipse.e4.ui.progress
+	org.eclipse.e4.tools.emf.ui
+	org.eclipse.e4.tools.services
+	org.eclipse.ecf
+	org.eclipse.ecf.identity
+	org.eclipse.ecf.filetransfer
+	org.eclipse.egit.feature.group
+	org.eclipse.emf.feature.group
+	org.eclipse.jgit.feature.group
+	org.eclipse.jgit.gpg.bc.feature.group
+	org.eclipse.jgit.http.apache.feature.group
+	org.eclipse.jgit.lfs.feature.group
+	org.eclipse.jgit.ssh.apache.feature.group
+	org.eclipse.m2e.feature.feature.group
+	org.eclipse.sdk.feature.group
+	org.eclipse.xtext.sdk.feature.group
+
+	org.objectweb.asm
+	org.objectweb.asm.tree
+
+	org.sat4j.core
+	org.sat4j.pb
+
+	slf4j.api
+	slf4j.nop
+}
+
+location "https://download.eclipse.org/ease/release/0.8.0/" {
+	org.eclipse.ease.feature.feature.group
+	org.eclipse.ease.lang.python.feature.feature.group
+	org.eclipse.ease.ui.feature.feature.group
+	org.eclipse.ease.python.jython.feature.feature.group
+}
+
+location "https://download.eclipse.org/tracecompass.incubator/2021-06/master/rcp-repository" {
+	org.jython
+}
+
+location "https://github.com/ssi-schaefer/lcdsl/releases/download/0.5.0/" {
+	com.wamas.ide.launching.feature.feature.group
+}

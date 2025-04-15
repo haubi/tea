@@ -62,6 +62,6 @@ location "https://download.eclipse.org/tracecompass.incubator/2021-06/master/rcp
 	org.jython
 }
 
-location "https://github.com/ssi-schaefer/lcdsl/releases/download/0.5.0/" {
+location "https://github.com/ssi-schaefer/lcdsl/releases/download/1.0.0/" {
 	com.wamas.ide.launching.feature.feature.group
 }

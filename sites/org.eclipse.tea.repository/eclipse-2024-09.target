@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/eclipse-cbi/targetplatform-dsl -->
-<target name="Eclipse 2024-09" sequenceNumber="1744717416">
+<target name="Eclipse 2024-09" sequenceNumber="1745368150">
   <locations>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="com.google.gson" version="2.11.0"/>
@@ -56,7 +56,7 @@
       <repository location="https://download.eclipse.org/tracecompass.incubator/2021-06/master/rcp-repository"/>
     </location>
     <location includeMode="planner" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="com.wamas.ide.launching.feature.feature.group" version="1.0.0.202504011345-UNOFFICIAL"/>
+      <unit id="com.wamas.ide.launching.feature.feature.group" version="1.0.0.202504011345"/>
       <repository location="https://github.com/ssi-schaefer/lcdsl/releases/download/1.0.0/"/>
     </location>
   </locations>
